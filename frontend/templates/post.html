@@ -1,0 +1,121 @@
+
+<div class="ProfileAndPost">
+    <div class="postInfo">
+        <a href="/?type=profile&username={{.Post.UserName}}">
+            <div class="authorImage">
+                <img src="https://api.multiavatar.com/{{.Post.UserName}}.svg" alt="">
+            </div>
+        </a>
+        <div class="authorInfo">
+            <span class="Title">{{.Post.Title}}</span>
+            <div class="authorContain">
+                <a href="/?type=profile&username={{.Post.UserName}}">
+                    <span class="authorName">@{{.Post.UserName}}</span>
+                </a>
+                <span class="material-symbols-outlined" id="timer">schedule</span>
+                <span class="postDate" data-time="{{.Post.CreatedAt}}">{{.Post.CreatedAt}}</span>
+            </div>
+        </div>
+        <span class="HideDesktop material-symbols-outlined close-post DisableUserSelect">
+            close
+        </span>
+        <!-- <div class="CommentButton">
+            <span class="CommentButtonTitle">
+                Comments
+            </span>
+            <span class="material-symbols-outlined">
+                swap_horiz
+                </span>
+        </div> -->
+    </div>
+    <div class="postContent">
+        <pre>{{.Post.Content}}</pre>
+        <!-- TODO IMAGES -->
+    </div>
+    <div class="PostReactionData">
+        <div class="LikeButtons">
+            <!-- TODO .POST.Liked Doesnt Work -->
+            <div isPost="true" id="{{.Post.ID}}" class='like DisableUserSelect {{if eq .Post.Liked "1"}}FILL{{end}}'>
+                <i class="material-symbols-outlined">thumb_up</i>
+                <span>{{.Post.LikeCount}}</span>
+            </div>
+            <div isPost="true" id="{{.Post.ID}}" class='dislike DisableUserSelect {{if eq .Post.Liked "0"}}FILL{{end}}'>
+                <i class="material-symbols-outlined">thumb_down</i>
+                <span> {{.Post.DislikeCount}}</span>
+            </div>
+        </div>
+        <div class="CommentButtons CommentButton">
+            <div class="DisableUserSelect">
+                <span class="material-symbols-outlined" id="{{.Post.ID}}">comment</span>
+                <span class="commentCount">
+                    {{.Post.CommentCount}}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="postComments">
+    <div class="postInfo center">
+        <div class="commentHeader">
+            <span class="Title">Comments</span>
+            <div class="PostButton">
+                <span class="PostButtonTitle">
+                    Post
+                </span>
+                <span class="material-symbols-outlined">
+                    swap_horiz
+                    </span>
+            </div>
+            <span class="material-symbols-outlined close-post DisableUserSelect">
+                close
+            </span>
+        </div>
+    </div>
+    <div class="Comments">
+        {{ range .Comments }}
+        
+        <div class="commentCard DisableUserSelect"><!-- Working Part -->
+            <a href="/?type=profile&username={{.UserName}}">
+            <div class="commentAuthorImage">
+                <img src="https://api.multiavatar.com/{{.UserName}}.svg" alt="">
+                <!-- TODO ADD PROPER link: -->
+            </div>
+            </a>
+            <div class="commentAuthor">
+                <div class="commentAuthorInfo">
+                    <div class="poster-info">
+                        <a href="/?type=profile&username={{.UserName}}"><span class="commentAuthorName">@{{.UserName}}</span></a>
+                        <div class="area-of-time">
+                            <span class="material-symbols-outlined" id="timer">schedule</span>
+                            <span class="commentTime" data-time="{{.CreatedAt}}"></span>
+                        </div>
+                    </div>
+                    <div class="commentReaction DisableUserSelect">
+                        <span isPost="false" class='like post  {{if eq .Liked "1"}}FILL{{end}}' id="{{.ID}}">
+                            <i class="material-symbols-outlined">
+                                thumb_up
+                            </i>
+                            <span>{{.LikeCount}}</span>
+                        </span>
+                        <span isPost="false" class='dislike  {{if eq .Liked "0"}}FILL{{end}}' id="{{.ID}}">
+                            <i class="material-symbols-outlined">thumb_down</i>
+                            <span>{{.DislikeCount}}</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="commentInfo">
+                    <p class="commentData collapse">{{.Content}}</p>
+                </div>
+            </div>
+        </div>
+        {{ end }}
+    </div>
+    <div class="commentContainer">
+        <div class="CommentErrorMessage">
+        </div>
+        <div class="commentInput">
+            <input type="text" name="commment" id="{{.Post.ID}}" placeholder="Comment" required maxlength="255">
+            <span class="material-symbols-outlined send-comment DisableUserSelect">send</span>
+        </div>
+    </div>
+</div>
