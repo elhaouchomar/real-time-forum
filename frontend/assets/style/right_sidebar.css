@@ -64,10 +64,6 @@
     transition: rotate .5s;
 }
 
-.rotate {
-    rotate: 180deg;
-    transition: rotate .5s;
-}
 .main {
     font-size: 25px;
     transition: all 0.5s;
@@ -147,13 +143,7 @@ span.postCounts a {
 .display {
     display: flex !important;
 }
-.Categories {
-    display: none;
-    flex-direction: column;
-    opacity: 1;
-    animation: opc 2s;
-    transition: all 1s;
-}
+
 .trending-item {
     display: flex;
     flex-direction: column;
