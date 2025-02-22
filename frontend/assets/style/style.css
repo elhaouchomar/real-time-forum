@@ -1395,20 +1395,6 @@ main {
     width: fit-content;
 }
 
-.ErrorMessage {
-    display: none;
-    justify-content: center;
-    color: #ffffff;
-    /* background-color: #ff5c5c; */
-    /* width: fit-content; */
-    transition: all 0.5s;
-    position: absolute;
-    right: 0px;
-    /* bottom: 0px; */
-    top: 50px;
-    margin: 10px;
-}
-
 .MsgContainer {
     background-color: #ff6666;
     width: fit-content;

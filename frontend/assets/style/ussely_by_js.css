@@ -1,0 +1,10 @@
+.dropdown i,
+.comment {
+    color: var(--BlueGreen);
+    text-shadow: var(--textshadow);
+}
+
+.FILL {
+    font-variation-settings: 'FILL' 1;
+    color: var(--BlueDarker) !important;
+}

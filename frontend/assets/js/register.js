@@ -82,3 +82,47 @@ user.addEventListener("input", validateForm);
 email.addEventListener("input", validateForm);
 
 confirmPass.addEventListener("input", validateForm);
+
+
+// shoz password
+document.querySelectorAll('.toggle-password').forEach(toggle => {
+    toggle.addEventListener('click', function () {
+        const input = this.previousElementSibling;
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+        this.textContent = type === 'password' ? 'visibility_off' : 'visibility';
+    });
+});
+
+
+function switchForm(type) {
+    const loginForm = document.querySelector('.sign-in');
+    const registerForm = document.querySelector('.sign-up');
+    const buttons = document.querySelectorAll('.mobile-switch button');
+
+    // Remove active class from all forms
+    [loginForm, registerForm].forEach(form => {
+        form.classList.remove('active-form');
+    });
+
+    // Add active class to selected form
+    if (type === 'login') {
+        loginForm.classList.add('active-form');
+    } else {
+        registerForm.classList.add('active-form');
+    }
+
+    // Update button states
+    buttons.forEach(button => {
+        button.classList.remove('active');
+        if (button.textContent.toLowerCase() === type) {
+            button.classList.add('active');
+        }
+    });
+}
+// Initialize mobile view
+window.addEventListener('load', () => {
+    if (window.innerWidth <= 768) {
+        switchForm('login');
+    }
+});

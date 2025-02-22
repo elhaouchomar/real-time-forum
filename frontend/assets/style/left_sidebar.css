@@ -1,0 +1,123 @@
+.sidebar-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 20%;
+    height: 100%;
+    position: fixed;
+    left: 2.5%;
+    border-right: solid 0.3px var(--WhiteBlue);
+    height: 100%;
+}
+
+.nav-links {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    height: 60%;
+    justify-content: space-between;
+}
+
+.nav-links.margin-top {
+    margin-top: 20px;
+}
+
+.nav-links a {
+    display: flex;
+    align-items: center;
+    /* font-size: 2rem; */
+    padding: 8px 25px 8px 8px;
+    color: var(--Black);
+}
+
+.nav-links a i {
+    font-size: 2.3rem;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.nav-links a:hover {
+    background-color: #41c6d3;
+    color: var(--White);
+    border-radius: 9999px;
+    width: 90%;
+}
+
+.nav-links a.selected {
+    background-color: var(--BlueDarker);
+    color: var(--White);
+    border-radius: 9999px;
+    width: 90%;
+}
+
+.disabled {
+    color: var(--GreeyD);
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: .6;
+}
+
+
+.disabled:hover {
+    background-color: transparent !important;
+    color: var(--GreeyD);
+}
+.theme-toggle-mobile{
+    display: none !important;
+}
+
+.theme{
+    color: var(--Black);
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.tweet-button {
+    background-color: var(--BlueDarker);
+    width: 70%;
+    border-radius: 99px;
+    margin-top: 15px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 10px;
+    height: 45px;
+    transition-duration: 0.2s;
+}
+
+.tweet-button:hover {
+    background-color: var(--BlueGreen);
+
+}
+
+
+
+@media only screen and (min-width: 768px) {
+    .sidebar-left {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        left: -100%;
+        transition: left 0.75s;
+        z-index: 12;
+        background-color: var(--GreeyTransparant);
+        border: none;
+    }
+
+}
+
+@media only screen and (max-width: 768px) {
+    .sidebar-left {
+        display: none;
+    }
+    .nav-links.margin-top {
+        margin-top: 0px;
+        background-color: var(--WhiteBlue);
+    }
+    .theme-toggle-mobile{
+        display: flex !important;
+    }
+}
