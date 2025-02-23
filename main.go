@@ -65,9 +65,9 @@ func main() {
 
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("./frontend/assets"))))
 
-	fmt.Println("Server listening on :8080...")
-	fmt.Println("http://localhost:8080")
-	err := http.ListenAndServe(":8080", nil)
+	fmt.Println("Server listening on :9090...")
+	fmt.Println("http://localhost:9090")
+	err := http.ListenAndServe(":9090", nil)
 	if err != nil {
 		panic(err.Error())
 	}

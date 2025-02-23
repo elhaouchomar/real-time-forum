@@ -114,12 +114,6 @@ function createPostContent(post) {
   return postContent;
 }
 
-function createSeeMore() {
-  const seeMore = document.createElement("span");
-  seeMore.className = "see-more";
-  seeMore.textContent = "See More";
-  return seeMore;
-}
 
 function createHashtag(post) {
   const hashtag = document.createElement("div");

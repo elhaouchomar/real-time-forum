@@ -26,16 +26,57 @@ document.addEventListener("DOMContentLoaded", () => {
     .addEventListener("submit", sendMessage);
 });
 
-const ignore = document.getElementById("message");
-const post = document.getElementById("posts");
-const right_side_bare = document.getElementById("categories");
-const area_msg = document.getElementById("area-msg");
 
-ignore.addEventListener("click", () => {
-  area_msg.style.display = "flex";
-  right_side_bare.style.display = "none";
-  post.style.display = "none";
-});
+  // Choose send messages
+  const ignore = document.getElementById("message");
+  const post = document.getElementById("posts");
+  const right_side_bare = document.getElementById("categories");
+  const area_msg = document.getElementById("area-msg");
+  const notif = document.querySelector(".notif");
+
+  document.addEventListener("click", (event) => {
+    const messageElement = event.target.closest("#message");
+    if (messageElement) {
+      notif.style.display = "none";
+      area_msg.style.display = "flex";
+      right_side_bare.style.display = "none";
+      post.style.display = "none";
+    }
+  });
+
+  // Change friend
+  if (window.innerWidth <= 780) {
+  const friends_list = document.querySelector(".friends-list");
+  const chat_box = document.querySelector(".chat-box");
+  const friend = document.querySelector(".friend");
+  const back = document.querySelector(".back");
+  const close_message = document.querySelector(".close-message");
+
+  if (friend) {
+    friend.addEventListener("click", () => {
+      friends_list.style.display = "none";
+      chat_box.style.display = "flex";
+    });
+  }
+
+  if (back) {
+    back.addEventListener("click", () => {
+      friends_list.style.display = "block";
+      chat_box.style.display = "none";
+    });
+  }
+
+  if (close_message) {
+    close_message.addEventListener("click", () => {
+      area_msg.style.display = "none";
+      post.style.display = "flex";
+      notif.style.display = "flex";
+    });
+  }
+}
+
+
+
 
 // SCROLL TO BOTTOM
 const messageInput = document.getElementById("messageInput");

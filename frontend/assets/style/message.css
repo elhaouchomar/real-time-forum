@@ -120,6 +120,8 @@
 }
 
 .friends-header {
+  display: flex;
+  justify-content: space-between;
   height: 60px;
   padding: 15px;
   text-align: center;
@@ -192,31 +194,39 @@
   color: white;
 }
 
+.close-message {
+  display: none;
+}
+
 @media only screen and (max-width: 780px) {
-  .chat-footer,
   .chat-box {
+    display: none;
+    width: 100%;
+  }
+  .chat-footer {
+    height: 60px;
     width: 100%;
   }
   .chat-container {
     width: 100%;
-    margin-top: 40px;
   }
   .back {
     display: block;
     margin-right: 10px;
   }
   .friends-list {
-    display: none;
+    /* display: none; */
+    width: 100%;
 
   }
   .msg-input {
     width: 80%;
     margin: 0px 15px 40px;
   }
-  
+  .close-message {
+    display: block;
+  }
 }
-
-
 /* messages */
 .messages-container {
   max-width: 800px;
