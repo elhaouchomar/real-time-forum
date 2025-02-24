@@ -1,7 +1,5 @@
-let popup = NaN;
 const UrlParams = new URLSearchParams(window.location.search);
 const sidebardLeft = document.querySelector(".sidebar-left");
-const menuIcon = document.querySelector(".menu");
 const windowMedia = window.matchMedia("(min-width: 768px)");
 const type = UrlParams.get("type");
 const username = UrlParams.get("username");
@@ -27,12 +25,8 @@ async function fetchPosts(offset, type) {
     handleLikes();
     removeReadPostListener();
     readPost();
-    removeShowLeftSidebarMobileListener();
-    showLeftSidebarMobile();
-    removeSeeMoreListener();
-    seeMore();
   } catch (error) {
-    window.location.href = `/error?code=404&message=Page Not Found`;
+    console.log(error);
   }
 }
 
@@ -77,7 +71,6 @@ function createPostDetails(post) {
   postDetails.append(
     createRowTweet(post),
     createPostContent(post),
-    createSeeMore(),
     createHashtag(post),
     createPostFooter(post)
   );
@@ -112,13 +105,6 @@ function createPostContent(post) {
   postParagraph.innerText = post.post_content;
   postContent.appendChild(postParagraph);
   return postContent;
-}
-
-function createSeeMore() {
-  const seeMore = document.createElement("span");
-  seeMore.className = "see-more";
-  seeMore.textContent = "See More";
-  return seeMore;
 }
 
 function createHashtag(post) {
@@ -184,112 +170,6 @@ function infiniteScroll() {
         await fetchPosts(offset, type);
       }
     }, 1000);
-  });
-}
-
-function popUp() {
-  const popupContainer = document.getElementById("popupContainer");
-  const popupHTML = `
-        <div id="popup" class="popup">
-            <div class="popup-content">
-                <h1>Thanks for trying</h1>
-                <p>Log in or sign up to add comments, likes, dislikes, and more.</p>
-                <a href="/login"><button>Log in</button></a>
-                <a href="/register"><button>Sign up</button></a>
-                <span class="logged-out">Stay logged out</span>
-            </div>
-        </div>
-    `;
-  popupContainer.innerHTML = popupHTML;
-  popup = document.getElementById("popup");
-  popup.style.display = "flex";
-  popupContainer.addEventListener("click", (e) => {
-    if (e.target === popup || e.target.classList.contains("logged-out")) {
-      popup.style.display = "none";
-    }
-  });
-}
-
-function handleNavMobileClick() {
-  document.querySelectorAll(".nav-mobile a div").forEach(function (div) {
-    div.addEventListener("click", function () {
-      document.querySelectorAll(".nav-mobile a div").forEach(function (item) {
-        item.classList.remove("clicked");
-      });
-      this.classList.add("clicked");
-    });
-  });
-}
-
-function postControlList() {
-  const dropdown = document.querySelectorAll(
-    ".dropdown i, .dropdown .ProfileImage"
-  );
-  dropdown.forEach((drop) => {
-    let contentSibling = drop.nextElementSibling;
-    drop.addEventListener("click", () => {
-      contentSibling.classList.toggle("show");
-    });
-    document.addEventListener("click", function (event) {
-      if (
-        !contentSibling.contains(event.target) &&
-        !drop.contains(event.target) &&
-        contentSibling.classList.contains("show")
-      ) {
-        contentSibling.classList.remove("show");
-      }
-    });
-  });
-}
-
-function showAndHideSideBar(e) {
-  const commentSection = document.querySelector(".postComments");
-  const postSection = document.querySelector(".ProfileAndPost");
-  if (e.matches) {
-    sidebardLeft.style.left = "2.5%";
-    if (commentSection) commentSection.style.display = "flex";
-    if (postSection) postSection.style.display = "flex";
-  } else {
-    if (commentSection) commentSection.style.display = "none";
-    if (postSection) postSection.style.display = "flex";
-    sidebardLeft.style.left = "-100%";
-  }
-}
-
-function MenuIcon() {
-  sidebardLeft.style.left = sidebardLeft.style.left === "0%" ? "-100%" : "0%";
-}
-
-function removeShowLeftSidebarMobileListener() {
-  menuIcon.removeEventListener("click", MenuIcon);
-  windowMedia.removeEventListener("change", showAndHideSideBar);
-}
-
-function showLeftSidebarMobile() {
-  windowMedia.addEventListener("change", showAndHideSideBar);
-  menuIcon.addEventListener("click", MenuIcon);
-}
-
-function removeSeeMoreListener() {
-  document.querySelectorAll(".see-more").forEach((tweetText) => {
-    tweetText.removeEventListener("click", seeMore);
-  });
-}
-
-function seeMore() {
-  document.querySelectorAll(".see-more").forEach((tweetText) => {
-    const seeMoreLink = tweetText;
-    const paragraph = tweetText.previousElementSibling.querySelector("p");
-    if (paragraph.scrollHeight <= 50) {
-      seeMoreLink.style.display = "none";
-    }
-    seeMoreLink.addEventListener("click", () => {
-      tweetText.previousElementSibling.classList.toggle("expanded");
-      seeMoreLink.textContent =
-        tweetText.previousElementSibling.classList.contains("expanded")
-          ? "See Less"
-          : "See More";
-    });
   });
 }
 
@@ -451,13 +331,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 infiniteScroll();
 fetchPosts(0, type);
-postControlList();
 readPost();
-showLeftSidebarMobile();
-seeMore();
 handleNavMobileClick();
-
-
 
 // static/js/chat.js
 // websockets
@@ -511,122 +386,3 @@ send.addEventListener("click", () => {
     messagesContainer.appendChild(messageElement);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 });
-
-
-
-
-
-// // static/js/chat.js
-// let ws;
-// let selectedUserId = null;
-// const messagesArea = document.getElementById('messages');
-// const messageInput = document.getElementById('messageInput');
-// const sendButton = document.getElementById('sendButton');
-
-// function connectWebSocket() {
-//     ws = new WebSocket(`ws://${window.location.host}/ws`);
-    
-//     ws.onopen = () => {
-//         console.log('Connected to chat server');
-//         loadOnlineUsers();
-//     };
-
-//     ws.onmessage = (event) => {
-//         const message = JSON.parse(event.data);
-//         handleIncomingMessage(message);
-//     };
-
-//     ws.onclose = () => {
-//         console.log('Disconnected from chat server');
-//         setTimeout(connectWebSocket, 3000); // Reconnect after 3 seconds
-//     };
-// }
-
-// function handleIncomingMessage(message) {
-//     if (message.type === 'status') {
-//         updateUserStatus(message);
-//         return;
-//     }
-
-//     if (message.receiver_id !== 0 && message.sender_id !== selectedUserId && 
-//         message.receiver_id !== currentUserId) {
-//         return;
-//     }
-
-//     appendMessage(message);
-// }
-
-// function appendMessage(message) {
-//     const messageDiv = document.createElement('div');
-//     messageDiv.className = `message ${message.sender_id === currentUserId ? 'sent' : 'received'}`;
-    
-//     const time = new Date(message.timestamp).toLocaleTimeString([], {
-//         hour: '2-digit',
-//         minute: '2-digit'
-//     });
-
-//     messageDiv.innerHTML = `
-//         <div>${message.content}</div>
-//         <div class="message-time">${time}</div>
-//     `;
-    
-//     messagesArea.appendChild(messageDiv);
-//     messagesArea.scrollTop = messagesArea.scrollHeight;
-// }
-
-// function updateUserStatus(message) {
-//     const userElement = document.querySelector(`#user-${message.sender_id}`);
-//     if (userElement) {
-//         const statusDot = userElement.querySelector('.status-dot');
-//         const isOnline = message.content.includes('online');
-//         statusDot.className = `status-dot ${isOnline ? 'online' : 'offline'}`;
-//     }
-// }
-
-// function loadChatHistory(userId) {
-//     selectedUserId = userId;
-//     fetch(`/api/chat/history?user_id=${userId}`)
-//         .then(response => response.json())
-//         .then(messages => {
-//             messagesArea.innerHTML = '';
-//             messages.forEach(message => appendMessage(message));
-//         })
-//         .catch(error => console.error('Error loading chat history:', error));
-// }
-
-// function sendMessage() {
-//     const content = messageInput.value.trim();
-//     if (!content || !selectedUserId) return;
-
-//     const message = {
-//         content: content,
-//         receiver_id: selectedUserId,
-//         type: 'message'
-//     };
-
-//     ws.send(JSON.stringify(message));
-//     messageInput.value = '';
-// }
-
-// // Event Listeners
-// sendButton.addEventListener('click', sendMessage);
-// messageInput.addEventListener('keypress', (e) => {
-//     if (e.key === 'Enter') {
-//         sendMessage();
-//     }
-// });
-
-// document.querySelectorAll('.friend').forEach(friend => {
-//     friend.addEventListener('click', () => {
-//         const userId = friend.getAttribute('data-user-id');
-//         loadChatHistory(userId);
-        
-//         // Update UI to show selected chat
-//         document.querySelectorAll('.friend').forEach(f => 
-//             f.classList.remove('selected'));
-//         friend.classList.add('selected');
-//     });
-// });
-
-// // Initialize WebSocket connection
-// connectWebSocket();

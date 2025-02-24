@@ -9,10 +9,6 @@ html {
     scroll-behavior: smooth;
 }
 
-.FILL {
-    font-variation-settings: 'FILL' 1;
-    color: var(--BlueDarker) !important;
-}
 
 .ProfileAndPost {
     display: flex;

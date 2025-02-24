@@ -89,13 +89,6 @@
     padding: 20px 0px 0px 0px;
 }
 
-.ProfileImage {
-    width: 50px;
-    height: 50px;
-    background-size: 46px;
-    background-repeat: no-repeat;
-
-}
 .profileName {
     color: var(--BlueDarker);
     font-weight: 600;
@@ -154,9 +147,6 @@ span.postCounts a {
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.5s ease-in-out;
-}
-.trending-item:hover, .trending-item:hover span{
-    /* background-color: var(--BlueGreen); */
 }
 .trending-item span {
     font-size: 0.9rem;
