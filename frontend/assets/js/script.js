@@ -304,7 +304,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   setInterval(updateAllTimes, 60000);
 });
-
 infiniteScroll();
 fetchPosts(0, type);
 readPost();

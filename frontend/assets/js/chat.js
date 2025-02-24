@@ -17,16 +17,6 @@ function appendMessage(message) {
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-
-// Add Message
-document.addEventListener("DOMContentLoaded", () => {
-  connectWebSocket();
-  document
-    .getElementById("messageForm")
-    .addEventListener("submit", sendMessage);
-});
-
-
   // Choose send messages
   const ignore = document.getElementById("message");
   const post = document.getElementById("posts");
@@ -74,9 +64,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 }
-
-
-
 
 // SCROLL TO BOTTOM
 const messageInput = document.getElementById("messageInput");
@@ -127,7 +114,7 @@ messageInput.addEventListener("keypress", (e) => {
 let ws;
 
 function connectWebSocket() {
-    ws = new WebSocket("ws://localhost:8080/ws"); // Correct WebSocket URL with quotes
+    ws = new WebSocket("ws://localhost:8080/ws"); // Ensure WebSocket server is running and accessible
     ws.onopen = () => {
         console.log("Connected to chat");
     };
@@ -150,27 +137,4 @@ function connectWebSocket() {
         console.log(event);
     };
 }
-
 connectWebSocket(); // Establish the WebSocket connection
-
-const send = document.getElementById("send");
-send.addEventListener("click", () => {
-    let message = document.getElementById("msg").value;
-    if (message === "") {
-        return;
-    }
-    ws.send(message);
-    document.getElementById("msg").value = "";
-    const messagesContainer = document.querySelector(".messages-list");
-    const messageElement = document.createElement("div");
-    messageElement.className = "message-card";
-    messageElement.innerHTML = `
-        <div class="message-header" style="display: flex; justify-content: space-between">
-            <span class="message-author">You</span>
-            <span class="message-time">${new Date().toLocaleTimeString()}</span>
-        </div>
-        <div class="message-content">${message}</div>
-    `;
-    messagesContainer.appendChild(messageElement);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-});
