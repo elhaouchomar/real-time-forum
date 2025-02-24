@@ -5,8 +5,8 @@
   width: calc(100% - 22.5%);
   height: 100vh;
   overflow: hidden;
-  background: #1e1e1e;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+  background: var(--White);
+  box-shadow: var(--shadow);
 }
 
 .chat-box {
@@ -14,7 +14,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #2a2a2a;
+  background: var(--WhiteBlue);
 }
 
 .chat-header {
@@ -22,9 +22,9 @@
   display: flex;
   align-items: center;
   padding: 15px;
-  border-bottom: 1px solid #444;
-  background: #333;
-  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.3);
+  border-bottom: var(--border);
+  background: var(--Greey);
+  box-shadow: var(--shadowLittle);
 }
 
 .profile-img {
@@ -32,19 +32,18 @@
   height: 50px;
   border-radius: 50%;
   margin-right: 10px;
-  border: 2px solid #4caf50;
+  border: 2px solid var(--BlueGreen);
 }
 
 .messages-area {
   flex: 1;
-  /* padding: 15px; */
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   margin-bottom: 173px;
 }
 
-.message {
+.messages {
   max-width: 75%;
   padding: 10px;
   margin: 8px 0;
@@ -53,37 +52,35 @@
 }
 
 .received {
-  background: #333;
-  color: white;
+  background: var(--Greey);
+  color: var(--Black);
   align-self: flex-start;
   border-bottom-left-radius: 0;
   margin: 15px;
 }
 
 .sent {
-  background: #0084ff;
-  color: white;
+  background: var(--BlueGreen);
+  color: var(--White);
   align-self: flex-end;
   border-bottom-right-radius: 0;
-  margin-left: auto;
-  min-width: 55px;
   margin: 15px;
+  min-width: 55px;
 }
 
 .message-time {
   font-size: 10px;
-  color: #bbb;
+  color: var(--GreeyD);
   position: absolute;
   bottom: -18px;
   right: 5px;
 }
 
 .chat-footer {
-  /* display: flex; */
   align-items: center;
-  padding: 10px 0px 10px;
-  background: #222;
-  border-top: 1px solid #444;
+  padding: 10px 0;
+  background: var(--WhiteB);
+  border-top: var(--border);
   position: absolute;
   justify-content: space-between;
   bottom: 0;
@@ -91,31 +88,28 @@
 }
 
 .msg-input {
-  /* flex: 1; */
-  /* height: 40px; */
   padding: 10px;
   border-radius: 20px;
-  border: 1px solid #555;
-  background: #333;
-  color: white;
+  border: 1px solid var(--GreeyD);
+  background: var(--Greey);
+  color: var(--Black);
   outline: none;
-  margin: 0px 15px 80px;
+  margin: 0 15px 80px;
   width: 86%;
 }
 
 .send-btn {
-  /* margin-left: 10px; */
   background: transparent;
   border: none;
-  color: #0084ff;
+  color: var(--BlueGreen);
   cursor: pointer;
 }
 
 .friends-list {
   width: 35%;
   height: 100%;
-  border-left: 1px solid #444;
-  background: #242424;
+  border-left: var(--border);
+  background: var(--WhiteBlue);
   overflow-y: auto;
 }
 
@@ -125,21 +119,21 @@
   height: 60px;
   padding: 15px;
   text-align: center;
-  border-bottom: 1px solid #444;
-  background: #333;
+  border-bottom: var(--border);
+  background: var(--Greey);
 }
 
 .friend {
   display: flex;
   align-items: center;
   padding: 10px;
-  border-bottom: 1px solid #444;
+  border-bottom: var(--border);
   cursor: pointer;
   transition: background 0.3s;
 }
 
 .friend:hover {
-  background: #3a3a3a;
+  background: var(--BlueGreenWhite);
 }
 
 .friend-avatar {
@@ -153,21 +147,21 @@
   position: absolute;
   bottom: 0;
   right: 0;
-  border: 2px solid #242424;
+  border: 2px solid var(--WhiteBlue);
   margin: 12px;
 }
 
 .status-dot.online {
-  background: #4caf50;
+  background: var(--BlueGreen);
 }
 
 .status-dot.offline {
-  background: #666;
+  background: var(--GreeyD);
 }
 
 .friend-info {
   margin-left: 10px;
-  color: white;
+  color: var(--Black);
 }
 
 .friend-name {
@@ -176,22 +170,27 @@
 
 .last-message {
   font-size: 12px;
-  color: #999;
+  color: var(--GreeyD);
 }
 
 .back {
   display: none;
 }
+
 .notif {
   height: 40px;
   top: 0;
   position: fixed;
-  background-color: #0f172a;
+  background-color: var(--WhiteBlue);
   width: 100%;
   display: none;
   justify-content: space-between;
   padding: 8px;
-  color: white;
+  color: var(--White);
+}
+
+.notif .material-symbols-outlined {
+  color: var(--Black);
 }
 
 .close-message {
@@ -215,19 +214,20 @@
     margin-right: 10px;
   }
   .friends-list {
-    /* display: none; */
     width: 100%;
-
   }
   .msg-input {
     width: 80%;
-    margin: 0px 15px 40px;
+    margin: 0 15px 40px;
   }
   .close-message {
     display: block;
   }
+  .notif {
+    display: flex;
+  }
 }
-/* messages */
+
 .messages-container {
   max-width: 800px;
   margin: 20px auto;
@@ -235,11 +235,11 @@
 }
 
 .message-card {
-  background: #fff;
+  background: var(--White);
   border-radius: 8px;
   padding: 15px;
   margin-bottom: 15px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: var(--shadowLittle);
 }
 
 .message-input {
@@ -250,5 +250,5 @@
   width: 100%;
   padding: 10px;
   border-radius: 4px;
-  border: 1px solid #ddd;
+  border: var(--border);
 }

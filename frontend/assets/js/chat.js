@@ -91,7 +91,7 @@ function sendMessage() {
       minute: "2-digit",
     });
     const messageDiv = document.createElement("div");
-    messageDiv.className = "message sent";
+    messageDiv.className = "messages sent";
     messageDiv.innerHTML = `
 <div>${message}</div>
 <div class="message-time">${time}</div>
@@ -121,3 +121,56 @@ messageInput.addEventListener("keypress", (e) => {
 // // Exemple d'utilisation
 // setUserStatus("Sarah-Smith", true); // En ligne
 // setUserStatus("Mike-Johnson", false); // Hors ligne
+
+
+// websockets
+let ws;
+
+function connectWebSocket() {
+    ws = new WebSocket("ws://localhost:8080/ws"); // Correct WebSocket URL with quotes
+    ws.onopen = () => {
+        console.log("Connected to chat");
+    };
+    ws.onmessage = (event) => {
+        console.log("----------------------", event.data);
+        const messagesContainer = document.querySelector(".messages-list");
+        const messageElement = document.createElement("div");
+        messageElement.className = "message-card";
+        messageElement.innerHTML = `
+            <div class="message-header" style="display: flex; justify-content: space-between">
+                <span class="message-author">Unknown Author</span>
+                <span class="message-time">${new Date().toLocaleTimeString()}</span>
+            </div>
+            <div class="message-content">${event.data}</div>
+        `;
+        messagesContainer.appendChild(messageElement);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    };
+    ws.onerror = (event) => {
+        console.log(event);
+    };
+}
+
+connectWebSocket(); // Establish the WebSocket connection
+
+const send = document.getElementById("send");
+send.addEventListener("click", () => {
+    let message = document.getElementById("msg").value;
+    if (message === "") {
+        return;
+    }
+    ws.send(message);
+    document.getElementById("msg").value = "";
+    const messagesContainer = document.querySelector(".messages-list");
+    const messageElement = document.createElement("div");
+    messageElement.className = "message-card";
+    messageElement.innerHTML = `
+        <div class="message-header" style="display: flex; justify-content: space-between">
+            <span class="message-author">You</span>
+            <span class="message-time">${new Date().toLocaleTimeString()}</span>
+        </div>
+        <div class="message-content">${message}</div>
+    `;
+    messagesContainer.appendChild(messageElement);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+});

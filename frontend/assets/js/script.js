@@ -270,30 +270,6 @@ themeToggle.forEach((elem) => {
   });
 });
 
-function handleNavMobileClick() {
-  document.querySelectorAll(".nav-mobile a div").forEach(function (div) {
-    div.addEventListener("click", function () {
-      document.querySelectorAll(".nav-mobile a div").forEach(function (item) {
-        item.classList.remove("clicked");
-      });
-      this.classList.add("clicked");
-    });
-  });
-}
-
-window.addEventListener("load", () => {
-  if (!window.location.hash) {
-    window.location.hash = "#posts";
-  }
-});
-
-window.addEventListener("hashchange", () => {
-  const hash = window.location.hash;
-  document.querySelectorAll("#posts, #categories").forEach((section) => {
-    section.style.display = hash === "#posts" ? "block" : "none";
-  });
-});
-
 function timeAgo(date) {
   const seconds = Math.floor((new Date() - new Date(date)) / 1000);
   if (seconds < 60) return "just now";
@@ -332,57 +308,3 @@ document.addEventListener("DOMContentLoaded", () => {
 infiniteScroll();
 fetchPosts(0, type);
 readPost();
-handleNavMobileClick();
-
-// static/js/chat.js
-// websockets
-let ws;
-
-function connectWebSocket() {
-    ws = new WebSocket("ws://localhost:8080/ws"); // Correct WebSocket URL with quotes
-    ws.onopen = () => {
-        console.log("Connected to chat");
-    };
-    ws.onmessage = (event) => {
-        console.log("----------------------", event.data);
-        const messagesContainer = document.querySelector(".messages-list");
-        const messageElement = document.createElement("div");
-        messageElement.className = "message-card";
-        messageElement.innerHTML = `
-            <div class="message-header" style="display: flex; justify-content: space-between">
-                <span class="message-author">Unknown Author</span>
-                <span class="message-time">${new Date().toLocaleTimeString()}</span>
-            </div>
-            <div class="message-content">${event.data}</div>
-        `;
-        messagesContainer.appendChild(messageElement);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    };
-    ws.onerror = (event) => {
-        console.log(event);
-    };
-}
-
-connectWebSocket(); // Establish the WebSocket connection
-
-const send = document.getElementById("send");
-send.addEventListener("click", () => {
-    let message = document.getElementById("msg").value;
-    if (message === "") {
-        return;
-    }
-    ws.send(message);
-    document.getElementById("msg").value = "";
-    const messagesContainer = document.querySelector(".messages-list");
-    const messageElement = document.createElement("div");
-    messageElement.className = "message-card";
-    messageElement.innerHTML = `
-        <div class="message-header" style="display: flex; justify-content: space-between">
-            <span class="message-author">You</span>
-            <span class="message-time">${new Date().toLocaleTimeString()}</span>
-        </div>
-        <div class="message-content">${message}</div>
-    `;
-    messagesContainer.appendChild(messageElement);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-});
