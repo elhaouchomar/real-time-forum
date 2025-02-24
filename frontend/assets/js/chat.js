@@ -109,7 +109,7 @@ messageInput.addEventListener("keypress", (e) => {
   }
 });
 
-// STATUS
+/// STATUS
 // function setUserStatus(userId, isOnline) {
 //   const userElement = document.querySelector(`#user-${userId} .status`);
 //   if (userElement) {
