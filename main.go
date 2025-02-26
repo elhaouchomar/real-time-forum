@@ -48,6 +48,8 @@ func main() {
 	// 	handlers.GetAllMessages(hub, w, r)
 	// })
 	http.HandleFunc("/", handlers.HomePage)
+	http.HandleFunc("POST /checker", handlers.Checker)
+
 	http.HandleFunc("/infinite-scroll", handlers.InfiniteScroll)
 
 	http.HandleFunc("POST /login", handlers.Login)

@@ -31,16 +31,13 @@ async function fetchPosts(offset, type) {
 }
 
 function updateProfile(profile) {
+  const userName = "Mohamed Tawil"
   const pImage = document.querySelector(".profileImage img");
   const pName = document.querySelector(".profileName");
   const pCounts = document.querySelector(".posts .postCounts");
   const cCounts = document.querySelector(".comments .postCounts");
-  pImage.src = profile.UserName
-    ? `https://api.multiavatar.com/${profile.UserName}.svg`
-    : "/assets/images/profile.png";
-  pName.textContent = profile.UserName
-    ? profile.UserName
-    : "Please Login First";
+  pImage.src =`https://ui-avatars.com/api/?name=${userName}`
+  pName.textContent = userName
   pCounts.textContent = `${profile.ArticleCount} Articles`;
   cCounts.textContent = `${profile.CommentCount} Comments`;
 }
@@ -60,7 +57,7 @@ function createProfileLink(username) {
   profileLink.href = `/?type=profile&username=${username}`;
   const profileImage = document.createElement("div");
   profileImage.className = "ProfileImage tweet-img";
-  profileImage.style.backgroundImage = `url('https://api.multiavatar.com/${username}.svg')`;
+  profileImage.style.backgroundImage = `url('https://ui-avatars.com/api/?name=${username}')`;
   profileLink.appendChild(profileImage);
   return profileLink;
 }
@@ -302,7 +299,7 @@ document.addEventListener("DOMContentLoaded", () => {
     childList: true,
     subtree: true,
   });
-  setInterval(updateAllTimes, 60000);
+  setInterval(updateAllTimes, 50000);
 });
 infiniteScroll();
 fetchPosts(0, type);

@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"regexp"
@@ -55,6 +57,38 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
+func MiddleWear(w http.ResponseWriter, r *http.Request) bool {
+	userID, err := CheckAuthentication(w, r)
+	fmt.Println("User id", userID, "err", err)
+	if userID == 0 || err != nil {
+		userID = 0
+		return false
+	}
+	return true
+}
+
+func JsResponse(w http.ResponseWriter, status int, msgStatus bool, data interface{}) {
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"status": msgStatus,
+		"data":   data,
+	})
+}
+
+func Checker(w http.ResponseWriter, r *http.Request) {
+	check := MiddleWear(w, r)
+	status := 200
+	if !check {
+		status = http.StatusUnauthorized
+	}
+	var data map[string]interface{}
+	if check {
+		data = map[string]interface{}{
+			"Test": "Checker Function in golang",
+		}
+	}
+	JsResponse(w, status, check, data)
+}
 func Login(w http.ResponseWriter, r *http.Request) {
 	redirected := RedirectToHomeIfAuthenticated(w, r)
 	if redirected {

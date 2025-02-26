@@ -82,10 +82,10 @@ async function handleCommentEvent(e) {
             const commentCard = document.createElement('div');
             commentCard.classList.add('commentCard');
             commentCard.classList.add('CommentAdded');
-
+            const userName =  "Mohamed Tawil"
             commentCard.innerHTML = `
                 <div class="commentAuthorImage">
-                    <img src="https://api.multiavatar.com/${data["UserName"]}.svg" alt="">
+                    <img src="https://ui-avatars.com/api/?name=${userName}" alt="">
                 </div>
                 <div class="commentAuthor">
                     <div class="commentAuthorInfo">
