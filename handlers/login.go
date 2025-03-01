@@ -5,11 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"regexp"
 	"strconv"
-	"strings"
 	"unicode"
 
 	"forum/database"
@@ -54,7 +52,8 @@ func Error(w http.ResponseWriter, r *http.Request) {
 }
 func Logout(w http.ResponseWriter, r *http.Request) {
 	DeleteAllCookie(w, r)
-	http.Redirect(w, r, "/", http.StatusFound)
+	JsResponse(w, 200, true, nil)
+	// http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func MiddleWear(w http.ResponseWriter, r *http.Request) bool {
@@ -67,7 +66,7 @@ func MiddleWear(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-func JsResponse(w http.ResponseWriter, status int, msgStatus bool, data interface{}) {
+func JsResponse(w http.ResponseWriter, status int, msgStatus bool, data any) {
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"status": msgStatus,
@@ -90,70 +89,133 @@ func Checker(w http.ResponseWriter, r *http.Request) {
 	JsResponse(w, status, check, data)
 }
 func Login(w http.ResponseWriter, r *http.Request) {
-	redirected := RedirectToHomeIfAuthenticated(w, r)
-	if redirected {
-		return
-	}
+	fmt.Println("Start Connect")
+	Data := struct {
+		Email    string
+		Password string
+	}{}
+	json.NewDecoder(r.Body).Decode(&Data)
+	fmt.Println("=========================\n", Data)
 	r.ParseForm()
-	email := strings.ToLower(r.Form.Get("email"))
-	upass := r.Form.Get("password")
-	structError := map[string]interface{}{
-		"StatuCode":    http.StatusBadRequest,
-		"MessageError": errors.New("username or email is required"),
-		"Register":     false,
-	}
-	if email == "" || upass == "" {
-		ErrorPage(w, "register.html", structError)
+	if Data.Email == "" || Data.Password == "" {
+		// JsResponse(w, false, "Email or username is required", nil)
 		return
 	}
-	if !validpassword(upass) {
-		structError["MessageError"] = "invalid password"
-		ErrorPage(w, "register.html", structError)
+	if !validpassword(Data.Password) {
+		// JsResponse(w, false, "Invalid Password")
 		return
 	}
+	fmt.Println("Invalid Password")
+
 	var hpassword string
 	var uid int
 	var err error
-	hpassword, uid, err = database.GetUserByUemail(DB, email)
+	hpassword, uid, err = database.GetUserByUemail(DB, Data.Email)
 	if err != nil || hpassword == "" {
-		hpassword, uid, err = database.GetUserByUname(DB, email)
+		hpassword, uid, err = database.GetUserByUname(DB, Data.Email)
 		if err != nil || hpassword == "" {
-			structError["StatuCode"] = http.StatusBadRequest
-			structError["MessageError"] = "invalid email or username"
-			structError["Register"] = false
-			ErrorPage(w, "register.html", structError)
+			// JsResponse(w, false, "Invalid email or username")
 			return
 		}
 	}
+	fmt.Println("Invalid email or username")
 
-	err = bcrypt.CompareHashAndPassword([]byte(hpassword), []byte(upass))
+	err = bcrypt.CompareHashAndPassword([]byte(hpassword), []byte(Data.Password))
 	if err != nil {
-		structError["StatuCode"] = http.StatusUnauthorized
-		structError["MessageError"] = "invalid email or password"
-		structError["Register"] = false
-		ErrorPage(w, "register.html", structError)
+		// JsResponse(w, false, "Invalid email or username")
 		return
 	}
 
-	token, err := tokening.GenerateSessionToken("email:" + email)
+	fmt.Println("sdf")
+
+	token, err := tokening.GenerateSessionToken("email:" + Data.Email)
 	if err != nil {
-		structError["StatuCode"] = http.StatusInternalServerError
-		structError["MessageError"] = "error creating a session"
-		structError["Register"] = false
-		ErrorPage(w, "error.html", structError)
+		// JsResponse(w, false, "Error Creating a session")
 		return
 	}
+	fmt.Println("tdg")
+
 	err = database.AddSessionToken(DB, uid, token)
 	if err != nil {
-		log.Println(err)
-		structError["StatuCode"] = http.StatusInternalServerError
-		structError["MessageError"] = "Internal server error"
-		structError["Register"] = false
-		ErrorPage(w, "error.html", structError)
+		// JsResponse(w, false, "internal server error")
 		return
 	}
 	SetCookie(w, token, "session", true)
-	http.Redirect(w, r, "/", http.StatusFound)
+	fmt.Println("Connected Sucssefully")
+	// func JsResponse(w http.ResponseWriter, status int, msgStatus bool, data interface{}) {
+	var data = map[string]any{
+		"status": true,
+		"token":  token,
+	}
+	JsResponse(w, 200, true, data)
+
+	// JsResponse(w, true, "User Logged Succesfully")
+	// Commented Part Bellow is belong to the old Forum PAGE :D
+
+	// redirected := RedirectToHomeIfAuthenticated(w, r)
+	// if redirected {
+	// 	return
+	// }
+	// r.ParseForm()
+	// email := strings.ToLower(r.Form.Get("email"))
+	// upass := r.Form.Get("password")
+	// structError := map[string]interface{}{
+	// 	"StatuCode":    http.StatusBadRequest,
+	// 	"MessageError": errors.New("username or email is required"),
+	// 	"Register":     false,
+	// }
+	// if email == "" || upass == "" {
+	// 	ErrorPage(w, "register.html", structError)
+	// 	return
+	// }
+	// if !validpassword(upass) {
+	// 	structError["MessageError"] = "invalid password"
+	// 	ErrorPage(w, "register.html", structError)
+	// 	return
+	// }
+	// var hpassword string
+	// var uid int
+	// var err error
+	// hpassword, uid, err = database.GetUserByUemail(DB, email)
+	// if err != nil || hpassword == "" {
+	// 	hpassword, uid, err = database.GetUserByUname(DB, email)
+	// 	if err != nil || hpassword == "" {
+	// 		structError["StatuCode"] = http.StatusBadRequest
+	// 		structError["MessageError"] = "invalid email or username"
+	// 		structError["Register"] = false
+	// 		ErrorPage(w, "register.html", structError)
+	// 		return
+	// 	}
+	// }
+
+	// err = bcrypt.CompareHashAndPassword([]byte(hpassword), []byte(upass))
+	// if err != nil {
+	// 	structError["StatuCode"] = http.StatusUnauthorized
+	// 	structError["MessageError"] = "invalid email or password"
+	// 	structError["Register"] = false
+	// 	ErrorPage(w, "register.html", structError)
+	// 	return
+	// }
+
+	// token, err := tokening.GenerateSessionToken("email:" + email)
+	// if err != nil {
+	// 	structError["StatuCode"] = http.StatusInternalServerError
+	// 	structError["MessageError"] = "error creating a session"
+	// 	structError["Register"] = false
+	// 	ErrorPage(w, "error.html", structError)
+	// 	return
+	// }
+	// err = database.AddSessionToken(DB, uid, token)
+	// if err != nil {
+	// 	log.Println(err)
+	// 	structError["StatuCode"] = http.StatusInternalServerError
+	// 	structError["MessageError"] = "Internal server error"
+	// 	structError["Register"] = false
+	// 	ErrorPage(w, "error.html", structError)
+	// 	return
+	// }
+	// SetCookie(w, token, "session", true)
+	// http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {

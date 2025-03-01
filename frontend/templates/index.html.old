@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/assets/style/google-icons/google-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/style/root.css" />
+    <link rel="stylesheet" href="/assets/style/create_post.css" />
+    <link rel="stylesheet" href="/assets/style/header.css" />
+    <link rel="stylesheet" href="/assets/style/left_sidebar.css" />
+    <link rel="stylesheet" href="/assets/style/message.css" />
+    <link rel="stylesheet" href="/assets/style/popstyle.css" />
+    <link rel="stylesheet" href="/assets/style/post.css" />
+    <link rel="stylesheet" href="/assets/style/register.css" />
+    <link rel="stylesheet" href="/assets/style/right_sidebar.css" />
+    <link rel="stylesheet" href="/assets/style/style.css" />
+    <link rel="stylesheet" href="/assets/style/ussely_by_js.css" />
+
+    <!-- TODO WebsiteTitle EX : Sweeter - Register | Sweeter - Login ...etc-->
+    <title>{{/*.Settings.Title*/}}</title>
+    <link rel="icon" href="/assets/images/logo.svg" type="image/svg+xml" />
+  </head>
+
+  <body>
+    <!-- TODO Never injected to HTML if User not Logedin -->
+    {{if .Profile.UserName}} {{template
+    "google-icons/google-icons/create-post"}} {{end}}
+    <div class="postContainer closed"></div>
+    <div class="ParentContainer">
+      {{template "header" .Profile}}
+      <!-- <div class="nav-mobile" id="right-side">
+        <a href="/#posts">
+          <div>For you</div>
+        </a>
+        <a href="#categories">
+          <div>Categories</div>
+        </a>
+      </div> -->
+      {{template "left-sidebar" .Profile}} {{template "profile-sidebar" .}} {{
+      template "message" }}
+      <div class="main-flex" id="posts">
+        <div class="main-feed">
+          <!-- Create New Post -->
+          <div class="new-tweet">
+            <!-- TODO User image -->
+            <div
+              class="ProfileImage tweet-img no-border"
+              style="background-image: url('{{if .Profile.UserName}}https://api.multiavatar.com/{{.Profile.UserName}}.svg{{else}}/assets/images/profile.png{{end}}')"
+            ></div>
+            <div class="new-post-header">
+              <div class="textarea">What's happening?</div>
+            </div>
+          </div>
+          <!-- End Of Create New Post -->
+        </div>
+      </div>
+    </div>
+    <div id="popupContainer"></div>
+    <div class="notif">
+      <a href="/"  class="selected" >
+        <i class="material-symbols-outlined">home</i>
+    </a>
+    <a  href="#"  href="/?type=liked">
+        <i class="material-symbols-outlined">favorite</i>
+    </a>
+    <a  id="message" class="selected" >
+        <i class="material-symbols-outlined">mail</i>
+    </a>
+    <a href="/" class="selected">
+      <i class="material-symbols-outlined">list</i>
+    </a>
+    <!-- <a href="/" class="disabled">
+      <i class="material-symbols-outlined disabled">notifications</i>
+    </a> -->
+    <a href="/"  class="selected" >
+        <i class="material-symbols-outlined">person</i>
+    </a>
+    
+  </div> 
+
+    {{if .Profile.UserName}}
+    <script>
+      function removeCreatePostListner() {
+        const CreatePostArea = document.querySelectorAll(".new-post-header");
+        CreatePostArea.forEach((elem) => {
+          elem.removeEventListener("click", createPostListner);
+        });
+      }
+      function createPostListner() {
+        const CreatePostArea = document.querySelectorAll(".new-post-header");
+        CreatePostArea.forEach((elem) => {
+          elem.addEventListener("click", () => {
+            createPost();
+          });
+        });
+      }
+      createPostListner();
+    </script>
+    {{end}} {{ if not .Profile.UserName}}
+    <script>
+      const input_Post = document.querySelectorAll(".new-post-header");
+      input_Post.forEach((elem) => {
+        elem.addEventListener("click", () => {
+          popUp();
+        });
+      });
+    </script>
+    {{end}}
+    <script src="/assets/js/profile.js"></script>
+    {{if .Profile.UserName}}
+    <script src="/assets/js/createPost.js"></script>
+    {{end}}
+    <script src="/assets/js/likes.js"></script>
+    <script src="/assets/js/script.js"></script>
+    <script src="/assets/js/chat.js"></script>
+  </body>
+</html>
