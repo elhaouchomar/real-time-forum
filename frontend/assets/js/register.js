@@ -1,14 +1,8 @@
+import { LoadPage } from "./spa.js";
+
 const container = document.getElementById('container');
 const registerBtnToggle = document.getElementById('registerBtnToggle');
 const loginBtn = document.getElementById('loginBtn');
-loginBtn.addEventListener('click', () => {
-    container.classList.remove("active");
-});
-
-registerBtnToggle.addEventListener('click', () => {
-    container.classList.add("active");
-});
-
 let pass = document.getElementById("pass");
 let confirmPass = document.getElementById("confirmPass");
 let user = document.getElementById("user");
@@ -17,6 +11,56 @@ let registerBtn = document.getElementById("registerBtn");
 let usernameMessage = document.getElementById("usernameMessage");
 let emailMessage = document.getElementById("emailMessage");
 let confirmPassMessage = document.getElementById("confirmPassMessage");
+
+loginBtn.addEventListener('click', () => {
+    container.classList.remove("active");
+});
+
+registerBtnToggle.addEventListener('click', () => {
+    container.classList.add("active");
+});
+
+const RegForm = document.getElementById("RegisterForm")
+const LogForm = document.getElementById("LoginForm")
+
+RegForm.addEventListener("submit", function(event){
+    event.preventDefault()
+})
+
+LogForm.addEventListener("submit", function(event){
+    event.preventDefault()
+    console.log("Submit Login Form");
+    
+    var email = LogForm.querySelector("input").value
+    var pass = LogForm.querySelector(".password-container input").value
+    
+    fetch("/login", {
+        method: "POST",
+        headers: {
+            "Content-Type" : "application/json"
+        },
+        body: JSON.stringify({
+            "email": email,
+            "password": pass,
+        })
+
+    }).then(response => {
+            if (!response.ok){
+                throw new Error("Error Connecting to login route")
+            }
+            return response.json()
+        })
+        .then(data =>  {
+            console.log(data);
+            if (data.status){
+                console.log("inside the Json Response");
+                LoadPage("home")
+            }
+        }).catch(err => {
+            console.log(err);
+        })
+})
+
 
 function checkPassword() {
     const patterns = {

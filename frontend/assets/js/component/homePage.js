@@ -1,3 +1,4 @@
+import { AVATAR_URL } from "../spa.js"
 import { Header } from "./header.js"
 import { LeftSideBar } from "./leftSideBar.js"
 import { Messages } from "./messages.js"
@@ -33,7 +34,7 @@ export function HomePage() {
             <!-- TODO User image -->
             <div
               class="ProfileImage tweet-img no-border"
-              style="background-image: url('https://ui-avatars.com/api/?name=${userName}')"
+              style="background-image: url('${AVATAR_URL}${userName}')"
             ></div>
             <div class="new-post-header">
               <div class="textarea">What's happening?</div>

@@ -1,13 +1,11 @@
-const ROUTES = {
-    "/home": {
-        "path": 'home',
-        "scripts": ["profile", "likes", "script", "chat"],
+export const ROUTES = {
+    "home": {
+        "scripts": ["spa", "profile", "likes", "script", "chat"],
         "styles": ["root", "create_post", "header", "left_sidebar",
                     "message", "popstyle", "post", "right_sidebar", "style", "ussely_by_js"],
     },
-    "/login": {
-        "path": 'login',
-        "scripts": ["register", "likes", "script", "chat"],
+    "login": {
+        "scripts": ["spa", "register"],
         "styles": ["register"],
 
     },

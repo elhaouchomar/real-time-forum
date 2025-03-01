@@ -47,7 +47,7 @@ async function handleReaction(btn, type) {
 const LikePostAndComments = btn => handleReaction(btn, "like");
 const DisLikePostAndComments = btn => handleReaction(btn, "dislike");
 
-function handleLikes() {
+export function HandleLikes() {
     const likeBtns = document.querySelectorAll('.like');
     const dislikeBtns = document.querySelectorAll('.dislike');
 

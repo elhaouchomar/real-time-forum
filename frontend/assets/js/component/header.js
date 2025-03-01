@@ -1,3 +1,5 @@
+import { AVATAR_URL, USERNAME } from "../spa.js";
+
 export function Header(){
     return    `<nav>
         <!-- Logo -->
@@ -8,17 +10,17 @@ export function Header(){
             <div class="main-account">
                 <div class="dropdown">
                     <div class="ProfileImage tweet-img"
-                        style="background-image: url('https://api.multiavatar.com/{{.UserName}}.svg')">
+                        style="background-image: url('${AVATAR_URL}${USERNAME}')">
                     </div>
                     <div class="content">
                         <!-- Control Posts -->
                         <ul>
-                            <a href="/?type=profile&username={{.UserName}}">
+                            <a class="Links" id="profile" href="/type=profile?username=${USERNAME}">
                                 <li><span class="material-symbols-outlined">account_circle</span>Profile</li>
                             </a>
                             <!-- Darck && light mode -->
                             <hr>
-                            <a href="/logout">
+                            <a class="Links" id="logout" href="/logout">
                                 <li><span class="material-symbols-outlined">logout</span>Logout</li>
                             </a>
                         </ul>

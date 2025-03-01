@@ -3,13 +3,13 @@ export function LoginPage(){
     temp.innerHTML =  `
      <div class="container active" id="container">
         <div class="form-container active-form  sign-up" id="sign-up-form">
-            <form method="POST" action="/register">
+            <form id="RegisterForm">
                 <h1>Create Account</h1>
                 <div style="justify-content: space-between; display: flex; gap: 10px;">
-                    <input type="text" id="" name="first-name" placeholder="First Name" required>
+                    <input type="text" name="first-name" placeholder="First Name" required>
                     <!-- <div id="usernameMessage" class="message"><i class="material-icons check-uncheck"
                             style="font-size: 10px;">&#xe5c9;</i> Username must contain only letters and numbers.</div> -->
-                    <input type="text" id="" name="last-name" placeholder="Last Name" required>
+                    <input type="text" name="last-name" placeholder="Last Name" required>
 
                 </div>
                 <select name="gender" id="gender" style="display: flex; justify-content: space-between;">
@@ -61,7 +61,7 @@ export function LoginPage(){
         </div>
 
         <div class="form-container sign-in" id="login-form">
-            <form method="POST" action="/login">
+            <form id="LoginForm">
                 <h1>Sign In</h1>
                 <input type="text" name="email" placeholder="Email" required>
                 <div class="password-container">

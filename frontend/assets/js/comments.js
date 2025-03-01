@@ -1,3 +1,5 @@
+import { HandleLikes } from "./likes.js";
+import { AVATAR_URL } from "./spa.js";
 
 function toggleCollapse(elem, comments) {
     elem.classList.toggle("collapse");
@@ -85,7 +87,7 @@ async function handleCommentEvent(e) {
             const userName =  "Mohamed Tawil"
             commentCard.innerHTML = `
                 <div class="commentAuthorImage">
-                    <img src="https://ui-avatars.com/api/?name=${userName}" alt="">
+                    <img src="${AVATAR_URL}${userName}" alt="">
                 </div>
                 <div class="commentAuthor">
                     <div class="commentAuthorInfo">
@@ -117,7 +119,8 @@ async function handleCommentEvent(e) {
             commentContainer.prepend(commentCard);
             document.querySelector('.commentCount').textContent = data.CommentCount
             // call new listeners
-            handleLikes();
+            HandleLikes();
+            HandleLikes()
 
             // remove old Listners :
             ExpandComments(false)

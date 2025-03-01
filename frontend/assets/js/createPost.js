@@ -1,4 +1,5 @@
-const AVATAR_URL = 'https://api.multiavatar.com';
+import { AVATAR_URL } from "./spa.js";
+
 const ERROR_DISPLAY_TIME = 5000;
 
 function showError(message) {
@@ -11,7 +12,7 @@ function showError(message) {
 function createPostTemplate(post) {
     return `
         <a href="/?type?profile&username=${post.UserName}">
-            <div class="ProfileImage tweet-img" style="background-image: url('${AVATAR_URL}/${post.UserName}.svg')"></div>
+            <div class="ProfileImage tweet-img" style="background-image: url('${AVATAR_URL}${post.UserName}')"></div>
         </a>
         <div class="post-details">
             <div class="row-tweet">
@@ -129,5 +130,5 @@ function updateUI(post, closeModal, form) {
 
     // Refresh event listeners
     [removeSeeMoreListner, removeReadPostListner, removeCreatePostListner].forEach(fn => fn());
-    [seeMore, readPost, handleLikes, createPostListner].forEach(fn => fn());
+    [seeMore, readPost, HandleLikes, createPostListner].forEach(fn => fn());
 }

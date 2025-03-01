@@ -1,5 +1,6 @@
 
 export async function apiRequest(url){
+    console.log(`Api Request Made to = ${url}`);
     try
     {
         const response = await fetch(`/${url}`, {

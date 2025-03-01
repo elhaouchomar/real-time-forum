@@ -1,3 +1,7 @@
+import { apiRequest } from "./apiRequest.js";
+import { HandleLikes } from "./likes.js";
+import { AVATAR_URL, LoadPage } from "./spa.js";
+
 const UrlParams = new URLSearchParams(window.location.search);
 const sidebardLeft = document.querySelector(".sidebar-left");
 const windowMedia = window.matchMedia("(min-width: 768px)");
@@ -22,7 +26,7 @@ async function fetchPosts(offset, type) {
         postsContainer.append(createPostCard(post));
       });
     }
-    handleLikes();
+    HandleLikes()
     removeReadPostListener();
     readPost();
   } catch (error) {
@@ -36,7 +40,7 @@ function updateProfile(profile) {
   const pName = document.querySelector(".profileName");
   const pCounts = document.querySelector(".posts .postCounts");
   const cCounts = document.querySelector(".comments .postCounts");
-  pImage.src =`https://ui-avatars.com/api/?name=${userName}`
+  pImage.src =`${AVATAR_URL}${userName}`
   pName.textContent = userName
   pCounts.textContent = `${profile.ArticleCount} Articles`;
   cCounts.textContent = `${profile.CommentCount} Comments`;
@@ -57,7 +61,7 @@ function createProfileLink(username) {
   profileLink.href = `/?type=profile&username=${username}`;
   const profileImage = document.createElement("div");
   profileImage.className = "ProfileImage tweet-img";
-  profileImage.style.backgroundImage = `url('https://ui-avatars.com/api/?name=${username}')`;
+  profileImage.style.backgroundImage = `url('${AVATAR_URL}${username}')`;
   profileLink.appendChild(profileImage);
   return profileLink;
 }
@@ -224,7 +228,7 @@ function loadPostContent(elem) {
     postContent.classList.remove("closed");
     ListenOncommentButtom(false);
     ListenOncommentButtom(true);
-    handleLikes();
+    HandleLikes();
   };
 }
 
@@ -301,6 +305,64 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   setInterval(updateAllTimes, 50000);
 });
+
+//////////////// Start Listning dropDown List For Posts ////////////
+function postControlList() {
+
+  const dropdown = document.querySelectorAll('.dropdown i, .dropdown .ProfileImage')
+  dropdown.forEach(drop => {
+      let contentSibling = drop.nextElementSibling
+      drop.addEventListener('click', () => {
+          contentSibling.classList.toggle("show")
+      })
+      document.addEventListener('click', function (event) {
+          if (!contentSibling.contains(event.target) && !drop.contains(event.target) && contentSibling.classList.contains("show")) {
+              contentSibling.classList.remove('show');
+          }
+      });
+  })
+}
+
+const Links = document.querySelectorAll(".Links")
+Links.forEach(elem => {
+    elem.addEventListener("click", async (event)=>{
+        event.preventDefault();
+        if (elem.id == "logout") {
+          const respons = await apiRequest("logout")
+          console.log(respons);
+            if (respons.status){
+              console.log("Clicked on logout icon");
+              LoadPage("login")
+              return
+            }
+            
+        }
+        //     <a class="CategoriesLinks" href="/?type=category&category={{$key}}">
+        //     <!-- TODO // selected-category /// Class For Specific Selected once -->
+        //     <div class="trending-item">
+        //         <div class="item-category">
+        //             <p>{{$key}}</p>
+        //         </div>
+        //         <span>{{$value}} Posts</span>
+        //     </div>
+        // </a>
+    })
+})
 infiniteScroll();
 fetchPosts(0, type);
+postControlList()
 readPost();
+
+console.log("xxxx");
+console.log("xxxx");
+console.log("xxxx");
+console.log("xxxx");
+console.log("xxxx");
+console.log("xxxx");
+console.log("xxxx");
+console.log("xxxx");
+console.log("xxxx");
+console.log("xxxx");
+console.log("xxxx");
+console.log("xxxx");
+console.log("xxxx");
