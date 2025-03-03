@@ -217,12 +217,12 @@ func broadcastMessage(msg Message) {
 }
 
 func sendPrivateMessage(msg Message) {
-	connectedUsers.RLock()
-	defer connectedUsers.RUnlock()
+	connectedUsers.Lock()
+	defer connectedUsers.Unlock()
 
+	fmt.Println(connectedUsers, msg)
 	if conn, ok := connectedUsers.m[msg.ReceiverID]; ok {
 		err := conn.Conn.WriteJSON(msg)
-		fmt.Println(msg)
 		if err != nil {
 			log.Printf("Error sending private message: %v", err)
 		}
