@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"regexp"
@@ -55,6 +57,38 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
+func MiddleWear(w http.ResponseWriter, r *http.Request) bool {
+	userID, err := CheckAuthentication(w, r)
+	fmt.Println("User id", userID, "err", err)
+	if userID == 0 || err != nil {
+		userID = 0
+		return false
+	}
+	return true
+}
+
+func JsResponse(w http.ResponseWriter, status int, msgStatus bool, data interface{}) {
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"status": msgStatus,
+		"data":   data,
+	})
+}
+
+func Checker(w http.ResponseWriter, r *http.Request) {
+	check := MiddleWear(w, r)
+	status := 200
+	if !check {
+		status = http.StatusUnauthorized
+	}
+	var data map[string]interface{}
+	if check {
+		data = map[string]interface{}{
+			"Test": "Checker Function in golang",
+		}
+	}
+	JsResponse(w, status, check, data)
+}
 func Login(w http.ResponseWriter, r *http.Request) {
 	redirected := RedirectToHomeIfAuthenticated(w, r)
 	if redirected {
@@ -91,7 +125,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
+	fmt.Println(uid,email,upass)
 	err = bcrypt.CompareHashAndPassword([]byte(hpassword), []byte(upass))
 	if err != nil {
 		structError["StatuCode"] = http.StatusUnauthorized
@@ -128,41 +162,61 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	r.ParseForm()
-	uemail := r.Form.Get("email")
-	uname := r.Form.Get("username")
-	upass := r.Form.Get("password")
+
+	// Get form values
+	firstName := r.Form.Get("first-name")
+	lastName := r.Form.Get("last-name")
+	gender := r.Form.Get("gender")
+	email := r.Form.Get("email")
+	username := r.Form.Get("username")
+	password := r.Form.Get("password")
+
+	age, err := strconv.Atoi(r.Form.Get("age"))
+
 	structError := map[string]interface{}{
 		"StatuCode":    http.StatusBadRequest,
-		"MessageError": errors.New("email or username already taken"),
+		"MessageError": errors.New("invalid input"),
 		"Register":     true,
 	}
-	if !email_RGX.MatchString(uemail) || !username_RGX.MatchString(uname) || !validpassword(upass) {
+
+	// Validate required fields
+	if firstName == "" || lastName == "" || gender == "" || age <= 0 {
+		structError["MessageError"] = "all fields are required"
+		ErrorPage(w, "register.html", structError)
+		return
+	}
+
+	// Validate email, username and password
+	if !email_RGX.MatchString(email) || !username_RGX.MatchString(username) || !validpassword(password) {
 		structError["MessageError"] = "invalid email or username"
 		ErrorPage(w, "register.html", structError)
 		return
 	}
 
-	exist := CheckUserExists(uemail, uname)
+	exist := CheckUserExists(email, username)
 	if exist {
 		structError["MessageError"] = "email or username already taken"
 		ErrorPage(w, "register.html", structError)
 		return
 	}
 
-	uid, err := database.CreateUser(DB, uemail, uname, upass)
+	// Create user
+	uid, err := database.CreateUser(DB, firstName, lastName, gender, age, email, username, password)
 	if err != nil {
 		structError["StatuCode"] = http.StatusInternalServerError
 		structError["MessageError"] = "something wrong, please try later"
 		ErrorPage(w, "register.html", structError)
 		return
 	}
-	token, err := tokening.GenerateSessionToken("username:" + uname)
+
+	token, err := tokening.GenerateSessionToken("username:" + username)
 	if err != nil {
 		structError["StatuCode"] = http.StatusInternalServerError
 		structError["MessageError"] = "something wrong, please try later"
 		ErrorPage(w, "register.html", structError)
 		return
 	}
+
 	err = database.AddSessionToken(DB, uid, token)
 	if err != nil {
 		structError["StatuCode"] = http.StatusInternalServerError
@@ -170,6 +224,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		ErrorPage(w, "register.html", structError)
 		return
 	}
+
 	SetCookie(w, token, "session", true)
 	http.Redirect(w, r, "/", http.StatusFound)
 }

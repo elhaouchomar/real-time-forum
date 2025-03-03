@@ -7,29 +7,48 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func CreateUser(db *sql.DB, email, username, password string) (int, error) {
+func CreateUser(db *sql.DB, firstName, lastName, gender string, age int, email, username, password string) (int, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return 0, err
 	}
-	stmt, err := db.Prepare("INSERT INTO users(email ,username, password) VALUES(?,?,?)")
+
+	stmt, err := db.Prepare(`
+        INSERT INTO users(
+            first_name,
+            last_name,
+            gender,
+            age,
+            email,
+            username,
+            password
+        ) VALUES(?, ?, ?, ?, ?, ?, ?)`)
 	if err != nil {
 		return 0, err
 	}
 	defer stmt.Close()
 
-	res, err := stmt.Exec(email, username, hashedPassword)
+	res, err := stmt.Exec(
+		firstName,
+		lastName,
+		gender,
+		age,
+		email,
+		username,
+		hashedPassword,
+	)
 	if err != nil {
 		return 0, err
 	}
+
 	uid, err := res.LastInsertId()
 	if err != nil {
 		return int(uid), err
 	}
+
 	fmt.Println("User created successfully!")
 	return int(uid), nil
 }
-
 func GetUserByUname(db *sql.DB, username string) (string, int, error) {
 	var hpassword string
 	var uid int

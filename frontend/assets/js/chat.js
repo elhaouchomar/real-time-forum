@@ -1,21 +1,22 @@
 
+let ws;
 
-function appendMessage(message) {
-  const messagesContainer = document.querySelector(".messages-list");
-  const messageElement = document.createElement("div");
-  messageElement.className = "message-card";
-  messageElement.innerHTML = `
-        <div class="message-header">
-            <span class="message-author">${message.author}</span>
-            <span class="message-time">${new Date(
-              message.timestamp
-            ).toLocaleString()}</span>
-        </div>
-        <div class="message-content">${message.content}</div>
-    `;
-  messagesContainer.appendChild(messageElement);
-  messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
+// function appendMessage(message) {
+//   const messagesContainer = document.querySelector(".messages-list");
+//   const messageElement = document.createElement("div");
+//   messageElement.className = "message-card";
+//   messageElement.innerHTML = `
+//         <div class="message-header">
+//             <span class="message-author">${message.author}</span>
+//             <span class="message-time">${new Date(
+//               message.timestamp
+//             ).toLocaleString()}</span>
+//         </div>
+//         <div class="message-content">${message.content}</div>
+//     `;
+//   messagesContainer.appendChild(messageElement);
+//   messagesContainer.scrollTop = messagesContainer.scrollHeight;
+// }
 
   // Choose send messages
   const ignore = document.getElementById("message");
@@ -69,6 +70,7 @@ function appendMessage(message) {
 const messageInput = document.getElementById("messageInput");
 const sendButton = document.getElementById("sendButton");
 const messagesArea = document.getElementById("messages");
+const r = document.getElementById("user-receiver")
 
 function sendMessage() {
   const message = messageInput.value.trim();
@@ -77,6 +79,9 @@ function sendMessage() {
       hour: "2-digit",
       minute: "2-digit",
     });
+    if (ws){
+      ws.send(JSON.stringify({ type: "message",username: r.innerText, content: message, timestamp: new Date().toISOString() }));
+    }
     const messageDiv = document.createElement("div");
     messageDiv.className = "messages sent";
     messageDiv.innerHTML = `
@@ -111,30 +116,34 @@ messageInput.addEventListener("keypress", (e) => {
 
 
 // websockets
-let ws;
 
 function connectWebSocket() {
-    ws = new WebSocket("ws://localhost:8080/ws"); // Ensure WebSocket server is running and accessible
+    ws = new WebSocket("ws://localhost:9090/ws"); // Ensure WebSocket server is running and accessible
     ws.onopen = () => {
         console.log("Connected to chat");
     };
     ws.onmessage = (event) => {
-        console.log("----------------------", event.data);
-        const messagesContainer = document.querySelector(".messages-list");
+      const data = JSON.parse(event.data);
+        console.log("----------------------", data.content);
+        const messagesContainer = document.querySelector(".messages-area");
         const messageElement = document.createElement("div");
-        messageElement.className = "message-card";
+        messageElement.className = "received";
         messageElement.innerHTML = `
             <div class="message-header" style="display: flex; justify-content: space-between">
-                <span class="message-author">Unknown Author</span>
-                <span class="message-time">${new Date().toLocaleTimeString()}</span>
+                <span class="message-author">${data.username}</span>
+                <span class="message-time">${data.timestamp}</span>
             </div>
-            <div class="message-content">${event.data}</div>
+            <div class="message-content">${data.content}</div>
         `;
         messagesContainer.appendChild(messageElement);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     };
     ws.onerror = (event) => {
         console.log(event);
+    };
+    ws.onclose = () => {
+        console.log("Disconnected from chat");
+        setTimeout(connectWebSocket, 5000); // Retry connection after 5 seconds
     };
 }
 connectWebSocket(); // Establish the WebSocket connection

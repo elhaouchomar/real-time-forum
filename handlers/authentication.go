@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
 	"forum/database"
 	"net/http"
 )
@@ -14,11 +15,12 @@ var structError = map[string]interface{}{
 
 func CheckAuthentication(w http.ResponseWriter, r *http.Request) (userID int, err error) {
 	c, err := r.Cookie("session")
-	if err != nil && err.Error() != "http: named cookie not present" {
+	fmt.Println("fff", err)
+
+	if err != nil && err.Error() != "http: named cookie not present"{
 		structError["StatuCode"] = http.StatusUnauthorized
 		structError["MessageError"] = "unauthorized " + err.Error()
 		ErrorPage(w, "error.html", structError)
-
 		return
 	}
 	if err != nil {

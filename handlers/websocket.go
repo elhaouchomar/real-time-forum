@@ -3,6 +3,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"sync"
@@ -39,19 +40,19 @@ type Message struct {
 	SenderID   int       `json:"sender_id"`
 	ReceiverID int       `json:"receiver_id"`
 	Timestamp  time.Time `json:"timestamp"`
-	Type       string    `json:"type"` 
+	Type       string    `json:"type"`
 	Username   string    `json:"username"`
 }
 
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	userID, err := CheckAuthentication(w, r)
 	if err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		// http.Er/ror(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
 	var username string
-	err = DB.QueryRow("SELECT username FROM users WHERE id = ?", userID).Scan(&username)
+	err = DB.QueryRow("SELECT username FROM users WHERE id = ?;", userID).Scan(&username)
 	if err != nil {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
@@ -87,15 +88,27 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	for {
 		var msg Message
 		err := conn.ReadJSON(&msg)
+		fmt.Println(msg)
 		if err != nil {
 			if !wsLib.IsCloseError(err, wsLib.CloseGoingAway, wsLib.CloseAbnormalClosure) {
-				log.Printf("WebSocket read error: %v", err)
+				log.Printf("WebSocket read errorfff: %v", err)
 			}
 			break
 		}
+		var receiver_id int
+		err = DB.QueryRow("SELECT id FROM users WHERE username = ?;", msg.Username).Scan(&receiver_id)
+		 if err != nil   || receiver_id == userID {
+			// http.Error(w, "User not found", http.StatusNotFound)
+			// return
+			// delet user from map
+			connectedUsers.Lock()
+			delete(connectedUsers.m, userID)
+			connectedUsers.Unlock()
+			break
 
+		 }
 		msg.SenderID = userID
-		msg.Username = username
+		msg.ReceiverID = receiver_id
 		msg.Timestamp = time.Now()
 
 		// Save message to database
@@ -209,8 +222,11 @@ func sendPrivateMessage(msg Message) {
 
 	if conn, ok := connectedUsers.m[msg.ReceiverID]; ok {
 		err := conn.Conn.WriteJSON(msg)
+		fmt.Println(msg)
 		if err != nil {
 			log.Printf("Error sending private message: %v", err)
 		}
+	} else {
+		log.Printf("User %d is not connected", msg.ReceiverID)
 	}
 }
