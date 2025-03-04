@@ -1,0 +1,55 @@
+:root {
+    --WhiteBlue: #daf0f5;
+    --White: #ffffff;
+    --WhiteB: #e0eced;
+    --Greey: #efefef;
+    --GreeyD: #919191;
+    --GreeyTransparant: hsla(0, 0%, 21%, 0.531);
+    --GreeyDarked: hsla(0, 0%, 81%, 0.294);
+    --shadow: 0px 10px 10px hsla(0, 0%, 40%, 0.3);
+    --shadowLittle: 0px 10px 10px hsla(0, 0%, 40%, 0.2);
+    --textshadow: 0px 5px 5px hsla(0, 0%, 40%, 0.3);
+    --border: 2px solid hsla(0, 0%, 54%, 0.318);
+    --BlueGreenWhite: #ffffff;
+    --BlueGreen: #088395;
+    --BlueDarker: #0a5c68;
+    --DarkBlue: #22252f;
+    --Black: #242424;
+  
+    --Created: #ff1515;
+    --bg-dark: #ffffff;
+    --text-dark: #cbd4dd;
+    --surface-dark: #1e293b;
+    --surface-hover-dark: #9babc2;
+    --primary-glow: #38bdf8;
+    --accent-dark: #c3e8ee;
+    --text-secondary-dark: #94a3b8;
+  }
+  
+
+  .dark-mode {
+  --WhiteBlue: #1e293b;
+  --White: #0f172a;
+  --WhiteB: #1e293b;
+  --Greey: #334155;
+  --GreeyD: white;
+  --GreeyTransparant: hsla(0, 0%, 21%, 0.531);
+  --GreeyDarked: hsla(0, 0%, 81%, 0.294);
+  --shadow: 0px 10px 10px hsla(0, 0%, 40%, 0.3);
+  --shadowLittle: 0px 10px 10px hsla(0, 0%, 40%, 0.2);
+  --textshadow: 0px 5px 5px hsla(0, 0%, 40%, 0.3);
+  --border: 2px solid hsla(0, 0%, 54%, 0.318);
+  --BlueGreenWhite: #0f172a;
+  --BlueGreen: #38bdf8;
+  --BlueDarker: #0ea5e9;
+  --DarkBlue: #1e40af;
+  --Black: #f1f5f9;
+
+  --bg-dark: #0f172a;
+  --text-dark: #f1f5f9;
+  --surface-dark: #1e293b;
+  --surface-hover-dark: #334155;
+  --primary-glow: #38bdf8;
+  --accent-dark: #334155;
+  --text-secondary-dark: #94a3b8;
+}

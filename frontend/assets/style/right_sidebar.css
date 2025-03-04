@@ -30,6 +30,7 @@
     animation: opc 2s;
     transition: all 1s;
 }
+
 @keyframes opc {
     0% {
         opacity: 0;
@@ -39,6 +40,7 @@
         opacity: 1;
     }
 }
+
 .sub-main:hover {
     background: var(--BlueDarker);
     color: var(--WhiteB);
@@ -54,6 +56,7 @@
     font-size: 1.3rem;
     opacity: 1 !important;
 }
+
 .switch-buttons {
     display: flex;
     flex-direction: column;
@@ -62,6 +65,11 @@
 .rotate {
     rotate: 180deg;
     transition: rotate .5s;
+}
+
+.switch-icon span {
+    font-size: 30px;
+    transition: rotate 0.5s;
 }
 
 .main {
@@ -89,18 +97,12 @@
     padding: 20px 0px 0px 0px;
 }
 
-.ProfileImage {
-    width: 50px;
-    height: 50px;
-    background-size: 46px;
-    background-repeat: no-repeat;
-
-}
 .profileName {
     color: var(--BlueDarker);
     font-weight: 600;
     margin-bottom: 15px;
 }
+
 .profileStatics {
     display: flex;
     position: relative;
@@ -133,13 +135,16 @@
     width: calc(100% - 20px);
     text-align: center;
 }
+
 .postCounts {
     color: var(--BlueDarker);
 }
+
 span.postCounts a {
     font-style: none;
     color: var(--BlueDarker);
 }
+
 .display {
     display: flex !important;
 }
@@ -155,9 +160,7 @@ span.postCounts a {
     cursor: pointer;
     transition: background-color 0.5s ease-in-out;
 }
-.trending-item:hover, .trending-item:hover span{
-    /* background-color: var(--BlueGreen); */
-}
+
 .trending-item span {
     font-size: 0.9rem;
 }
@@ -178,6 +181,7 @@ span.postCounts a {
 .selected-category p:hover {
     color: var(--BlueDarker);
 }
+
 .item-category {
     display: flex;
     align-items: center;
@@ -191,7 +195,7 @@ span.postCounts a {
 
 
 
-.item-category p{
+.item-category p {
     color: white;
 }
 
@@ -199,15 +203,4 @@ span.postCounts a {
 .item-category p {
     font-size: 1.1rem;
     color: var(--BlueGreen);
-}
-
-
-@media only screen and (max-width: 768px) {
-    #categories {
-        display: none;
-    }
-    #categories:target {
-        display: flex;
-        justify-content: center;
-    }
 }

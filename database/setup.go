@@ -22,6 +22,13 @@ func OpenDatabase(file string) *sql.DB {
 		log.Fatal(err)
 	}
 	fmt.Println("Database opened successfully!")
+
+	// Execute PRAGMA statements
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		log.Fatalf("Error setting PRAGMA foreign_keys: %v", err)
+	}
+
 	return db
 }
 

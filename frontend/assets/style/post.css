@@ -9,10 +9,6 @@ html {
     scroll-behavior: smooth;
 }
 
-.FILL {
-    font-variation-settings: 'FILL' 1;
-    color: var(--BlueDarker) !important;
-}
 
 .ProfileAndPost {
     display: flex;
@@ -194,17 +190,17 @@ html {
     margin-left: 10px;
     gap: 5px;
     width: calc(100% - 40px);
-    justify-content: space-around;
+    justify-content: space-between;
 }
 .commentHeader .Title {
-    display: inline-block;
+    /* display: inline-block; */
     font-size: 26px;
     font-weight: bold;
     color: var(--BlueDarker);
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    max-width: 100%;
+    /* text-overflow: ellipsis; */
+    /* overflow: hidden; */
+    /* white-space: nowrap;
+    max-width: 100%; */
 }
 .center {
     justify-content: center;
@@ -441,21 +437,21 @@ select .DisableUserSelect {
 }
 .PostButton {
     display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 5px;
+    /* align-items: center; */
+    /* justify-content: center; */
+    /* padding: 5px; */
     border-radius: 5px;
-    background-color: var(--BlueGreen);
-    color: var(--White);
+    /* background-color: var(--BlueGreen); */
+    color: var(--BlueDarker);
     cursor: pointer;
     transition: all 0.3s;
-    width: 115px;
+    /* width: 115px; */
 }
-
+.PostButton .material-symbols-outlined,
 .close-post {
     position: absolute;
-    top: 5px;
-    right: -2px;
+    /* top: 5px;
+    right: -2px; */
     color: var(--BlueDarker);
     background-color: var(--BlueGreenWhite);
     border-radius: 50%;

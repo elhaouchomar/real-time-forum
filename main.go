@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
 	"os"
 	"time"
@@ -14,8 +13,6 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 )
-
-var templates = template.Must(template.ParseGlob("frontend/templates/**/*.html"))
 
 func main() {
 	// handlers.Info = make(map[int]handlers.User)
@@ -39,14 +36,9 @@ func main() {
 	fmt.Println("User created successfully!")
 	fmt.Println(database.QuerryPostsbyUser(db, "test", 0, 5, 0))
 
-	// hub := websocket.NewHub()
-	// go hub.Run()
 	http.HandleFunc("/ws", handlers.HandleWebSocket)
-	http.HandleFunc("/api/chat/history", handlers.GetChatHistory)
-	// http.HandleFunc("/ws", handlers.HandleMessages)
-	// http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-	// 	handlers.GetAllMessages(hub, w, r)
-	// })
+	// http.HandleFunc("/api/chat/history", handlers.GetChatHistory)
+
 	http.HandleFunc("/", handlers.HomePage)
 	http.HandleFunc("/infinite-scroll", handlers.InfiniteScroll)
 
