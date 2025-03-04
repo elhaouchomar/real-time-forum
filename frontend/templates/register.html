@@ -31,18 +31,21 @@
         <div class="form-container active-form  sign-up" id="sign-up-form">
             <form method="POST" action="/register">
                 <h1>Create Account</h1>
-                <div style="justify-content: space-between; display: flex; gap: 10px;">
+                <div style="justify-content: space-between; display: flex; gap: 30px; width: 100%;">
                     <input type="text" id="" name="first-name" placeholder="First Name" required>
                     <!-- <div id="usernameMessage" class="message"><i class="material-icons check-uncheck"
                             style="font-size: 10px;">&#xe5c9;</i> Username must contain only letters and numbers.</div> -->
                     <input type="text" id="" name="last-name" placeholder="Last Name" required>
 
                 </div>
-                <select name="gender" id="gender" style="display: flex; justify-content: space-between;">
-                    <option value="">Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select>                
+                <div style="justify-content: space-between; display: flex; gap: 30px; width: 100%;" >
+                    <select name="gender" id="gender" style="display: flex; justify-content: space-between;">
+                        <option value="">Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>         
+                    <input type="number" id="" name="age" placeholder="Age" required>      
+                </div>
                 
                 <input type="text" id="user" name="username" placeholder="Username" required>
                 <div id="usernameMessage" class="message"><i class="material-icons check-uncheck"

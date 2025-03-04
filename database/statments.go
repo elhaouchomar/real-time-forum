@@ -1,13 +1,16 @@
 package database
 
 var tables = map[string]string{
-	"Pragma": `PRAGMA foreign_keys = ON;`,
 	"users": `
 		CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 		email TEXT UNIQUE NOT NULL,
 		username TEXT UNIQUE NOT NULL,
 		password TEXT NOT NULL,
+		first_name TEXT NOT NULL,
+		last_name TEXT NOT NULL,
+		age INTEGER NOT NULL,
+		gender TEXT CHECK(gender IN ('male', 'female')) NOT NULL,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 		);`,
 
@@ -36,18 +39,22 @@ var tables = map[string]string{
 		CONSTRAINT no_duplicates UNIQUE (post_id, user_id, content)
 		);`,
 
-	"categories": `CREATE TABLE IF NOT EXISTS categories (
-		id INTEGER PRIMARY KEY  NOT NULL,
-		name TEXT UNIQUE NOT NULL
-		);`,
+	"categories": `
+        CREATE TABLE IF NOT EXISTS categories (
+            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            name TEXT UNIQUE NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );`,
 
-	"post_categories": `CREATE TABLE IF NOT EXISTS post_categories (
-		post_id INTEGER NOT NULL,
-		category_id INTEGER NOT NULL,
-		PRIMARY KEY (post_id, category_id),
-		FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
-		FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
-		);`,
+	"post_categories": `
+        CREATE TABLE IF NOT EXISTS post_categories (
+            post_id INTEGER NOT NULL,
+            category_id INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (post_id, category_id),
+            FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+            FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+        );`,
 
 	"post_likes": `CREATE TABLE IF NOT EXISTS post_likes (
 		user_id INTEGER NOT NULL,
@@ -152,7 +159,7 @@ END;`,
 		`CREATE TRIGGER 1here2_react_count_insert
 BEFORE INSERT ON 1here2_likes
 FOR EACH ROW
-BEGIN
+BEGIN+-
 	UPDATE 1here2s
 	SET 
 	like_count = like_count + (NEW.is_like = 1) ,
@@ -195,13 +202,15 @@ END;`,
 		[]string{"post", "comment"},
 	},
 	{
-		"CreateCategories", `INSERT OR IGNORE INTO Categories (Name) VALUES
-		('General'),
-		('Entertainment'),
-		('Health'),
-		('Business'),
-		('Sports'),
-		('Technology');`,
+		"CreateCategories", `
+        INSERT OR IGNORE INTO categories (name) VALUES
+            ('General'),
+            ('Entertainment'),
+            ('Health'),
+            ('Business'),
+            ('Sports'),
+            ('Technology');
+        `,
 		[]string{},
 	},
 }
