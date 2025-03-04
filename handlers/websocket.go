@@ -2,7 +2,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -16,9 +15,6 @@ var (
 	upgrader = wsLib.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
-		CheckOrigin: func(r *http.Request) bool {
-			return true // Configure appropriately for production
-		},
 	}
 
 	// Thread-safe connected users map
@@ -64,7 +60,6 @@ func GetUsers(userID int) ([]string, error) {
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	userID, err := CheckAuthentication(w, r)
 	if err != nil {
-		// http.Er/ror(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
@@ -90,7 +85,8 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	connectedUsers.Lock()
 	connectedUsers.m[userID] = userConn
 	connectedUsers.Unlock()
-	BrodcastUsers()
+	BroadcastUsersList()
+	GetChatHistory(userID)
 	broadcastStatus(userID, username, true)
 
 	defer func() {
@@ -115,9 +111,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		var receiver_id int
 		err = DB.QueryRow("SELECT id FROM users WHERE username = ?;", msg.Username).Scan(&receiver_id)
 		if err != nil || receiver_id == userID {
-			// http.Error(w, "User not found", http.StatusNotFound)
-			// return
-			// delet user from map
+
 			connectedUsers.Lock()
 			delete(connectedUsers.m, userID)
 			connectedUsers.Unlock()
@@ -155,31 +149,22 @@ func saveMessage(msg Message) error {
 	return nil
 }
 
-func GetChatHistory(w http.ResponseWriter, r *http.Request) {
-	userID, err := CheckAuthentication(w, r)
-	if err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
+type ChatHistory struct {
+	Type     string    `json:"type"`
+	Messages []Message `json:"messages"`
+}
 
-	otherUserID := r.URL.Query().Get("user_id")
-	if otherUserID == "" {
-		http.Error(w, "Missing user_id parameter", http.StatusBadRequest)
-		return
-	}
-
+func GetChatHistory(userID int) {
 	query := `
         SELECT m.id, m.content, m.sender_id, m.receiver_id, m.timestamp, u.username
         FROM messages m
         JOIN users u ON m.sender_id = u.id
-        WHERE (m.sender_id = ? AND m.receiver_id = ?) 
-           OR (m.sender_id = ? AND m.receiver_id = ?)
-        ORDER BY m.timestamp DESC
-        LIMIT 50`
+        WHERE m.sender_id = ? OR m.receiver_id = ?
+        ORDER BY m.timestamp ASC`
 
-	rows, err := DB.Query(query, userID, otherUserID, otherUserID, userID)
+	rows, err := DB.Query(query, userID, userID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("Error retrieving chat history: %v", err)
 		return
 	}
 	defer rows.Close()
@@ -190,15 +175,27 @@ func GetChatHistory(w http.ResponseWriter, r *http.Request) {
 		err := rows.Scan(&msg.ID, &msg.Content, &msg.SenderID, &msg.ReceiverID,
 			&msg.Timestamp, &msg.Username)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Printf("Error scanning message: %v", err)
 			return
 		}
+		msg.Type = "chat_history"
 		messages = append(messages, msg)
 	}
 
-	json.NewEncoder(w).Encode(messages)
-}
+	history := ChatHistory{
+		Type:     "chat_history",
+		Messages: messages,
+	}
 
+	connectedUsers.RLock()
+	if conn, ok := connectedUsers.m[userID]; ok {
+		err := conn.Conn.WriteJSON(history)
+		if err != nil {
+			log.Printf("Error sending chat history: %v", err)
+		}
+	}
+	connectedUsers.RUnlock()
+}
 func broadcastStatus(userID int, username string, online bool) {
 	status := Message{
 		Type:      "status",
@@ -207,9 +204,9 @@ func broadcastStatus(userID int, username string, online bool) {
 		Timestamp: time.Now(),
 	}
 	if online {
-		status.Content += " is online"
+		status.Content = "online"
 	} else {
-		status.Content += " is offline"
+		status.Content = "offline"
 	}
 	broadcastMessage(status)
 }
@@ -227,35 +224,72 @@ func broadcastMessage(msg Message) {
 		}
 	}
 }
-type UserFriend struct {
-	Type     string `json:"type"`
-	Data     []string `json:"data"`
+
+type UsersList struct {
+	Type         string            `json:"type"`
+	Usernames    []string          `json:"usernames"`
+	UserStatuses map[string]string `json:"user_statuses"`
+	UserIDs      map[string]int    `json:"user_ids"`
 }
-func BrodcastUsers() error {
+
+func BroadcastUsersList() error {
 	connectedUsers.Lock()
 	defer connectedUsers.Unlock()
 
-	for id, conn := range connectedUsers.m {
-		users, err := GetUsers(id)
+	for currentUserID, conn := range connectedUsers.m {
+		usernames, err := GetUsers(currentUserID)
 		if err != nil {
-			log.Printf("Error getting users for user %d: %v", id, err)
+			log.Printf("Error getting users for user %d: %v", currentUserID, err)
+			continue
 		}
-		var userFriends UserFriend
-		userFriends.Type = "users"
-		userFriends.Data = users
-		err = conn.Conn.WriteJSON(userFriends)
+
+		userStatuses := make(map[string]string)
+		userIDs := make(map[string]int)
+
+		// Populate user data
+		for _, username := range usernames {
+			// Get user ID
+			userID, err := GetUserIDByUsername(username)
+			if err != nil {
+				log.Printf("Error getting user ID for %s: %v", username, err)
+				continue
+			}
+			userIDs[username] = userID
+
+			// Set status
+			userStatuses[username] = "offline"
+			for _, c := range connectedUsers.m {
+				if c.Username == username {
+					userStatuses[username] = "online"
+					break
+				}
+			}
+		}
+
+		usersList := UsersList{
+			Type:         "users_list",
+			Usernames:    usernames,
+			UserStatuses: userStatuses,
+			UserIDs:      userIDs,
+		}
+
+		err = conn.Conn.WriteJSON(usersList)
 		if err != nil {
-			log.Printf("Error sending message to user %d: %v", conn.UserID, err)
+			log.Printf("Error sending users list to user %d: %v", conn.UserID, err)
 		}
 	}
 	return nil
 }
 
+func GetUserIDByUsername(username string) (int, error) {
+	var id int
+	err := DB.QueryRow("SELECT id FROM users WHERE username = ?", username).Scan(&id)
+	return id, err
+}
 func sendPrivateMessage(msg Message) {
 	connectedUsers.Lock()
 	defer connectedUsers.Unlock()
 
-	fmt.Println(connectedUsers, msg)
 	if conn, ok := connectedUsers.m[msg.ReceiverID]; ok {
 		err := conn.Conn.WriteJSON(msg)
 		if err != nil {

@@ -6,19 +6,22 @@
         <span class="material-symbols-outlined back">
           arrow_back
           </span>
-        <img src="../../assets/images/profile.png" class="profile-img" alt="Profile">
+          <div class="friend-avatar">
+            <img src="../../assets/images/profile.png" class="profile-img" alt="${username}">
+            <div class="status" id="user-status-${userId}"></div>
+        </div>
         <span id="user-receiver"></span>
       </div>
       
       <div class="messages-area" id="messages">
-        <div class="messages received">
-          <div>Hello! How are you?</div>
-          <div class="message-time">12:30 PM</div>
-        </div>
-        <div class="messages sent">
-          <div>I'm good, thanks! What about you?</div>
-          <div class="message-time">12:32 PM</div>
-        </div>
+        <!-- <div class="messages received"> -->
+          <!-- <div>Hello! How are you?</div>
+          <div class="message-time">12:30 PM</div> -->
+        <!-- </div> -->
+        <!-- <div class="messages sent"> -->
+          <!-- <div>I'm good, thanks! What about you?</div>
+          <div class="message-time">12:32 PM</div> -->
+        <!-- </div> -->
         <div class="chat-footer">
           <input type="text" class="msg-input" id="messageInput" placeholder="Type a message...">
           <button class="send-btn" id="sendButton"><i class="material-symbols-outlined">send</i></button>

@@ -61,8 +61,16 @@
   align-self: flex-start;
   border-bottom-left-radius: 0;
   margin: 15px;
+  min-width: 55px;
 }
-
+.received-info {
+  font-size: 12px;
+  margin-bottom: 5px;
+  font-style: italic;
+  font-weight: 300;
+  display: flex;
+  justify-content: space-between;
+}
 .sent {
   background: var(--BlueGreen);
   color: var(--White);
@@ -71,7 +79,10 @@
   margin: 15px;
   min-width: 55px;
 }
-
+.message-time{
+  margin-top: 5px;
+}
+.message-athour,
 .message-time {
   font-size: 10px;
   color: var(--GreeyD);
@@ -147,22 +158,22 @@
   position: relative;
 }
 
-.status-dot {
-  width: 10px;
-  height: 10px;
+.status {
+  width: 13px;
+  height: 13px;
   border-radius: 50%;
   position: absolute;
   bottom: 0;
   right: 0;
   border: 2px solid var(--WhiteBlue);
-  margin: 12px;
+  margin: 10px;
 }
 
-.status-dot.online {
-  background: var(--BlueGreen);
+.online {
+  background: green;
 }
 
-.status-dot.offline {
+.offline {
   background: var(--GreeyD);
 }
 
