@@ -44,6 +44,23 @@ type Message struct {
 	Username   string    `json:"username"`
 }
 
+func GetUsers(userID int) ([]string, error) {
+	var users []string
+	rows, err := DB.Query("SELECT username FROM users WHERE id != ?;", userID)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		var username string
+		err := rows.Scan(&username)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, username)
+	}
+	return users, nil
+}
+
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	userID, err := CheckAuthentication(w, r)
 	if err != nil {
@@ -73,7 +90,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	connectedUsers.Lock()
 	connectedUsers.m[userID] = userConn
 	connectedUsers.Unlock()
-
+	BrodcastUsers()
 	broadcastStatus(userID, username, true)
 
 	defer func() {
@@ -97,7 +114,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		}
 		var receiver_id int
 		err = DB.QueryRow("SELECT id FROM users WHERE username = ?;", msg.Username).Scan(&receiver_id)
-		 if err != nil   || receiver_id == userID {
+		if err != nil || receiver_id == userID {
 			// http.Error(w, "User not found", http.StatusNotFound)
 			// return
 			// delet user from map
@@ -106,7 +123,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 			connectedUsers.Unlock()
 			break
 
-		 }
+		}
 		msg.SenderID = userID
 		msg.ReceiverID = receiver_id
 		msg.Timestamp = time.Now()
@@ -117,13 +134,8 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 			log.Printf("Error saving message: %v", err)
 			continue
 		}
+		sendPrivateMessage(msg)
 
-		// Send message
-		if msg.ReceiverID == 0 {
-			broadcastMessage(msg)
-		} else {
-			sendPrivateMessage(msg)
-		}
 	}
 }
 
@@ -214,6 +226,29 @@ func broadcastMessage(msg Message) {
 			}
 		}
 	}
+}
+type UserFriend struct {
+	Type     string `json:"type"`
+	Data     []string `json:"data"`
+}
+func BrodcastUsers() error {
+	connectedUsers.Lock()
+	defer connectedUsers.Unlock()
+
+	for id, conn := range connectedUsers.m {
+		users, err := GetUsers(id)
+		if err != nil {
+			log.Printf("Error getting users for user %d: %v", id, err)
+		}
+		var userFriends UserFriend
+		userFriends.Type = "users"
+		userFriends.Data = users
+		err = conn.Conn.WriteJSON(userFriends)
+		if err != nil {
+			log.Printf("Error sending message to user %d: %v", conn.UserID, err)
+		}
+	}
+	return nil
 }
 
 func sendPrivateMessage(msg Message) {
