@@ -59,7 +59,7 @@
   flex-wrap: wrap;
   align-items: flex-start;
   width: 100%;
-  /* min-height: 100px; */
+  min-height: 100px;
   padding: 12px 16px 0 16px;
   background-color: var(--WhiteBlue);
   border-radius: 10px;

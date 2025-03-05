@@ -86,7 +86,6 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	connectedUsers.m[userID] = userConn
 	connectedUsers.Unlock()
 	BroadcastUsersList()
-	GetChatHistory(userID)
 	broadcastStatus(userID, username, true)
 
 	defer func() {
@@ -97,7 +96,6 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		broadcastStatus(userID, username, false)
 	}()
 
-	// Handle incoming messages
 	for {
 		var msg Message
 		err := conn.ReadJSON(&msg)
@@ -122,7 +120,6 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		msg.ReceiverID = receiver_id
 		msg.Timestamp = time.Now()
 
-		// Save message to database
 		err = saveMessage(msg)
 		if err != nil {
 			log.Printf("Error saving message: %v", err)
@@ -149,53 +146,6 @@ func saveMessage(msg Message) error {
 	return nil
 }
 
-type ChatHistory struct {
-	Type     string    `json:"type"`
-	Messages []Message `json:"messages"`
-}
-
-func GetChatHistory(userID int) {
-	query := `
-        SELECT m.id, m.content, m.sender_id, m.receiver_id, m.timestamp, u.username
-        FROM messages m
-        JOIN users u ON m.sender_id = u.id
-        WHERE m.sender_id = ? OR m.receiver_id = ?
-        ORDER BY m.timestamp ASC`
-
-	rows, err := DB.Query(query, userID, userID)
-	if err != nil {
-		log.Printf("Error retrieving chat history: %v", err)
-		return
-	}
-	defer rows.Close()
-
-	var messages []Message
-	for rows.Next() {
-		var msg Message
-		err := rows.Scan(&msg.ID, &msg.Content, &msg.SenderID, &msg.ReceiverID,
-			&msg.Timestamp, &msg.Username)
-		if err != nil {
-			log.Printf("Error scanning message: %v", err)
-			return
-		}
-		msg.Type = "chat_history"
-		messages = append(messages, msg)
-	}
-
-	history := ChatHistory{
-		Type:     "chat_history",
-		Messages: messages,
-	}
-
-	connectedUsers.RLock()
-	if conn, ok := connectedUsers.m[userID]; ok {
-		err := conn.Conn.WriteJSON(history)
-		if err != nil {
-			log.Printf("Error sending chat history: %v", err)
-		}
-	}
-	connectedUsers.RUnlock()
-}
 func broadcastStatus(userID int, username string, online bool) {
 	status := Message{
 		Type:      "status",

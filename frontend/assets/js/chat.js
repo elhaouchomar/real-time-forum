@@ -1,4 +1,5 @@
 let ws;
+
 // Choose send messages
 const ignore = document.getElementById("message");
 const post = document.getElementById("posts");
@@ -19,10 +20,11 @@ document.addEventListener("click", (event) => {
 // Change friend
 const friends_list = document.querySelector(".friends-list");
 const chat_box = document.querySelector(".chat-box");
-const friend = document.querySelector(".friend");
-const back = document.querySelector(".back");
-const close_message = document.querySelector(".close-message");
 if (window.innerWidth <= 780) {
+  const friend = document.querySelector(".friend");
+  const back = document.querySelector(".back");
+  const close_message = document.querySelector(".close-message");
+
   if (friend) {
     friend.addEventListener("click", () => {
       friends_list.style.display = "none";
@@ -88,7 +90,6 @@ messageInput.addEventListener("keypress", (e) => {
   }
 });
 
-// websockets
 function connectWebSocket() {
   ws = new WebSocket("ws://localhost:9090/ws");
 
@@ -98,38 +99,30 @@ function connectWebSocket() {
 
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
+    console.log(event.data); // {"type":"users_list","usernames":["basta","omarel"],"user_statuses":{"basta":"offline","omarel":"online"},"user_ids":{"basta":2,"omarel":1}}
+
     if (data.type === "users_list") {
+      console.log(data.usernames, data.user_ids, data.user_statuses);
+
       addFriend(data.usernames, data.user_ids, data.user_statuses);
       return;
     }
-    if (data.type === "chat_history") {
-      displayChatHistory(data.messages);
-      return;
-  }
+
     if (data.type === "message") {
-      const messagesContainer = document.querySelector(".messages-area");
+      const messagesContainer = document.getElementById("messages");
       const messageElement = document.createElement("div");
-      messageElement.className = "messages received";
-      const time = new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+      messageElement.className = "received";
       messageElement.innerHTML = `
-        <div class="message-bubble">
-          <div class="message-content">${data.content}</div>
-          <div class="message-details">
-        <span class="message-author">${data.username}</span>
-        <span class="message-time">${time}</span>
-          </div>
-        </div>
-      `;
+              <div class="message-header" style="display: flex; justify-content: space-between">
+                  <span class="message-author">${data.username}</span>
+                  <span class="message-time">${data.timestamp}</span>
+              </div>
+              <div class="message-content">${data.content}</div>
+          `;
       messagesContainer.appendChild(messageElement);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
   };
-
-  // <div>${data.username}</div>
-
   ws.onerror = (event) => console.log(event);
   ws.onclose = () => {
     console.log("Disconnected from chat");
@@ -150,7 +143,7 @@ function addFriend(friends, userIds, userStatuses) {
     friendElement.innerHTML = `
           <div class="friend-avatar">
               <img src="../../assets/images/profile.png" class="profile-img" alt="${friend}">
-              <div class="status" id="user-${userId}"></div>
+              <div class="status ${status}" id="user-${userId}"></div>
           </div>
           <div class="friend-info">
               <div class="friend-name">${friend}</div>

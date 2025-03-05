@@ -352,17 +352,3 @@ infiniteScroll();
 fetchPosts(0, type);
 postControlList()
 readPost();
-
-console.log("xxxx");
-console.log("xxxx");
-console.log("xxxx");
-console.log("xxxx");
-console.log("xxxx");
-console.log("xxxx");
-console.log("xxxx");
-console.log("xxxx");
-console.log("xxxx");
-console.log("xxxx");
-console.log("xxxx");
-console.log("xxxx");
-console.log("xxxx");
