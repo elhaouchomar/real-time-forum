@@ -1,8 +1,9 @@
 export function CreatePostPage(){
-    return `
-    <div class="postModal">
+    const tmp = document.createElement('div')
+    tmp.id = "CreatePostModal"
+    tmp.innerHTML = `<div class="postModal">
         <div class="CreatePostContainer">
-            <form>
+            <form id="CreatePost">
                 <div class="titleInput">
                     <input type="text" name="title" placeholder="Enter a Title for your post" required maxlength="60"
                         aria-label="Post Title">
@@ -39,4 +40,5 @@ export function CreatePostPage(){
         </div>  
     </div>
 `
+    return tmp
 }

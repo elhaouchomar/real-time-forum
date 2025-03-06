@@ -1,67 +1,5 @@
 import { LoadPage } from "./spa.js";
 
-const container = document.getElementById('container');
-const registerBtnToggle = document.getElementById('registerBtnToggle');
-const loginBtn = document.getElementById('loginBtn');
-let pass = document.getElementById("pass");
-let confirmPass = document.getElementById("confirmPass");
-let user = document.getElementById("user");
-let email = document.getElementById("email");
-let registerBtn = document.getElementById("registerBtn");
-let usernameMessage = document.getElementById("usernameMessage");
-let emailMessage = document.getElementById("emailMessage");
-let confirmPassMessage = document.getElementById("confirmPassMessage");
-
-loginBtn.addEventListener('click', () => {
-    container.classList.remove("active");
-});
-
-registerBtnToggle.addEventListener('click', () => {
-    container.classList.add("active");
-});
-
-const RegForm = document.getElementById("RegisterForm")
-const LogForm = document.getElementById("LoginForm")
-
-RegForm.addEventListener("submit", function(event){
-    event.preventDefault()
-})
-
-LogForm.addEventListener("submit", function(event){
-    event.preventDefault()
-    console.log("Submit Login Form");
-    
-    var email = LogForm.querySelector("input").value
-    var pass = LogForm.querySelector(".password-container input").value
-    
-    fetch("/login", {
-        method: "POST",
-        headers: {
-            "Content-Type" : "application/json"
-        },
-        body: JSON.stringify({
-            "email": email,
-            "password": pass,
-        })
-
-    }).then(response => {
-            if (!response.ok){
-                throw new Error("Error Connecting to login route")
-            }
-            return response.json()
-        })
-        .then(data =>  {
-            console.log(data);
-            if (data.status){
-                console.log("inside the Json Response");
-                LoadPage("home")
-            }
-        }).catch(err => {
-            console.log(err);
-        })
-})
-
-
 function checkPassword() {
     const patterns = {
         lower: /(?=.*[a-z])/,
@@ -91,6 +29,10 @@ function checkPassword() {
 }
 
 function validateForm() {
+    let registerBtn = document.getElementById("registerBtn");
+    let usernameMessage = document.getElementById("usernameMessage");
+    let emailMessage = document.getElementById("emailMessage");
+    let confirmPassMessage = document.getElementById("confirmPassMessage");
     let usernameValid = /^[\w]+$/.test(user.value);
     let emailValid = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email.value);
     let confirmPasswordValid = pass.value === confirmPass.value;
@@ -117,29 +59,13 @@ function validateForm() {
     registerBtn.disabled = !(usernameValid && emailValid && confirmPasswordValid && passwordValid);
 }
 
-pass.addEventListener("input", () => {
-    checkPassword();
-    validateForm();
-});
-
-user.addEventListener("input", validateForm);
-email.addEventListener("input", validateForm);
-
-confirmPass.addEventListener("input", validateForm);
-
 
 // shoz password
-document.querySelectorAll('.toggle-password').forEach(toggle => {
-    toggle.addEventListener('click', function () {
-        const input = this.previousElementSibling;
-        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
-        input.setAttribute('type', type);
-        this.textContent = type === 'password' ? 'visibility_off' : 'visibility';
-    });
-});
+
 
 
 function switchForm(type) {
+    
     const loginForm = document.querySelector('.sign-in');
     const registerForm = document.querySelector('.sign-up');
     const buttons = document.querySelectorAll('.mobile-switch button');
@@ -164,9 +90,123 @@ function switchForm(type) {
         }
     });
 }
-// Initialize mobile view
-window.addEventListener('load', () => {
-    if (window.innerWidth <= 768) {
-        switchForm('login');
-    }
-});
+
+export function ErrorHandling(data, page){
+    const ErrorContainer = document.querySelector(`#${page} .ErrorMessage`)
+    ErrorContainer.style.display = "block"
+    const msgContainer = ErrorContainer.querySelector(`.Content`)
+    msgContainer.textContent = data.message
+}
+export function registerFunctions(){
+    const container = document.getElementById('container');
+    const registerBtnToggle = document.getElementById('registerBtnToggle');
+    const loginBtn = document.getElementById('loginBtn');
+    let pass = document.getElementById("pass");
+    let confirmPass = document.getElementById("confirmPass");
+    let user = document.getElementById("user");
+    let email = document.getElementById("email");
+   
+    const RegForm = document.getElementById("RegisterForm")
+    const LogForm = document.getElementById("LoginForm")
+    console.log("====> registerFunctions CALLED <======");
+    
+    document.querySelectorAll('.toggle-password').forEach(toggle => {
+        toggle.addEventListener('click', function () {
+            const input = this.previousElementSibling;
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+            this.textContent = type === 'password' ? 'visibility_off' : 'visibility';
+        });
+    });
+    // Initialize mobile view
+    window.addEventListener('load', () => {
+        if (window.innerWidth <= 768) {
+            switchForm('login');
+        }
+    });
+    
+    loginBtn.addEventListener('click', () => {
+        container.classList.remove("active");
+    });
+
+    registerBtnToggle.addEventListener('click', () => {
+        container.classList.add("active");
+    });
+
+    RegForm.addEventListener("submit", function(event){
+        event.preventDefault()
+        console.log("Submit Register Form");
+        var Form = new FormData(event.target)
+        
+        fetch("/register", {
+            method: "POST",
+            headers: {
+                "Content-Type" : "application/json"
+            },
+            body: JSON.stringify({
+                "Email": Form.get("email"),
+                "UserName": Form.get("username"),
+                "Gender": Form.get("gender"),
+                "FirstName": Form.get("first-name"),
+                "LastName": Form.get("last-name"),
+                "Password": Form.get("password"),
+                "Age": Form.get("age"),
+            })
+
+        }).then(response => response.json())
+            .then(data =>  {
+                if (!data.status){
+                    console.log(data.data);
+                    ErrorHandling(data.data, "RegisterForm")
+                    throw new Error("Error Connecting")
+                }
+                if (data.status){
+                    console.log("inside the Json Response");
+                    LoadPage("login")
+                }
+            }).catch(err => {
+                console.log(err);
+            })
+    })
+
+    LogForm.addEventListener("submit", function(event){
+        event.preventDefault()
+        console.log("Submit Login Form");
+        var Form = new FormData(event.target)
+        
+        fetch("/login", {
+            method: "POST",
+            headers: {
+                "Content-Type" : "application/json"
+            },
+            body: JSON.stringify({
+                "email": Form.get("email"),
+                "password": Form.get("password"),
+            })
+
+        }).then(response => response.json())
+            .then(data =>  {
+                if (!data.status){
+                    console.log(data.data);
+                    ErrorHandling(data.data, "LoginForm")
+                    throw new Error("Error Connecting")
+                }
+                if (data.status){
+                    console.log("inside the Json Response");
+                    LoadPage("home")
+                }
+            }).catch(err => {
+                console.log(err);
+            })
+    })
+
+    pass.addEventListener("input", () => {
+        checkPassword();
+        validateForm();
+    });
+
+    user.addEventListener("input", validateForm);
+    email.addEventListener("input", validateForm);
+
+    confirmPass.addEventListener("input", validateForm);
+}

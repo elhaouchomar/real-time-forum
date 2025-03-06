@@ -7,6 +7,7 @@
 			<link href="/assets/style/google-icons/google-icons.css" rel="stylesheet" />
 			<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 			<link id="home" rel="stylesheet" href="/assets/style/root.css" />
+			<link id="home" rel="stylesheet" href="/assets/style/error.css" />
 			<link id="home" rel="stylesheet" href="/assets/style/create_post.css" />
 			<link id="home" rel="stylesheet" href="/assets/style/header.css" />
 			<link id="home" rel="stylesheet" href="/assets/style/left_sidebar.css" />
@@ -25,33 +26,14 @@
 					display: flex;
 					justify-content: center;
 					align-items: center;
-					height: 100vh;
 					width: 100vw;
 				}
 			</style>	
+	  <script src="/assets/js/spa.js" defer type="module" id="spa.js"></script>
 		</head>
-
 		<body>
 			<div class="SPAContainer">
 				
 			</div>			
-			<script>
-				function removeCreatePostListner() {
-					const CreatePostArea = document.querySelectorAll(".new-post-header");
-					CreatePostArea.forEach((elem) => {
-					elem.removeEventListener("click", createPostListner);
-					});
-				}
-				function createPostListner() {
-					const CreatePostArea = document.querySelectorAll(".new-post-header");
-					CreatePostArea.forEach((elem) => {
-					elem.addEventListener("click", () => {
-						createPost();
-					});
-					});
-				}
-				<!-- createPostListner(); --->
-			</script>
-			<script src="/assets/js/spa.js" type="module" id="spa.js"></script>
 		</body>
 		</html>

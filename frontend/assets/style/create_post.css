@@ -15,6 +15,13 @@
 .Hide {
     display: none !important;
 }
+.ErrorMessage {
+    display: none;
+    color: white;
+    position: absolute;
+    right: 10px;
+    top: 60px;
+}
 
 .CreatePostContainer {
     display: flex;

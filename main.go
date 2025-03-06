@@ -46,8 +46,8 @@ func main() {
 
 	http.HandleFunc("POST /login", handlers.Login)
 	http.HandleFunc("POST /register", handlers.Register)
-	http.HandleFunc("/login", handlers.RegisterPage)
-	http.HandleFunc("/register", handlers.RegisterPage)
+	// http.HandleFunc("/login", handlers.RegisterPage)
+	// http.HandleFunc("/register", handlers.RegisterPage)
 	http.HandleFunc("/logout", handlers.Logout)
 	http.HandleFunc("/error", handlers.Error)
 

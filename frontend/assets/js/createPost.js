@@ -1,4 +1,7 @@
-import { AVATAR_URL } from "./spa.js";
+import { CreatePostPage } from "./component/createPostPage.js";
+import { HandleLikes } from "./likes.js";
+import { readPost } from "./script.js";
+import { ListnerMap, AVATAR_URL, SPAContainer } from "./spa.js";
 
 const ERROR_DISPLAY_TIME = 5000;
 
@@ -41,26 +44,41 @@ function createPostTemplate(post) {
                 </div>
                 <div class="comment post" id="${post.ID}">
                     <i class="material-symbols-outlined showCmnts">comment</i>
-                    <span>0</span>
+                    <span id="${post.ID}">0</span>
                 </div>
             </div>
         </div>`;
 }
-async function createPost() {
+
+export function createPostListner() {
+    const CreatePostArea = document.querySelectorAll(".new-post-header");
+    CreatePostArea.forEach((elem) => {
+        const handler = () =>  createPost()
+        if (ListnerMap.has(elem)){
+            elem.removeEventListener('click', ListnerMap.get(elem))
+        }
+        elem.addEventListener("click", handler);
+        ListnerMap.set(elem, handler)
+    });
+}
+
+export async function createPost() {
+    const CreatePostPageHtml = CreatePostPage()
+    const firShild = SPAContainer.querySelector('div')
+    SPAContainer.insertBefore(CreatePostPageHtml, firShild)
     const modal = document.querySelector(".postModal");
     const closeBtn = document.querySelector(".titleInput .close-post");
     const form = document.querySelector('.CreatePostContainer form');
-
+  
     modal.style.display = "flex";
     document.querySelector(".titleInput input").focus();
 
     const closeModal = () => {
-        modal.style.display = "none";
-        document.getElementById("CreatePostScriptInjected")?.remove();
+        SPAContainer.querySelector('#CreatePostModal').remove()
     };
 
     window.onclick = e => {
-        if (e.target === modal || e.target === popup) closeModal();
+        if (e.target === modal) closeModal();
     };
 
     closeBtn.addEventListener('click', closeModal);
@@ -98,18 +116,16 @@ async function createPost() {
                 body: JSON.stringify(data)
             });
 
+            const post = await response.json();
+            console.log("======>", post);
+            
             if (response.status === 200) {
-                const post = await response.json();
                 updateUI(post, closeModal, form);
             } else {
-                showError(response.status === 429
-                    ? "You have reached the limit of creating posts, wait for 5 minutes"
-                    : "Error While creating post"
-                );
+                showError(post.data.message)
             }
         } catch (error) {
-            console.error('Create post failed:', error);
-            showError("Failed to create post");
+            showError("Failed to create post, try later...");
         }
     });
 }
@@ -124,11 +140,9 @@ function updateUI(post, closeModal, form) {
 
     const mainFeed = document.querySelector('.main-feed');
     mainFeed.insertBefore(postCard, mainFeed.children[1]);
-
     closeModal();
     form.reset();
 
     // Refresh event listeners
-    [removeSeeMoreListner, removeReadPostListner, removeCreatePostListner].forEach(fn => fn());
-    [seeMore, readPost, HandleLikes, createPostListner].forEach(fn => fn());
+    [readPost, HandleLikes, createPostListner].forEach(fn => fn());
 }

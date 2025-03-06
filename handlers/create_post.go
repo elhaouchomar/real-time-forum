@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strings"
 	"time"
@@ -15,23 +14,31 @@ var userPostCreationTime = make(map[int]time.Time)
 var userPostCreationCount = make(map[int]int)
 
 func CreatePost(w http.ResponseWriter, r *http.Request) {
+	var DATA = map[string]any{
+		"status":  false,
+		"message": "",
+	}
 	if r.Method != "POST" {
-		ErrorJs(w, http.StatusMethodNotAllowed, errors.New("invalid method"))
+		DATA["message"] = "invalid method"
+		JsResponse(w, http.StatusMethodNotAllowed, false, DATA)
 		return
 	}
 	if r.Header.Get("Content-Type") != "application/json" {
-		ErrorJs(w, http.StatusBadRequest, errors.New(r.Header.Get("Content-Type")))
+		DATA["message"] = "invalid content type"
+		JsResponse(w, http.StatusBadRequest, false, DATA)
 		return
 	}
 
 	UserId, err := CheckAuthentication(w, r)
 	if err != nil {
-		ErrorJs(w, http.StatusUnauthorized, errors.New("unauthorized "))
+		DATA["message"] = "unauthorized..."
+		JsResponse(w, http.StatusUnauthorized, false, DATA)
 		return
 	}
 	UserProfile, err := database.GetUserProfile(DB, UserId)
 	if err != nil {
-		ErrorJs(w, http.StatusUnauthorized, errors.New("unauthorized UserProfile"))
+		DATA["message"] = "Unauthorized UserProfile..."
+		JsResponse(w, http.StatusUnauthorized, false, DATA)
 		return
 	}
 	data := struct {
@@ -42,11 +49,13 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	}{}
 	err = json.NewDecoder(r.Body).Decode(&data)
 	if (strings.Trim(data.Title, " ") == "") || (strings.Trim(data.Content, " ") == "") {
-		ErrorJs(w, http.StatusBadRequest, errors.New("please enter title and content"))
+		DATA["message"] = "Please check title and content..."
+		JsResponse(w, http.StatusBadRequest, false, DATA)
 		return
 	}
 	if (!title_RGX.MatchString(data.Title)) || (!content_RGX.MatchString(data.Content)) || (len(data.Categories) == 0) || (err != nil) {
-		ErrorJs(w, http.StatusBadRequest, errors.New("required input not provided"))
+		DATA["message"] = "required input not provided..."
+		JsResponse(w, http.StatusBadRequest, false, DATA)
 		return
 	}
 
@@ -55,13 +64,15 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 	// Check if user has created too many posts in the given time frames
 	if hasCreatedTooManyPostsIn5Minutes(UserId) {
-		ErrorJs(w, http.StatusTooManyRequests, errors.New("too many posts created in a short period"))
+		DATA["message"] = "You have reached the limit of creating posts, wait for 5 minutes"
+		JsResponse(w, http.StatusTooManyRequests, false, DATA)
 		return
 	}
 
 	id, err := database.CreatePost(DB, UserId, data.Title, data.Content, data.Categories)
 	if err != nil {
-		ErrorJs(w, http.StatusInternalServerError, errors.New("somethign went wrong creating post"))
+		DATA["message"] = "Somethign went wrong, please try again later..."
+		JsResponse(w, http.StatusInternalServerError, false, DATA)
 		return
 	}
 
@@ -70,10 +81,10 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	userPostCreationCount[UserId]++
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"status":        "ok",
+		"status":        true,
 		"ID":            id,
-		"Title":         data.Title,           // TODO get username
-		"UserName":      UserProfile.UserName, // TODO get username
+		"Title":         data.Title,
+		"UserName":      UserProfile.UserName,
 		"CreatedAt":     "now",
 		"Content":       data.Content,
 		"Categories":    data.CategoriesList,

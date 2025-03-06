@@ -10,12 +10,9 @@
   scroll-margin-top: 100px;
 }
 
-html {
-  font-family: "Poppins", sans-serif;
-}
-
 body {
   position: relative;
+  font-family: "Poppins", sans-serif;
   background-color: var(--Greey);
   width: 100%;
 }

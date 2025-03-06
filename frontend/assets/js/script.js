@@ -1,17 +1,24 @@
 import { apiRequest } from "./apiRequest.js";
+import { CommentInputEventListenner, ExpandComments } from "./comments.js";
 import { HandleLikes } from "./likes.js";
-import { AVATAR_URL, LoadPage } from "./spa.js";
+import { AVATAR_URL, BodyElement, ChangeUrl, ListnerMap, LoadPage } from "./spa.js";
 
-const UrlParams = new URLSearchParams(window.location.search);
-const sidebardLeft = document.querySelector(".sidebar-left");
+// const sidebardLeft = document.querySelector(".sidebar-left");
 const windowMedia = window.matchMedia("(min-width: 768px)");
-const type = UrlParams.get("type");
-const username = UrlParams.get("username");
-let errorr = "";
 
-async function fetchPosts(offset, type) {
+// let errorr = "";
+
+export async function fetchPosts(offset, type) {
+  const UrlParams = new URLSearchParams(window.location.search);
+  var type = UrlParams.get("type");
+  const username = UrlParams.get("username");
+  console.log("====> fetchPosts CALLED <======", username);
+
   type = type || "home";
   let category_name = UrlParams.get("category");
+  console.log("Category name ", category_name);
+  console.log("type name ", type, window.location.search);
+  
   const postsContainer = document.querySelector(".main-feed");
   try {
     const response = await fetch(
@@ -20,6 +27,8 @@ async function fetchPosts(offset, type) {
       }${username ? `&username=${username}` : ""}`
     );
     const posts = await response.json();
+    console.log("POST +>>>>>>>", posts);
+    
     if (posts) {
       updateProfile(posts.profile);
       posts.posts.forEach((post) => {
@@ -27,7 +36,6 @@ async function fetchPosts(offset, type) {
       });
     }
     HandleLikes()
-    removeReadPostListener();
     readPost();
   } catch (error) {
     console.log(error);
@@ -35,7 +43,7 @@ async function fetchPosts(offset, type) {
 }
 
 function updateProfile(profile) {
-  const userName = "Mohamed Tawil"
+  const userName = profile.UserName
   const pImage = document.querySelector(".profileImage img");
   const pName = document.querySelector(".profileName");
   const pCounts = document.querySelector(".posts .postCounts");
@@ -132,7 +140,7 @@ function createPostFooter(post) {
   const comment = document.createElement("div");
   comment.className = "comment post";
   comment.id = post.post_id;
-  comment.innerHTML = `<i class="material-symbols-outlined showCmnts">comment</i><span>${post.comment_count}</span>`;
+  comment.innerHTML = `<i class="material-symbols-outlined showCmnts">comment</i><span id="${post.post_id}">${post.comment_count}</span>`;
   postFooter.append(react, comment);
   return postFooter;
 }
@@ -159,26 +167,72 @@ function createDislikeCounter(post) {
   return dislikeCounter;
 }
 
-function infiniteScroll() {
-  let offset = 10;
-  let timeout = null;
-  window.addEventListener("scroll", () => {
-    clearTimeout(timeout);
-    timeout = setTimeout(async () => {
-      const { scrollTop, scrollHeight, clientHeight } =
-        document.documentElement;
-      if (scrollTop + clientHeight >= scrollHeight - 5) {
-        await fetchPosts(offset, type);
-      }
-    }, 1000);
-  });
+export function infiniteScroll() {
+    console.log("====> infiniteScroll CALLED <======");
+
+    var UrlParams = new URLSearchParams(window.location.search);
+    const type = UrlParams.get("type");
+    
+    let offset = 10;
+    let timeout = null;
+    window.addEventListener("scroll", () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(async () => {
+        const { scrollTop, scrollHeight, clientHeight } =
+          document.documentElement;
+        if (scrollTop + clientHeight >= scrollHeight - 5) {
+          await fetchPosts(offset, type);
+        }
+      }, 1000);
+    });
+
+    themeToggle.forEach((elem) => {
+      elem.checked = darkModeStored;
+      elem.addEventListener("change", () => {
+        toggleDarkMode(elem.checked);
+      });
+    });
+
+    const Links = document.querySelectorAll(".Links")
+    Links.forEach(elem => {
+        elem.addEventListener("click", async (event)=>{
+            event.preventDefault();
+            if (elem.id == "logout") {
+              const respons = await apiRequest("logout")
+              console.log(respons);
+              if (respons.status){
+                console.log("Clicked on logout icon");
+                LoadPage("login")
+                return
+              }
+            }
+            const LinkHref = elem.getAttribute("href")
+            const params = new URLSearchParams(LinkHref.split("?")[1])
+            const type = params.get("type") || "home"
+            
+            ChangeUrl(LinkHref)
+            LoadPage(type, null, null, true)            
+            
+            //     <a class="CategoriesLinks" href="/?type=category&category={{$key}}">
+            //     <!-- TODO // selected-category /// Class For Specific Selected once -->
+            //     <div class="trending-item">
+            //         <div class="item-category">
+            //             <p>{{$key}}</p>
+            //         </div>
+            //         <span>{{$value}} Posts</span>
+            //     </div>
+            // </a>
+        })
+    })
+
 }
 
 async function fetchPost(url) {
   try {
     const response = await fetch(url);
+    if (response.status === 401) return LoadPage("login")
     if (response.status != 200) {
-      window.location.href = "/error?code=404&message=Page Not Found";
+      LoadPage("error", 404, "Page Not Found")
       return false;
     }
     return await response.text();
@@ -187,49 +241,59 @@ async function fetchPost(url) {
   }
 }
 
-function removeReadPostListener() {
+
+export function readPost() {
+  console.log("====> readPost CALLED <======");
+  
   document.querySelectorAll(".post").forEach((elem) => {
-    elem.removeEventListener("click", loadPostContent(elem));
+    const handler = () => loadPostContent(elem)
+    if (ListnerMap.has(elem)){
+      elem.removeEventListener('click', ListnerMap.get(elem))
+    }
+    elem.addEventListener("click", handler);
+    ListnerMap.set(elem, handler)
   });
 }
 
-function readPost() {
-  document.querySelectorAll(".post").forEach((elem) => {
-    elem.addEventListener("click", loadPostContent(elem));
-  });
-}
-
-function loadPostContent(elem) {
-  return async () => {
+async function loadPostContent(elem) {
+  console.log("====> loadPostContent CALLED <======");
+  
+  
     const html = await fetchPost(`/post/${elem.id}`);
     if (!html) return;
-    const postContent = document.querySelector(".postContainer");
+    console.log("Post content :", html);
+    
+    const postContent = document.createElement("div");
+    postContent.classList.add("postContainer")
     postContent.innerHTML = html;
-    if (!document.getElementById("ScriptInjected")) {
-      const script = document.createElement("script");
-      script.id = "ScriptInjected";
-      script.src = "/assets/js/comments.js";
-      document.body.appendChild(script);
-    }
-    document.body.classList.add("stop-scrolling");
-    document.addEventListener("click", (event) => {
+    BodyElement.appendChild(postContent)
+    BodyElement.classList.add("stop-scrolling");
+    CommentInputEventListenner()
+    ExpandComments()
+
+    const handleClick = (event) => {
       if (
-        event.target == postContent ||
-        event.target.classList.contains("close-post")
+      event.target == postContent ||
+      event.target.classList.contains("close-post")
       ) {
-        ExpandComments(false);
-        postContent.innerHTML = "";
-        postContent.classList.add("closed");
-        document.body.classList.remove("stop-scrolling");
-        if (document.getElementById("ScriptInjected"))
-          document.getElementById("ScriptInjected").remove();
+      ExpandComments(false);
+      postContent.innerHTML = "";
+      postContent.classList.add("closed");
+      document.body.classList.remove("stop-scrolling");
+      if (document.getElementById("ScriptInjected"))
+        document.getElementById("ScriptInjected").remove();
       }
-    });
+    };
+
+    if (ListnerMap.has(document)) {
+      document.removeEventListener("click", ListnerMap.get(document));
+    }
+
+    document.addEventListener("click", handleClick);
+    ListnerMap.set(document, handleClick);
     postContent.classList.remove("closed");
-    ListenOncommentButtom(false);
-    ListenOncommentButtom(true);
+    ListenOncommentButtom();
     HandleLikes();
-  };
 }
 
 function DisplayPost() {
@@ -242,13 +306,13 @@ function DisplayPost() {
   PostButtonSwitcher();
 }
 
-function ListenOncommentButtom(add) {
+function ListenOncommentButtom() {
   const commentButton = document.querySelector(".CommentButton");
-  if (add) {
-    commentButton.addEventListener("click", DisplayPost);
-  } else {
-    commentButton.removeEventListener("click", DisplayPost);
-  }
+  if (ListnerMap.has(commentButton)) {
+    commentButton.removeEventListener("click", ListnerMap.get(commentButton));
+  } 
+  commentButton.addEventListener("click", DisplayPost);
+  ListnerMap.set(commentButton)
 }
 
 const themeToggle = document.querySelectorAll("#switch");
@@ -264,12 +328,7 @@ function toggleDarkMode(isDark) {
 const darkModeStored = localStorage.getItem("darkMode") === "true";
 toggleDarkMode(darkModeStored);
 
-themeToggle.forEach((elem) => {
-  elem.checked = darkModeStored;
-  elem.addEventListener("change", () => {
-    toggleDarkMode(elem.checked);
-  });
-});
+
 
 function timeAgo(date) {
   const seconds = Math.floor((new Date() - new Date(date)) / 1000);
@@ -307,19 +366,32 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 //////////////// Start Listning dropDown List For Posts ////////////
-function postControlList() {
+export function postControlList() {
+  console.log("====> postControlList CALLED <======");
 
   const dropdown = document.querySelectorAll('.dropdown i, .dropdown .ProfileImage')
   dropdown.forEach(drop => {
-      let contentSibling = drop.nextElementSibling
-      drop.addEventListener('click', () => {
-          contentSibling.classList.toggle("show")
-      })
-      document.addEventListener('click', function (event) {
+      
+      if (ListnerMap.has(drop)) {
+          drop.removeEventListener('click', ListnerMap.get(drop));
+          document.removeEventListener('click', ListnerMap.get(drop));
+      }
+
+      let contentSibling = drop.nextElementSibling;
+      const handleClick = () => {
+          contentSibling.classList.toggle("show");
+      };
+      const handleClickOutside = (event) => {
           if (!contentSibling.contains(event.target) && !drop.contains(event.target) && contentSibling.classList.contains("show")) {
-              contentSibling.classList.remove('show');
+          contentSibling.classList.remove('show');
           }
-      });
+      };
+
+      drop.addEventListener('click', handleClick);
+      document.addEventListener('click', handleClickOutside);
+
+      ListnerMap.set(drop, handleClick);
+      ListnerMap.set(document, handleClickOutside);
   })
 }
 
@@ -348,7 +420,3 @@ Links.forEach(elem => {
         // </a>
     })
 })
-infiniteScroll();
-fetchPosts(0, type);
-postControlList()
-readPost();

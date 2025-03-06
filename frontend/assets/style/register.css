@@ -18,7 +18,20 @@
     --DarkBlue: #22252f;
     --Black: #242424;
 }
-
+body{
+    font-family: Montserrat;
+}
+.ErrorMessage {
+    display: none;
+    background-color: #ff5d5d;
+    margin-top: 10px;
+    padding: 10px 30px;
+    border-radius: 3px;
+    color: white;
+    /* width: 100%; */
+    font-size: 14px;
+    text-align: center;
+}
 
 .container {
     background-color: var(--White);
@@ -26,10 +39,10 @@
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
     position: relative;
     overflow: hidden;
-    width: 80vw;
-    max-width: 100%;
-    min-height: 480px;
-    height: 95vh;
+    width: 74vw;
+    /* max-width: 100%; */
+    /* min-height: 480px; */
+    height: 80vh;
     display: flex;
     flex-direction: row;
 }
@@ -39,6 +52,7 @@
     line-height: 20px;
     letter-spacing: 0.3px;
     margin: 20px 0;
+    text-align: center;
 }
 
 .container span {
@@ -74,7 +88,7 @@
 .container form {
     background-color: var(--White);
     display: flex;
-    align-items: center;
+    /* align-items: center; */
     justify-content: center;
     flex-direction: column;
     padding: 0 40px;
@@ -85,8 +99,8 @@ select,
 .container input {
     background-color: var(--Greey);
     border: none;
-    margin: 8px -9px;
-    padding: 8px 8px;
+    margin: 8px 0;
+    padding: 8px;
     font-size: 13px;
     border-radius: 8px;
     width: 100%;
@@ -193,7 +207,7 @@ select,
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    padding: 0 30px;
+    /* padding: 0 30px; */
     text-align: center;
     top: 0;
     transform: translateX(0);
@@ -265,7 +279,7 @@ select,
 }
 
 .password-container input {
-    width: 100%;
+    /* width: 100%; */
 }
 
 .toggle-password {
@@ -329,4 +343,7 @@ select,
             opacity: 1;
         }
     }
+}
+h1 {
+    text-align: center;
 }

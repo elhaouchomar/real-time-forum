@@ -3,7 +3,7 @@
     <div class="postInfo">
         <a href="/?type=profile&username={{.Post.UserName}}">
             <div class="authorImage">
-                <img src="https://api.multiavatar.com/{{.Post.UserName}}.svg" alt="">
+                <img src="https://ui-avatars.com/api/?name={{.Post.UserName}}" alt="">
             </div>
         </a>
         <div class="authorInfo">
@@ -47,7 +47,7 @@
         <div class="CommentButtons CommentButton">
             <div class="DisableUserSelect">
                 <span class="material-symbols-outlined" id="{{.Post.ID}}">comment</span>
-                <span class="commentCount">
+                <span id="{{.Post.ID}}" class="commentCount">
                     {{.Post.CommentCount}}
                 </span>
             </div>
@@ -74,7 +74,7 @@
         <div class="commentCard DisableUserSelect"><!-- Working Part -->
             <a href="/?type=profile&username={{.UserName}}">
             <div class="commentAuthorImage">
-                <img src="https://api.multiavatar.com/{{.UserName}}.svg" alt="">
+                <img src="https://ui-avatars.com/api/?name={{.UserName}}" alt="">
                 <!-- TODO ADD PROPER link: -->
             </div>
             </a>

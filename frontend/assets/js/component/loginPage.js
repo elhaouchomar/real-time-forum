@@ -1,8 +1,8 @@
 export function LoginPage(){
     const temp = document.createElement('div')
     temp.innerHTML =  `
-     <div class="container active" id="container">
-        <div class="form-container active-form  sign-up" id="sign-up-form">
+     <div class="container" id="container">
+        <div class="form-container  sign-up" id="sign-up-form">
             <form id="RegisterForm">
                 <h1>Create Account</h1>
                 <div style="justify-content: space-between; display: flex; gap: 10px;">
@@ -12,12 +12,14 @@ export function LoginPage(){
                     <input type="text" name="last-name" placeholder="Last Name" required>
 
                 </div>
-                <select name="gender" id="gender" style="display: flex; justify-content: space-between;">
-                    <option value="">Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select>                
-                
+                <div style="justify-content: space-between; display: flex; gap: 30px; width: 100%;" >
+                    <select name="gender" id="gender" style="display: flex; justify-content: space-between;">
+                        <option value="">Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>         
+                    <input type="number" id="" name="age" placeholder="Age" required>      
+                </div>
                 <input type="text" id="user" name="username" placeholder="Username" required>
                 <div id="usernameMessage" class="message"><i class="material-icons check-uncheck"
                         style="font-size: 10px;">&#xe5c9;</i> Username must contain only letters and numbers.</div>
@@ -49,18 +51,15 @@ export function LoginPage(){
                         style="font-size: 10px;">&#xe5c9;</i> Confirmation password does not match.</div>
                 <button type="submit" id="registerBtn" disabled>Register</button>
                 <p>You have an account? <a href="#" onclick="switchForm('login')">Sign in</a></p>
-                {{if .MessageError}}
-                {{if .Register}}
                 <div class="ErrorMessage">
-                    <i class="material-icons" style="font-size: 14px;">&#xe000;</i> {{.MessageError}}
+                    <i class="material-icons" style="font-size: 14px;">&#xe000;</i>
+                    <span class="Content">
+                    </span>
                 </div>
-                {{end}}
-                {{end}}
-                
             </form>
         </div>
 
-        <div class="form-container sign-in" id="login-form">
+        <div class="form-container active-form sign-in" id="login-form">
             <form id="LoginForm">
                 <h1>Sign In</h1>
                 <input type="text" name="email" placeholder="Email" required>
@@ -70,13 +69,11 @@ export function LoginPage(){
                 </div>
                 <p>Don't have an account? <a href="#" onclick="switchForm('register')">Sign Up</a></p>
                 <button type="submit">Sign In</button>
-                {{if .MessageError}}
-                {{if not .Register}}
                 <div class="ErrorMessage">
-                    <i class="material-icons" style="font-size: 14px;">&#xe000;</i> {{.MessageError}}
+                    <i class="material-icons" style="font-size: 14px;">&#xe000;</i>
+                    <span class="Content">
+                    </span>
                 </div>
-                {{end}}
-                {{end}}
             </form>
         </div>
 

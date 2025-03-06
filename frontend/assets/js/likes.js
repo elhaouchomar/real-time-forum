@@ -1,3 +1,5 @@
+import { LoadPage } from "./spa.js";
+
 // Store handler references
 const likeHandlers = new WeakMap();
 const dislikeHandlers = new WeakMap();
@@ -19,7 +21,7 @@ async function handleReaction(btn, type) {
             })
         });
 
-        if (res.status === 401) return popUp();
+        if (res.status === 401) return LoadPage("login");
         if (res.status !== 200) return;
 
         const data = await res.json();

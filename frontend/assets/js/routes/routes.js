@@ -1,3 +1,6 @@
+import { createPostListner } from "../createPost.js";
+import { fetchPosts, infiniteScroll, postControlList, readPost } from "../script.js";
+
 export const ROUTES = {
     "home": {
         "scripts": ["spa", "profile", "likes", "script", "chat"],
@@ -9,6 +12,9 @@ export const ROUTES = {
         "styles": ["register"],
 
     },
+    "error":{
+        "styles": ["error"],
+    }
 }
 //     <link rel="stylesheet" href="/assets/style/root.css" />
 {/* <link rel="stylesheet" href="/assets/style/create_post.css" />

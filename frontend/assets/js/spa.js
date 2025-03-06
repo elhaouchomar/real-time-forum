@@ -2,14 +2,30 @@ import { HomePage } from "./component/homePage.js";
 import { LoginPage } from "./component/loginPage.js"
 import { apiRequest } from "./apiRequest.js"
 import { ROUTES } from "./routes/routes.js";
-const SPAContainer = document.querySelector(".SPAContainer");
+import { fetchPosts, infiniteScroll, postControlList, readPost } from "./script.js";
+import { registerFunctions } from "./register.js";
+import {createPostListner} from "./createPost.js"
+import { ErrorPage } from "./component/error.js";
+
+export const SPAContainer = document.querySelector(".SPAContainer");
 const headElement = document.querySelector('head')
-const BodyElement = document.querySelector("body")
+export const BodyElement = document.querySelector("body")
 export const AVATAR_URL = 'https://ui-avatars.com/api/?name=';//${userName}
-export const USERNAME = 'Mohamed TEST';//${userName}
+export const USERNAME = null
+export const ListnerMap = new WeakMap()
+
 var MAIN_URL = window.location.pathname.split("/")[1]
 MAIN_URL =  MAIN_URL == "" ? "home" : MAIN_URL
 console.log("XXXX", MAIN_URL);
+
+
+window.onload = async () => {
+    const response = await apiRequest("checker")
+    Logged = response.status
+    MAIN_URL = Logged ? MAIN_URL : "login"
+    console.log(`User Logged Statuse => ${Logged} --> Redirected to ${MAIN_URL}`);
+    LoadPage(MAIN_URL)
+}
 
 var Logged = false
 
@@ -40,69 +56,41 @@ function createStyle(src, page){
     return temp.firstChild
 }
 
-window.onload = async () => {
-    const response = await apiRequest("checker")
-    Logged = response.status
-    MAIN_URL = Logged ? MAIN_URL : "login"
-    console.log(`User Logged Statuse => ${Logged} --> Redirected to ${MAIN_URL}`);
-    LoadPage(MAIN_URL)
-}
 
-
-export async function LoadPage(page = "home"){
+export async function LoadPage(page = "home", code, msg, skip = false){
     console.log(`Loading Page => ${page}`);
-    ChangeUrl(page)
+    if (!skip) ChangeUrl(page)
     clearSPAContainer()
 
-    if (page == "home"){
+    if (page == "home" || page == "category" ||
+         page == "trending" || page == "profile" || page == "liked"){
         removeStyleElements()
-        removeScriptElements()
         SPAContainer.appendChild(HomePage())
         console.log("Append HomePage");
-        ROUTES[page]["scripts"].forEach(elem => {
-            BodyElement.appendChild(createScript(elem, "module"))
-        })
-        ROUTES[page]["styles"].forEach(elem => {
+        infiniteScroll()
+        fetchPosts(0, page)
+        postControlList()
+        readPost()
+        createPostListner()
+        ROUTES["home"]["styles"].forEach(elem => {
             headElement.appendChild(createStyle(elem, page))
         })
-        // SPAContainer.appendChild(NavBar())
-        // BodyElement.appendChild(createScript("script","module"))
-        // const HomePageHMTL = HomePage();
-        // console.log(bodyContainer);
-        
-        // // bodyContainer.innerHTML = HomePageHMTL
-        // BodyElement.appendChild(createScript("createPost"))
-        // BodyElement.appendChild(createScript("likes"))
-        // BodyElement.appendChild(createScript("script","module"))
-        // BodyElement.appendChild(createScript("chat"))
     } else if (page == "login") {
         removeStyleElements();
-        removeScriptElements();
         SPAContainer.appendChild(LoginPage());
         console.log("Append LoginPage");
-        ROUTES[page]["scripts"].forEach(name => {
-            console.log("Adding JS of Login", page);
-            BodyElement.appendChild(createScript(name, "module"));
-        });
+        registerFunctions()
         ROUTES[page]["styles"].forEach(name => {
             console.log("Adding CSS of Login", page);
             headElement.appendChild(createStyle(name, page));
         });
+    }else if (page == "error"){
+        SPAContainer.appendChild(ErrorPage(code, msg));
+    }else{
+        removeStyleElements();
+        SPAContainer.appendChild(ErrorPage(404, "Page Not Found"));
+        headElement.appendChild(createStyle(ROUTES["error"]["styles"][0], "error"));
     }
-    // await fetchPost(`http://localhost:8080/${page}`).then(
-    //     elem => {
-    //         htmlPage.innerHTML = elem
-    //         // const htmlPage = document.querySelector('html')
-    //         const bodyElement = htmlPage.querySelector('body')
-    //         console.log("BODY + ", bodyElement);
-            
-    //         console.log("test=:>");
-            
-    //         return
-    //     }
-    // )
-   
-        
 }
 
 function removeStyleElements(){
@@ -130,3 +118,20 @@ export function ChangeUrl(url, data = {}) {
     console.log("URL Changed to =>", url);
     // LoadPage("home")
 }
+
+navigation.addEventListener("navigate", (event) => {
+    const Url = new URL(event.destination.url)
+    const params = new URLSearchParams(Url.search)
+    var type = params.get("type")
+    var category = params.get("category")
+    if (!type){
+        type = Url.pathname.split("/")[1]
+    }
+    LoadPage(type, null, null, true)
+    console.log("=====================================")
+    console.log("=====================================")
+    console.log("  Any changes ",event.destination.url, event.pushState )
+    console.log("=====================================")
+    console.log("=====================================")
+
+})
