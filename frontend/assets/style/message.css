@@ -41,10 +41,15 @@
 
 .messages-area {
   flex: 1;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  margin-bottom: 173px;
+  height: calc(100% - 70px);
+  overflow-y: auto;
+  padding-bottom: 40px;
+}
+#chat {
+  margin-bottom: 70px;
+  overflow-y: auto;
 }
 
 .messages {

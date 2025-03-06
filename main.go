@@ -22,6 +22,19 @@ func main() {
 		os.Exit(1)
 	}
 
+	// dispatcher := handlers.NewDispatcher(5) // 5 workers
+    // dispatcher.Run()
+    
+   
+    
+    // Example of adding a job
+    // job := handlers.Job{
+    //     ID:      1,
+    //     Type:    "notification",
+    //     Payload: map[string]interface{}{"userId": 123},
+    // }
+    // dispatcher.JobQueue <- job
+
 	fmt.Printf("Creating database at %v...\n", os.Args[1:])
 	db := database.OpenDatabase(os.Args[1])
 	database.CreateTables(db)
@@ -37,7 +50,7 @@ func main() {
 	fmt.Println(database.QuerryPostsbyUser(db, "test", 0, 5, 0))
 
 	http.HandleFunc("/ws", handlers.HandleWebSocket)
-	// http.HandleFunc("/api/chat/history", handlers.GetChatHistory)
+	http.HandleFunc("/api/chat/history", handlers.GetChatHistory)
 
 	http.HandleFunc("/", handlers.HomePage)
 	http.HandleFunc("POST /checker", handlers.Checker)
