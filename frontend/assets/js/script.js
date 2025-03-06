@@ -206,6 +206,10 @@ export function infiniteScroll() {
                 return
               }
             }
+            if (elem.id == "message"){
+              elem.hidden = false
+              return
+            }
             const LinkHref = elem.getAttribute("href")
             const params = new URLSearchParams(LinkHref.split("?")[1])
             const type = params.get("type") || "home"
@@ -394,29 +398,3 @@ export function postControlList() {
       ListnerMap.set(document, handleClickOutside);
   })
 }
-
-const Links = document.querySelectorAll(".Links")
-Links.forEach(elem => {
-    elem.addEventListener("click", async (event)=>{
-        event.preventDefault();
-        if (elem.id == "logout") {
-          const respons = await apiRequest("logout")
-          console.log(respons);
-            if (respons.status){
-              console.log("Clicked on logout icon");
-              LoadPage("login")
-              return
-            }
-            
-        }
-        //     <a class="CategoriesLinks" href="/?type=category&category={{$key}}">
-        //     <!-- TODO // selected-category /// Class For Specific Selected once -->
-        //     <div class="trending-item">
-        //         <div class="item-category">
-        //             <p>{{$key}}</p>
-        //         </div>
-        //         <span>{{$value}} Posts</span>
-        //     </div>
-        // </a>
-    })
-})

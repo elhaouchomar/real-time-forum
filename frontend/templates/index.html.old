@@ -37,8 +37,9 @@
           <div>Categories</div>
         </a>
       </div> -->
-      {{template "left-sidebar" .Profile}} {{template "profile-sidebar" .}} {{
-      template "message" }}
+      {{template "left-sidebar" .Profile}} 
+      {{template "profile-sidebar" .}} 
+      {{template "message" }}
       <div class="main-flex" id="posts">
         <div class="main-feed">
           <!-- Create New Post -->
