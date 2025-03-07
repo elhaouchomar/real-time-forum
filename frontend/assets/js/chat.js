@@ -115,93 +115,146 @@ function connectWebSocket() {
   };
 }
 let button = document.getElementById("sendButton");
-let checkStatus = document.querySelector(".status");
+// let checkStatus = document.querySelector(".status");
+let currentUserId = null;
+
+function setCurrentUser(userId) {
+  currentUserId = userId;
+}
 
 function handleWebSocketMessage(event) {
   const data = JSON.parse(event.data);
+  console.log("WebSocket received:", data);
 
   if (data.type === "users_list") {
+    console.log("Updating friends list", data);
     addFriend(
       data.usernames,
       data.user_ids,
       data.user_statuses,
       data.last_messages,
-      data.last_times
+      data.last_times,
+      data.unread_counts
     );
     return;
   }
 
   if (data.type === "message") {
+    console.log("Message received:", data);
     const time = new Date().toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     });
-    let checkStatus = document.querySelector(".status");
-    console.log(checkStatus.id);
-    
-    checkStatus.id=parseInt(checkStatus.id.slice(12,checkStatus.id.length))
-    console.log(checkStatus.id,button.id,data);
 
-    if (!checkStatus.id || checkStatus.id != data.sender_id) {
-      alert(`${data.username} send you message!`)
-      return
+    let checkStatus = document.querySelector(".status");
+    console.log("Status element:", checkStatus);
+
+    if (!checkStatus || !checkStatus.id) {
+      console.log("checkStatus غير موجود، كاين مشكل فـ DOM!");
+      alert(`${data.username} sent you a message!`);
+      return;
     }
 
-    const messageElement = createMessageElement(data.content, time, "received");
-    messagesArea.appendChild(messageElement);
-    messagesArea.scrollTop = messagesArea.scrollHeight;
+    let activeUserId = null;
+    if (checkStatus.id.includes(`${currentUserId}`)) {
+      alert(`${data.username} sent you a message!`);
+      return;
+    } else if (checkStatus.id.startsWith("user-status-")) {
+      activeUserId = parseInt(checkStatus.id.replace("user-status-", ""));
+    } else {
+      const matches = checkStatus.id.match(/\d+/);
+      activeUserId = matches ? parseInt(matches[0]) : NaN;
+    }
+
+    console.log("Active User ID:", activeUserId, "Sender ID:", data.sender_id);
+
+    if (!isNaN(activeUserId) && activeUserId === data.sender_id) {
+      const messagesArea = document.querySelector(".messages-area");
+      if (!messagesArea) {
+        console.error("messagesArea is not defined!");
+        return;
+      }
+      const messageElement = createMessageElement(data.content, time, "received");
+      messagesArea.appendChild(messageElement);
+      messagesArea.scrollTop = messagesArea.scrollHeight;
+    } else {
+      console.log("Message is from another user");
+      alert(`${data.username} sent you a message!`);
+    }
   }
 }
 
-function addFriend(friends, userIds, userStatuses, lastMessages, lastTimes) {
+
+function addFriend(friends, userIds, userStatuses, lastMessages, lastTimes, unreadCounts) {
   const friendsList = document.querySelector(".allfriends");
+  if (!friendsList) {
+    console.error("friendsList is not found in the DOM!");
+    return;
+  }
+
   friendsList.innerHTML = "";
 
   friends.forEach((friend) => {
     const userId = userIds[friend];
-    const status = userStatuses[friend];
-    const lastMessage = lastMessages[friend];
-    const lastTime = new Date(lastTimes[friend]).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
+    const status = userStatuses[friend] || "offline";
+    const lastMessage = lastMessages[friend] || "No messages yet";
+    const unreadCount = unreadCounts[friend] || 0;
+    const lastTime = lastTimes[friend] ? 
+      new Date(lastTimes[friend]).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "—";
+
     const friendElement = document.createElement("div");
     friendElement.className = "friend";
+    if (unreadCount > 0) {
+      friendElement.classList.add("has-unread");
+    }
+
+    const img = new Image();
+    img.src = `https://api.multiavatar.com/${friend}.svg`;
+    img.onerror = function () {
+      img.src = `https://ui-avatars.com/api/?name=${friend}&background=random`;
+    };
+
     friendElement.innerHTML = `
       <div class="friend-avatar">
-      <img src="../../assets/images/profile.png" class="profile-img" alt="${friend}">
-      <div class="status ${status}" id="user-${userId}"></div>
+          <img src="${img.src}" class="profile-img" alt="${friend}">
+          <div class="status ${status}" id="user-${userId}"></div>
       </div>
       <div class="friend-info">
-      <div>
-        <div class="friend-name">${friend}</div>
-        <div class="last-message">${lastMessage}</div>
-      </div>
-      <div class="time-notif">
-        <div class="last-time">${lastTime}</div>
-        <div class="notification">0</div>
-      </div>
+          <div>
+              <div class="friend-name">${friend}</div>
+              <div class="last-message">${lastMessage.length > 30 ? lastMessage.substring(0, 30) + '...' : lastMessage}</div>
+          </div>
+          <div class="time-notif">
+              <div class="last-time">${lastTime}</div>
+              ${unreadCount > 0 ? `<div class="notification">${unreadCount}</div>` : ''}
+          </div>
       </div>`;
 
-    const statusElement = friendElement.querySelector(`#user-${userId}`);
-    statusElement.classList.toggle("online", status === "online");
-    statusElement.classList.toggle("offline", status === "offline");
-
     friendElement.addEventListener("click", () => {
+      console.log("Friend clicked:", friend);
+
+      const messagesArea = document.querySelector(".messages-area");
+      const show_user = document.querySelector("#show-user");
+      const friend_avatar = document.querySelector("#friend-avatar");
+      const button = document.querySelector("#chat-button");
+
+      if (!messagesArea || !show_user || !friend_avatar || !button) {
+        console.error("One or more DOM elements are missing! Check `.messages-area`, `#show-user`, `#friend-avatar`, `#chat-button`.");
+        return;
+      }
+
       messagesArea.innerHTML = "";
-      const show_user = document.getElementById("user-receiver");
-      friends_list.style.display = window.innerWidth <= 780 ? "none" : "block";
-      chat_box.style.display = "flex";
       show_user.innerHTML = friend;
       friend_avatar.innerHTML = `
-                <div class="friend-avatar">
-            <img src="../../assets/images/profile.png" class="profile-img" alt="${username}">
-                  <div class="status ${status}" id="user-status-${userId}"></div>
+        <div class="friend-avatar">
+          <img src="../../assets/images/profile.png" class="profile-img" alt="${friend}">
+          <div class="status ${status}" id="user-status-${userId}"></div>
         </div>`;
       button.id = `user-status-${userId}`;
-      messageOffset = 0;
+      currentUserId = userId;
+
       fetchChatHistory(userId, messageOffset);
+
       if (messagesArea && userID == 0) {
         userID = userId;
         messagesArea.addEventListener("scroll", async () => {
@@ -212,10 +265,57 @@ function addFriend(friends, userIds, userStatuses, lastMessages, lastTimes) {
           }
         });
       }
+
+      if (unreadCount > 0) {
+        markMessagesAsRead(userId);
+        friendElement.classList.remove("has-unread");
+        const notifElement = friendElement.querySelector(".notification");
+        if (notifElement) notifElement.classList.add("hidden");
+      }
     });
+
     friendsList.appendChild(friendElement);
   });
 }
+
+
+function markMessagesAsRead(senderId) {
+  if (!currentUserId) {
+    return;
+  }
+
+  fetch('/api/mark-read', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sender_id: senderId,
+      receiver_id: currentUserId
+    })
+  })
+    .then(response => {
+      if (response.ok) {
+        console.log(`Marked messages from ${senderId} as read`);
+      } else {
+        console.error('Failed to mark messages as read');
+      }
+    })
+    .catch(error => {
+      console.error('Error marking messages as read:', error);
+    });
+}
+
+
+function createMessageElement(content, time, type) {
+  const messageElement = document.createElement("div");
+  messageElement.className = `message ${type}`;
+  messageElement.innerHTML = `
+      <div class="message-content">${content}</div>
+      <div class="message-time">${time}</div>
+  `;
+  return messageElement;
+}
+
+
 
 async function fetchChatHistory(userId, offset = 0) {
   await fetch(`/api/chat/history?user_id=${userId}&offset=${offset}`)
@@ -226,7 +326,9 @@ async function fetchChatHistory(userId, offset = 0) {
       return response.json();
     })
     .then((data) => {
+
       messageOffset += 10;
+      console.log(messageOffset);
       data.messages.forEach((mess) => {
         const messageDiv = displayMessage(mess, userId);
         messagesArea.prepend(messageDiv);

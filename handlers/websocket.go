@@ -2,6 +2,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -183,6 +184,7 @@ type UsersList struct {
 	UserIDs      map[string]int       `json:"user_ids"`
 	LastMessages map[string]string    `json:"last_messages"`
 	LastTimes    map[string]time.Time `json:"last_times"`
+	UnreadCounts map[string]int       `json:"unread_counts"` // Added field for unread message counts
 }
 
 func BroadcastUsersList() error {
@@ -200,10 +202,9 @@ func BroadcastUsersList() error {
 		userIDs := make(map[string]int)
 		lastMessages := make(map[string]string)
 		lastTimes := make(map[string]time.Time)
+		unreadCounts := make(map[string]int)
 
-		// Populate user data
 		for _, username := range usernames {
-			// Get user ID
 			userID, err := GetUserIDByUsername(username)
 			if err != nil {
 				log.Printf("Error getting user ID for %s: %v", username, err)
@@ -211,7 +212,7 @@ func BroadcastUsersList() error {
 			}
 			userIDs[username] = userID
 
-			// Set status
+			// Check if user is online
 			userStatuses[username] = "offline"
 			for _, c := range connectedUsers.m {
 				if c.Username == username {
@@ -220,23 +221,53 @@ func BroadcastUsersList() error {
 				}
 			}
 
-			// Get last message and time
+			// Get last message
 			var lastMessage string
 			var lastTime time.Time
-			err = DB.QueryRow("SELECT content, timestamp FROM messages WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) ORDER BY timestamp DESC LIMIT 1", userID, currentUserID, currentUserID, userID).Scan(&lastMessage, &lastTime)
-			if err == nil {
+			err = DB.QueryRow(`
+				SELECT content, timestamp FROM messages 
+				WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) 
+				ORDER BY timestamp DESC LIMIT 1`,
+				userID, currentUserID, currentUserID, userID,
+			).Scan(&lastMessage, &lastTime)
+
+			if err != nil {
+				lastMessages[username] = "No messages yet"
+				lastTimes[username] = time.Time{}
+			} else {
 				lastMessages[username] = lastMessage
 				lastTimes[username] = lastTime
+			}
+
+			// Count unread messages
+			var count int
+			err = DB.QueryRow("SELECT COUNT(*) FROM messages WHERE sender_id = ? AND receiver_id = ? AND read = 0", userID, currentUserID).Scan(&count)
+			if err != nil {
+				unreadCounts[username] = 0
 			} else {
-				lastMessages[username] = ""
-				lastTimes[username] = time.Time{}
+				unreadCounts[username] = count
 			}
 		}
 
-		// Sort users by last message time, if empty sort by alphabetic
+		// Sorting users
 		sort.Slice(usernames, func(i, j int) bool {
+			// Prioritize users with unread messages
+			if unreadCounts[usernames[i]] > 0 && unreadCounts[usernames[j]] == 0 {
+				return true
+			}
+			if unreadCounts[usernames[i]] == 0 && unreadCounts[usernames[j]] > 0 {
+				return false
+			}
+
+			// Sort by last message timestamp
 			if lastTimes[usernames[i]].IsZero() && lastTimes[usernames[j]].IsZero() {
-				return usernames[i] < usernames[j]
+				return usernames[i] < usernames[j] // Sort alphabetically if no timestamps
+			}
+			if lastTimes[usernames[i]].IsZero() {
+				return false
+			}
+			if lastTimes[usernames[j]].IsZero() {
+				return true
 			}
 			return lastTimes[usernames[i]].After(lastTimes[usernames[j]])
 		})
@@ -248,6 +279,7 @@ func BroadcastUsersList() error {
 			UserIDs:      userIDs,
 			LastMessages: lastMessages,
 			LastTimes:    lastTimes,
+			UnreadCounts: unreadCounts,
 		}
 
 		err = conn.Conn.WriteJSON(usersList)
@@ -258,11 +290,13 @@ func BroadcastUsersList() error {
 	return nil
 }
 
+
 func GetUserIDByUsername(username string) (int, error) {
 	var id int
 	err := DB.QueryRow("SELECT id FROM users WHERE username = ?", username).Scan(&id)
 	return id, err
 }
+
 func sendPrivateMessage(msg Message) {
 	connectedUsers.Lock()
 	defer connectedUsers.Unlock()
@@ -275,4 +309,25 @@ func sendPrivateMessage(msg Message) {
 	} else {
 		log.Printf("User %d is not connected", msg.ReceiverID)
 	}
+}
+
+func MarkMessagesAsRead(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		SenderID   int `json:"sender_id"`
+		ReceiverID int `json:"receiver_id"`
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+
+	_, err = DB.Exec("UPDATE messages SET read = 1 WHERE sender_id = ? AND receiver_id = ?", req.SenderID, req.ReceiverID)
+	if err != nil {
+		http.Error(w, "Failed to update messages", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
