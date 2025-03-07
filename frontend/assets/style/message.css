@@ -10,6 +10,7 @@
 }
 
 .chat-box {
+  display: none;
   width: 65%;
   height: 100%;
   display: flex;
@@ -84,7 +85,7 @@
   margin: 15px;
   min-width: 55px;
 }
-.message-time{
+.message-time {
   margin-top: 5px;
 }
 .message-athour,
@@ -144,7 +145,8 @@
   background: var(--Greey);
 }
 .friends-header h2 {
-  color: var(--BlueGreen)
+  font-style: italic;
+  color: var(--BlueGreen);
 }
 .friend {
   display: flex;
@@ -183,7 +185,10 @@
 }
 
 .friend-info {
-  margin-left: 10px;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  margin: 0px 8px 0px 8px;
   color: var(--Black);
 }
 
@@ -194,6 +199,40 @@
 .last-message {
   font-size: 12px;
   color: var(--GreeyD);
+}
+.time-notif {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  padding: 4px;
+}
+
+.last-time {
+  margin-bottom: 30px;
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.notification {
+  background-color: var(--BlueGreen);
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  border-radius: 50%;
+  position: absolute;
+  margin: 15px 5px 0px 0px;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.notification:hover {
+  transform: scale(1.1);
 }
 
 .back {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sort"
 	"sync"
 	"time"
 
@@ -176,10 +177,12 @@ func broadcastMessage(msg Message) {
 }
 
 type UsersList struct {
-	Type         string            `json:"type"`
-	Usernames    []string          `json:"usernames"`
-	UserStatuses map[string]string `json:"user_statuses"`
-	UserIDs      map[string]int    `json:"user_ids"`
+	Type         string               `json:"type"`
+	Usernames    []string             `json:"usernames"`
+	UserStatuses map[string]string    `json:"user_statuses"`
+	UserIDs      map[string]int       `json:"user_ids"`
+	LastMessages map[string]string    `json:"last_messages"`
+	LastTimes    map[string]time.Time `json:"last_times"`
 }
 
 func BroadcastUsersList() error {
@@ -195,6 +198,8 @@ func BroadcastUsersList() error {
 
 		userStatuses := make(map[string]string)
 		userIDs := make(map[string]int)
+		lastMessages := make(map[string]string)
+		lastTimes := make(map[string]time.Time)
 
 		// Populate user data
 		for _, username := range usernames {
@@ -214,13 +219,35 @@ func BroadcastUsersList() error {
 					break
 				}
 			}
+
+			// Get last message and time
+			var lastMessage string
+			var lastTime time.Time
+			err = DB.QueryRow("SELECT content, timestamp FROM messages WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) ORDER BY timestamp DESC LIMIT 1", userID, currentUserID, currentUserID, userID).Scan(&lastMessage, &lastTime)
+			if err == nil {
+				lastMessages[username] = lastMessage
+				lastTimes[username] = lastTime
+			} else {
+				lastMessages[username] = ""
+				lastTimes[username] = time.Time{}
+			}
 		}
+
+		// Sort users by last message time, if empty sort by alphabetic
+		sort.Slice(usernames, func(i, j int) bool {
+			if lastTimes[usernames[i]].IsZero() && lastTimes[usernames[j]].IsZero() {
+				return usernames[i] < usernames[j]
+			}
+			return lastTimes[usernames[i]].After(lastTimes[usernames[j]])
+		})
 
 		usersList := UsersList{
 			Type:         "users_list",
 			Usernames:    usernames,
 			UserStatuses: userStatuses,
 			UserIDs:      userIDs,
+			LastMessages: lastMessages,
+			LastTimes:    lastTimes,
 		}
 
 		err = conn.Conn.WriteJSON(usersList)

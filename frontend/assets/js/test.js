@@ -13,11 +13,11 @@ const notif = document.querySelector(".notif");
 const friends_list = document.querySelector(".friends-list");
 const chat_box = document.querySelector(".chat-box");
 const messageInput = document.getElementById("messageInput");
-const sendButton = document.querySelector(".send-btn");
+const sendButton = document.getElementById("sendButton");
 const messagesArea = document.getElementById("messages");
 const r = document.getElementById("user-receiver");
 const chat = document.getElementById("chat");
-const friend_avatar = document.querySelector(".friend-avatar");
+const chatHeader = document.querySelector(".chat-header")
 
 // Event Listeners
 document.addEventListener("click", handleDocumentClick);
@@ -114,46 +114,27 @@ function connectWebSocket() {
     setTimeout(connectWebSocket, 5000);
   };
 }
-let button = document.getElementById("sendButton");
-let checkStatus = document.querySelector(".status");
 
 function handleWebSocketMessage(event) {
   const data = JSON.parse(event.data);
-
+  console.log(data);
+  
   if (data.type === "users_list") {
-    addFriend(
-      data.usernames,
-      data.user_ids,
-      data.user_statuses,
-      data.last_messages,
-      data.last_times
-    );
+    addFriend(data.usernames, data.user_ids, data.user_statuses, data.last_messages, data.last_times, data.unread_messages);
     return;
   }
-
   if (data.type === "message") {
     const time = new Date().toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     });
-    let checkStatus = document.querySelector(".status");
-    console.log(checkStatus.id);
-    
-    checkStatus.id=parseInt(checkStatus.id.slice(12,checkStatus.id.length))
-    console.log(checkStatus.id,button.id,data);
-
-    if (!checkStatus.id || checkStatus.id != data.sender_id) {
-      alert(`${data.username} send you message!`)
-      return
-    }
-
     const messageElement = createMessageElement(data.content, time, "received");
     messagesArea.appendChild(messageElement);
     messagesArea.scrollTop = messagesArea.scrollHeight;
   }
 }
 
-function addFriend(friends, userIds, userStatuses, lastMessages, lastTimes) {
+function addFriend(friends, userIds, userStatuses, lastMessages, lastTimes, unreadCount) {
   const friendsList = document.querySelector(".allfriends");
   friendsList.innerHTML = "";
 
@@ -161,6 +142,7 @@ function addFriend(friends, userIds, userStatuses, lastMessages, lastTimes) {
     const userId = userIds[friend];
     const status = userStatuses[friend];
     const lastMessage = lastMessages[friend];
+    const unread_Msg = 0
     const lastTime = new Date(lastTimes[friend]).toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
@@ -180,26 +162,23 @@ function addFriend(friends, userIds, userStatuses, lastMessages, lastTimes) {
       </div>
       <div class="time-notif">
         <div class="last-time">${lastTime}</div>
-        <div class="notification">0</div>
+        <div class="notification">${unread_Msg}</div>
       </div>
       </div>`;
-
     const statusElement = friendElement.querySelector(`#user-${userId}`);
     statusElement.classList.toggle("online", status === "online");
     statusElement.classList.toggle("offline", status === "offline");
 
     friendElement.addEventListener("click", () => {
       messagesArea.innerHTML = "";
-      const show_user = document.getElementById("user-receiver");
       friends_list.style.display = window.innerWidth <= 780 ? "none" : "block";
       chat_box.style.display = "flex";
-      show_user.innerHTML = friend;
-      friend_avatar.innerHTML = `
+      chatHeader.innerHTML = `
                 <div class="friend-avatar">
             <img src="../../assets/images/profile.png" class="profile-img" alt="${username}">
                   <div class="status ${status}" id="user-status-${userId}"></div>
-        </div>`;
-      button.id = `user-status-${userId}`;
+        </div>
+        <span id="user-receiver">${friend}</span>`
       messageOffset = 0;
       fetchChatHistory(userId, messageOffset);
       if (messagesArea && userID == 0) {
@@ -213,6 +192,7 @@ function addFriend(friends, userIds, userStatuses, lastMessages, lastTimes) {
         });
       }
     });
+
     friendsList.appendChild(friendElement);
   });
 }
@@ -231,8 +211,7 @@ async function fetchChatHistory(userId, offset = 0) {
         const messageDiv = displayMessage(mess, userId);
         messagesArea.prepend(messageDiv);
       });
-      messagesArea.scrollTop =
-        messageOffset <= 10 ? messagesArea.scrollHeight : 60;
+      messagesArea.scrollTop = messageOffset <= 10 ? messagesArea.scrollHeight : 60;
     })
     .catch((error) => {
       console.error(error);
@@ -246,11 +225,7 @@ function displayMessage(message, currentUserId) {
     minute: "2-digit",
   });
   const isSent = parseInt(message.sender_id) !== parseInt(currentUserId);
-  return createMessageElement(
-    message.content,
-    time,
-    isSent ? "sent" : "received"
-  );
+  return createMessageElement(message.content, time, isSent ? "sent" : "received");
 }
 
 connectWebSocket();
