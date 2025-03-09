@@ -153,10 +153,6 @@ function handleIncomingMessage(data) {
   });
   let activeUserId = getActiveChatUserId();
 
-  console.log("Active User ID:", activeUserId, "Sender ID:", data.sender_id);
-  console.log(data.sender_id, activeUserId);
-  
-
   if (activeUserId === data.sender_id) {
     const messagesContainer =
       window.messagesArea ||
@@ -166,7 +162,8 @@ function handleIncomingMessage(data) {
       const messageElement = createMessageElement(
         data.content,
         time,
-        "received"
+        "received",
+        data.username
       );
       messagesContainer.appendChild(messageElement);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -199,6 +196,7 @@ function getActiveChatUserId() {
 // Message Functions
 function sendMessage() {
   const message = messageInput.value.trim();
+  
   if (message) {
     const time = new Date().toLocaleTimeString([], {
       hour: "2-digit",
@@ -215,7 +213,8 @@ function sendMessage() {
         })
       );
     }
-    const messageDiv = createMessageElement(message, time, "sent");
+    
+    const messageDiv = createMessageElement(message, time, "sent", "You");
     messagesArea.appendChild(messageDiv);
     messageInput.value = "";
     messagesArea.scrollTop = messagesArea.scrollHeight;
@@ -246,6 +245,8 @@ function displayMessage(message, currentUserId) {
     hour12: false,
   });
   const isSent = parseInt(message.sender_id) !== parseInt(currentUserId);
+  console.log(message)
+  
   return createMessageElement(
     message.content,
     time,
@@ -274,7 +275,7 @@ function addFriend(
   friends.forEach((friend) => {
     const userId = userIds[friend];
     const status = userStatuses[friend] || "offline";
-    const lastMessage = lastMessages[friend] || "No messages yet";
+    const lastMessage = lastMessages[friend];
     const unreadCount = unreadCounts[friend] || 0;
     const lastTime = lastTimes[friend]
       ? new Date(lastTimes[friend]).toLocaleTimeString([], {
