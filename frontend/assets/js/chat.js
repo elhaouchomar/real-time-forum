@@ -210,7 +210,7 @@ function sendMessage() {
         })
       );
     }
-    const messageDiv = createMessageElement(message, time, "sent");
+    const messageDiv = createMessageElement(message, time, "sent", "You");
     messagesArea.appendChild(messageDiv);
     messageInput.value = "";
     messagesArea.scrollTop = messagesArea.scrollHeight;
@@ -237,12 +237,12 @@ export function displayMessage(message, currentUserId) {
   const time = new Date(message.timestamp).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
-    hour12: false
+    hour12: false,
   });
   const isSent = parseInt(message.sender_id) !== parseInt(currentUserId);
   console.log("Is Sent  ;", isSent);
   
-  return createMessageElement(message.content, time, isSent ? "sent" : "received");
+  return createMessageElement(message.content, time, isSent ? "sent" : "received", message.username);
 }
 
 // Friend List Functions
@@ -276,6 +276,7 @@ function addFriend(
       ? new Date(lastTimes[friend]).toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
+          hour12: false,
         })
       : "—";
 
