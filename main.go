@@ -51,6 +51,7 @@ func main() {
 
 	http.HandleFunc("/ws", handlers.HandleWebSocket)
 	http.HandleFunc("/api/chat/history", handlers.GetChatHistory)
+	http.HandleFunc("/api/mark-read", handlers.MarkMessagesAsRead)
 
 	http.HandleFunc("/", handlers.HomePage)
 	http.HandleFunc("POST /checker", handlers.Checker)

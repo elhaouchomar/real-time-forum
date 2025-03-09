@@ -84,14 +84,15 @@ var tables = map[string]string{
 		FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 		);`,
 	"messages": `CREATE TABLE IF NOT EXISTS messages (
-		 id INTEGER PRIMARY KEY AUTOINCREMENT,
-		 content TEXT NOT NULL,
-		 sender_id INTEGER NOT NULL,
-		 receiver_id INTEGER NOT NULL,
-		 timestamp DATETIME NOT NULL,
-		 FOREIGN KEY (sender_id) REFERENCES users(id),
-		 FOREIGN KEY (receiver_id) REFERENCES users(id)
-		);`,
+     id INTEGER PRIMARY KEY AUTOINCREMENT,
+     content TEXT NOT NULL,
+     sender_id INTEGER NOT NULL,
+     receiver_id INTEGER NOT NULL,
+     timestamp DATETIME NOT NULL,
+     read INTEGER DEFAULT 0,
+     FOREIGN KEY (sender_id) REFERENCES users(id),
+     FOREIGN KEY (receiver_id) REFERENCES users(id)
+);`,
 }
 
 type triger struct {
@@ -121,7 +122,8 @@ BEGIN
 END;`,
 		[]string{},
 	},
-	{"one_session_per_user",
+	{
+		"one_session_per_user",
 		`CREATE TRIGGER one_session_per_user
 		BEFORE INSERT ON sessions
 		FOR EACH ROW
