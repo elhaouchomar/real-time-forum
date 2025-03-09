@@ -68,6 +68,7 @@ func MiddleWear(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func JsResponse(w http.ResponseWriter, status int, msgStatus bool, data any) {
+	w.Header().Set("Content-Type", "application-json")
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(map[string]any{
 		"status": msgStatus,
@@ -324,7 +325,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println("Age", Data.Age)
 	Age, err := strconv.Atoi(Data.Age)
-	if (err != nil){
+	if err != nil {
 		RespondData["message"] = "Please Enter the age."
 		JsResponse(w, http.StatusBadRequest, false, RespondData)
 		return

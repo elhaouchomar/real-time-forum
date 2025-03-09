@@ -51,7 +51,7 @@
 #chat {
   margin-bottom: 70px;
   overflow-y: auto;
-  height: calc(100% - 120px);
+  height: 100%;
 }
 
 .messages {
@@ -96,10 +96,9 @@
 }
 .message-time {
   position: absolute;
-  font-size: 12px;
+  font-size: 9px;
   bottom: 1px;
   right: 2px;
-
 }
 
 .sent .message-author{

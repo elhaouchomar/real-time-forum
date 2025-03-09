@@ -64,7 +64,7 @@ function validateForm() {
 
 
 
-function switchForm(type) {
+export function switchForm(type) {
     
     const loginForm = document.querySelector('.sign-in');
     const registerForm = document.querySelector('.sign-up');
@@ -132,7 +132,10 @@ export function registerFunctions(){
     registerBtnToggle.addEventListener('click', () => {
         container.classList.add("active");
     });
-
+    const switchButton = RegForm.querySelector("p span")
+    switchButton.addEventListener("click", ()=>{
+        switchForm("login")
+    })
     RegForm.addEventListener("submit", function(event){
         event.preventDefault()
         console.log("Submit Register Form");
@@ -160,15 +163,20 @@ export function registerFunctions(){
                     ErrorHandling(data.data, "RegisterForm")
                     throw new Error("Error Connecting")
                 }
+                console.log(data);
+                
                 if (data.status){
                     console.log("inside the Json Response");
-                    LoadPage("login")
+                    LoadPage("home")
                 }
             }).catch(err => {
                 console.log(err);
             })
     })
-
+    const switchButton2 = LogForm.querySelector("p span")
+    switchButton2.addEventListener("click", ()=>{
+        switchForm("register")
+    })
     LogForm.addEventListener("submit", function(event){
         event.preventDefault()
         console.log("Submit Login Form");

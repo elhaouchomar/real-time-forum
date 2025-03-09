@@ -31,15 +31,29 @@ export async function fetchPosts(offset, type) {
     
     if (posts) {
       updateProfile(posts.profile);
-      posts.posts.forEach((post) => {
-        postsContainer.append(createPostCard(post));
-      });
+      updateCategoriesCount(posts.categories)
+      if (posts.posts){
+        posts.posts.forEach((post) => {
+          postsContainer.append(createPostCard(post));
+        });
+      }
+
     }
     HandleLikes()
     readPost();
   } catch (error) {
     console.log(error);
   }
+}
+
+function updateCategoriesCount(categoriesCount){
+  const categories = document.querySelectorAll(".Categories .trending-item span");
+  categories.forEach((category) => {
+    const categoryName = category.parentElement.querySelector(".item-category p").textContent.trim();
+    if (categoriesCount[categoryName]) {
+      category.textContent = `${categoriesCount[categoryName]} Posts`;
+    }
+  });
 }
 
 function updateProfile(profile) {
@@ -207,7 +221,8 @@ export function infiniteScroll() {
               }
             }
             if (elem.id == "message"){
-              elem.hidden = false
+              document.querySelector("#area-msg").hidden = false
+              console.log("aciba");
               return
             }
             const LinkHref = elem.getAttribute("href")

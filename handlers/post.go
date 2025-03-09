@@ -103,6 +103,8 @@ func InfiniteScroll(w http.ResponseWriter, r *http.Request) {
 	}
 	typeQuery := r.URL.Query().Get("type")
 	offset_str := r.URL.Query().Get("offset")
+	fmt.Println("typeQuery", typeQuery, "offset_str", offset_str)
+	fmt.Println("typeQuery", r.URL.Query().Get("type"), "offset_str", r.URL.Query().Get("offset"))
 	offset, err := strconv.Atoi(offset_str)
 	if err != nil {
 		offset = 0
@@ -117,6 +119,7 @@ func InfiniteScroll(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		posts, err = database.QuerryLatestPostsByCategory(DB, uid, category, offset)
+		fmt.Println("Posts :", posts)
 		if err != nil {
 			ErrorJs(w, http.StatusInternalServerError, err)
 			return
@@ -165,6 +168,11 @@ func InfiniteScroll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	categories, err := database.GetCategoriesWithPostCount(DB)
+	if err != nil {
+		ErrorJs(w, http.StatusInternalServerError, err)
+		return
+	}
 	// Set the content type header to application/json
 	w.Header().Add("Content-Type", "application/json")
 
@@ -172,8 +180,9 @@ func InfiniteScroll(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	err = json.NewEncoder(w).Encode(struct {
-		Posts   []structs.Post  `json:"posts"`
-		Profile structs.Profile `json:"profile"`
-	}{Posts: posts, Profile: profile})
+		Posts      []structs.Post  `json:"posts"`
+		Profile    structs.Profile `json:"profile"`
+		Categories map[string]int  `json:"categories"`
+	}{Posts: posts, Profile: profile, Categories: categories})
 	fmt.Println(err)
 }

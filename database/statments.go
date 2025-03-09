@@ -161,7 +161,7 @@ END;`,
 		`CREATE TRIGGER 1here2_react_count_insert
 BEFORE INSERT ON 1here2_likes
 FOR EACH ROW
-BEGIN+-
+BEGIN
 	UPDATE 1here2s
 	SET 
 	like_count = like_count + (NEW.is_like = 1) ,

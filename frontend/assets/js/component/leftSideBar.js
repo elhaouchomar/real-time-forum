@@ -1,11 +1,11 @@
 export function LeftSideBar(){
     return `<section class="sidebar-left">
         <div class="nav-links margin-top">
-            <a class="Links seelcted" href="/">
+            <a class="Links selected" href="/">
                 <i class="material-symbols-outlined">home</i>
                 <span>Home</span>
             </a>
-            <a  class="Links" id="message" class="selected" >
+            <a  class="Links" id="message"  href="#">
                 <i class="material-symbols-outlined">mail</i>
                 <span>Messages</span>
             </a>
@@ -17,7 +17,7 @@ export function LeftSideBar(){
                 <i class="material-symbols-outlined">person</i>
                 <span>Profile</span>
             </a>
-            <a class="Links" href="/?type=trending" class="selected">
+            <a class="Links" href="/?type=trending">
                 <i class="material-symbols-outlined">trending_up</i>
                 <span>Trending</span>
             </a>

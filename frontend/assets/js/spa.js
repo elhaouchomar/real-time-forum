@@ -6,6 +6,9 @@ import { fetchPosts, infiniteScroll, postControlList, readPost } from "./script.
 import { registerFunctions } from "./register.js";
 import {createPostListner} from "./createPost.js"
 import { ErrorPage } from "./component/error.js";
+import { connectWebSocket, initChat } from "./chat.js";
+
+
 
 export const SPAContainer = document.querySelector(".SPAContainer");
 const headElement = document.querySelector('head')
@@ -25,6 +28,7 @@ window.onload = async () => {
     MAIN_URL = Logged ? MAIN_URL : "login"
     console.log(`User Logged Statuse => ${Logged} --> Redirected to ${MAIN_URL}`);
     LoadPage(MAIN_URL)
+   
 }
 
 var Logged = false
@@ -75,6 +79,8 @@ export async function LoadPage(page = "home", code, msg, skip = false){
         ROUTES["home"]["styles"].forEach(elem => {
             headElement.appendChild(createStyle(elem, page))
         })
+        connectWebSocket()
+        initChat()
     } else if (page == "login") {
         removeStyleElements();
         SPAContainer.appendChild(LoginPage());

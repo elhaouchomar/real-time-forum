@@ -50,7 +50,7 @@ export function LoginPage(){
                 <div id="confirmPassMessage" class="message"><i class="material-icons check-uncheck"
                         style="font-size: 10px;">&#xe5c9;</i> Confirmation password does not match.</div>
                 <button type="submit" id="registerBtn" disabled>Register</button>
-                <p>You have an account? <a href="#" onclick="switchForm('login')">Sign in</a></p>
+                <p>You have an account? <span>Sign in</span></p>
                 <div class="ErrorMessage">
                     <i class="material-icons" style="font-size: 14px;">&#xe000;</i>
                     <span class="Content">
@@ -67,7 +67,7 @@ export function LoginPage(){
                     <input type="password" name="password" placeholder="Password" required>
                     <span class="material-symbols-outlined toggle-password">visibility_off</span>
                 </div>
-                <p>Don't have an account? <a href="#" onclick="switchForm('register')">Sign Up</a></p>
+                <p>Don't have an account? <span>Sign Up</span></p>
                 <button type="submit">Sign In</button>
                 <div class="ErrorMessage">
                     <i class="material-icons" style="font-size: 14px;">&#xe000;</i>

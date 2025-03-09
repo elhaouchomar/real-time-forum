@@ -46,7 +46,7 @@ export function RightSideBar(){
                     <div class="item-category">
                         <p>Business</p>
                     </div>
-                    <span>11 Posts</span>
+                    <span>0 Posts</span>
                 </div>
             </a>
 
@@ -57,7 +57,7 @@ export function RightSideBar(){
                     <div class="item-category">
                         <p>Entertainment</p>
                     </div>
-                    <span>12 Posts</span>
+                    <span>0 Posts</span>
                 </div>
             </a>
 
@@ -68,7 +68,7 @@ export function RightSideBar(){
                     <div class="item-category">
                         <p>General</p>
                     </div>
-                    <span>9 Posts</span>
+                    <span>0 Posts</span>
                 </div>
             </a>
 
@@ -79,7 +79,7 @@ export function RightSideBar(){
                     <div class="item-category">
                         <p>Health</p>
                     </div>
-                    <span>10 Posts</span>
+                    <span>0 Posts</span>
                 </div>
             </a>
 
@@ -90,7 +90,7 @@ export function RightSideBar(){
                     <div class="item-category">
                         <p>Sports</p>
                     </div>
-                    <span>7 Posts</span>
+                    <span>0 Posts</span>
                 </div>
             </a>
 
@@ -101,7 +101,7 @@ export function RightSideBar(){
                     <div class="item-category">
                         <p>Technology</p>
                     </div>
-                    <span>5 Posts</span>
+                    <span>0 Posts</span>
                 </div>
             </a>
 

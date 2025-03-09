@@ -1,16 +1,14 @@
-// Global variables
-let ws;
+import * as spa from "./spa.js";
+
+// Chat Vars
+export let ws;
 let userID = 0;
 let isLoading = false;
 let messageOffset = 0;
 const MESSAGES_PER_PAGE = 10;
-let currentUserId = null;
+// DOM Elements
+const ignore = document.getElementById("message");
 
-document.addEventListener("DOMContentLoaded", () => {
-  initializeDOMElements();
-  setupEventListeners();
-  connectWebSocket();
-});
 
 function initializeDOMElements() {
   window.ignore = document.getElementById("message");
@@ -32,19 +30,16 @@ function initializeDOMElements() {
     document.querySelector(".friend-avatar");
 }
 
-function setupEventListeners() {
-  // Main event listeners
+export function initChat() {
+  initializeDOMElements()
+  const chat = document.getElementById("chat");
+  const messageInput = document.getElementById("messageInput");
+  const sendButton = document.getElementById("sendButton");
+  // Event Listeners
   document.addEventListener("click", handleDocumentClick);
+  sendButton.addEventListener("click", sendMessage);
+  messageInput.addEventListener("keypress", handleKeyPress);
 
-  if (window.sendButton) {
-    window.sendButton.addEventListener("click", sendMessage);
-  }
-
-  if (window.messageInput) {
-    window.messageInput.addEventListener("keypress", handleKeyPress);
-  }
-
-  // Mobile-specific event listeners
   if (window.innerWidth <= 780) {
     const friend = document.querySelector(".friend");
     const back = document.querySelector(".back");
@@ -52,25 +47,20 @@ function setupEventListeners() {
 
     if (friend) friend.addEventListener("click", showChatBox);
     if (back) back.addEventListener("click", showFriendsList);
-    if (close_message)
-      close_message.addEventListener("click", closeMessageArea);
+    if (close_message) close_message.addEventListener("click", closeMessageArea);
   }
 }
 
-// UI Interaction Functions
 function handleDocumentClick(event) {
   const messageElement = event.target.closest("#message");
-  if (
-    messageElement &&
-    window.notif &&
-    window.area_msg &&
-    window.right_side_bare &&
-    window.post
-  ) {
-    window.notif.style.display = "none";
-    window.area_msg.style.display = "flex";
-    window.right_side_bare.style.display = "none";
-    window.post.style.display = "none";
+  const post = document.getElementById("posts");
+  const right_side_bare = document.getElementById("categories");
+  const area_msg = document.getElementById("area-msg");
+
+  if (messageElement) {
+    area_msg.style.display = "flex";
+    right_side_bare.style.display = "none";
+    post.style.display = "none";
   }
 }
 
@@ -103,7 +93,7 @@ function closeMessageArea() {
 }
 
 // WebSocket Functions
-function connectWebSocket() {
+export function connectWebSocket() {
   try {
     ws = new WebSocket("ws://localhost:9090/ws");
 
@@ -155,6 +145,7 @@ function handleIncomingMessage(data) {
 
   console.log("Active User ID:", activeUserId, "Sender ID:", data.sender_id);
   console.log(data.sender_id, activeUserId);
+  console.log("omar : ", data);
   
 
   if (activeUserId === data.sender_id) {
@@ -166,7 +157,8 @@ function handleIncomingMessage(data) {
       const messageElement = createMessageElement(
         data.content,
         time,
-        "received"
+        "received",
+        data.username
       );
       messagesContainer.appendChild(messageElement);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -199,6 +191,9 @@ function getActiveChatUserId() {
 // Message Functions
 function sendMessage() {
   const message = messageInput.value.trim();
+  const messagesArea = document.getElementById("messages");
+  const r = document.getElementById("user-receiver");
+
   if (message) {
     const time = new Date().toLocaleTimeString([], {
       hour: "2-digit",
@@ -238,20 +233,15 @@ function createMessageElement(content, time, type, username) {
   `;
   return messageDiv;
 }
-
-function displayMessage(message, currentUserId) {
+export function displayMessage(message, currentUserId) {
   const time = new Date(message.timestamp).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
-    hour12: false,
   });
   const isSent = parseInt(message.sender_id) !== parseInt(currentUserId);
-  return createMessageElement(
-    message.content,
-    time,
-    isSent ? "sent" : "received",
-    message.username
-  );
+  console.log("Is Sent  ;", isSent);
+  
+  return createMessageElement(message.content, time, isSent ? "sent" : "received");
 }
 
 // Friend List Functions
@@ -264,16 +254,21 @@ function addFriend(
   unreadCounts
 ) {
   const friendsList = document.querySelector(".allfriends");
+  const messagesArea = document.getElementById("messages");
+  const friends_list = document.querySelector(".friends-list");
+  const chat_box = document.querySelector(".chat-box");
+
   if (!friendsList) {
     console.error("friendsList is not found in the DOM!");
     return;
   }
 
   friendsList.innerHTML = "";
+  if (friends){
 
-  friends.forEach((friend) => {
-    const userId = userIds[friend];
-    const status = userStatuses[friend] || "offline";
+    friends.forEach((friend) => {
+      const userId = userIds[friend];
+      const status = userStatuses[friend] || "offline";
     const lastMessage = lastMessages[friend] || "No messages yet";
     const unreadCount = unreadCounts[friend] || 0;
     const lastTime = lastTimes[friend]
@@ -283,21 +278,21 @@ function addFriend(
         })
       : "—";
 
-    const friendElement = document.createElement("div");
-    friendElement.className = "friend";
-    if (unreadCount > 0) {
+      const friendElement = document.createElement("div");
+      friendElement.className = "friend";
+      if (unreadCount > 0) {
       friendElement.classList.add("has-unread");
     }
 
     friendElement.innerHTML = `
-      <div class="friend-avatar">
-          <img src="../../assets/images/profile.png" class="profile-img" alt="${friend}">
-          <div class="status ${status}" id="user-${userId}"></div>
-      </div>
-      <div class="friend-info">
-          <div>
+        <div class="friend-avatar">
+            <img src="../../assets/images/profile.png" class="profile-img" alt="${friend}">
+            <div class="status ${status}" id="user-${userId}"></div>
+        </div>
+        <div class="friend-info">
+            <div>
               <div class="friend-name">${friend}</div>
-              <div class="last-message">${
+                <div class="last-message">${
                 lastMessage.length > 30
                   ? lastMessage.substring(0, 15) + "..."
                   : lastMessage
@@ -311,11 +306,39 @@ function addFriend(
           </div>
       </div>`;
 
-    friendElement.addEventListener("click", () =>
-      handleFriendClick(friend, userId, status, unreadCount)
-    );
-    friendsList.appendChild(friendElement);
-  });
+      friendElement.addEventListener("click", () =>
+        handleFriendClick(friend, userId, status, unreadCount)
+      );
+      friendsList.appendChild(friendElement);
+
+      // const statusElement = friendElement.querySelector(`#user-${userId}`);
+      // statusElement.classList.toggle("online", status === "online");
+      // statusElement.classList.toggle("offline", status === "offline");
+
+      // friendElement.addEventListener("click", () => {
+      //   messagesArea.innerHTML = "";
+      //   const show_user = document.getElementById("user-receiver");
+      //   friends_list.style.display = window.innerWidth <= 780 ? "none" : "block";
+      //   chat_box.style.display = "flex";
+      //   show_user.innerText = friend;
+      //   messageOffset = 0;
+      //   fetchChatHistory(userId, messageOffset);
+      //   if (messagesArea && userID == 0) {
+      //     userID = userId;
+      //     messagesArea.addEventListener("scroll", async () => {
+      //       if (messagesArea.scrollTop === 0 && !isLoading && userID !== 0) {
+      //         isLoading = true;
+      //         await fetchChatHistory(userID, messageOffset);
+      //         isLoading = false;
+      //       }
+      //     });
+      //   }
+      // });
+
+      // friendsList.appendChild(friendElement);
+    });
+  }
+  
 }
 
 function handleFriendClick(friend, userId, status, unreadCount) {

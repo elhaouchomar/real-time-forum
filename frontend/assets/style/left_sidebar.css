@@ -99,6 +99,7 @@ nav {
     padding: 10px;
     height: 45px;
     transition-duration: 0.2s;
+    height: fit-content;
 }
 
 .tweet-button:hover {
