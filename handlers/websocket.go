@@ -99,6 +99,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	for {
+		BroadcastUsersList()
 		var msg Message
 		err := conn.ReadJSON(&msg)
 		fmt.Println(msg)
@@ -108,6 +109,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 			}
 			break
 		}
+		// broadcastStatus(userID, username, true)
 		var receiver_id int
 		err = DB.QueryRow("SELECT id FROM users WHERE username = ?;", msg.Username).Scan(&receiver_id)
 		if err != nil || receiver_id == userID {
@@ -251,13 +253,6 @@ func BroadcastUsersList() error {
 
 		// Sorting users
 		sort.Slice(usernames, func(i, j int) bool {
-			// Prioritize users with unread messages
-			if unreadCounts[usernames[i]] > 0 && unreadCounts[usernames[j]] == 0 {
-				return true
-			}
-			if unreadCounts[usernames[i]] == 0 && unreadCounts[usernames[j]] > 0 {
-				return false
-			}
 
 			// Sort by last message timestamp
 			if lastTimes[usernames[i]].IsZero() && lastTimes[usernames[j]].IsZero() {
@@ -291,6 +286,63 @@ func BroadcastUsersList() error {
 }
 
 
+
+func MarkMessagesAsRead(w http.ResponseWriter, r *http.Request) {
+	// Ensure the request method is POST or PUT
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+	userID, err := CheckAuthentication(w, r)
+	if err != nil {
+		return
+	}
+	// Decode request body
+	var req struct {
+		SenderID   int `json:"sender_id"`
+		ReceiverID int `json:"receiver_id"`
+	}
+
+	err = json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Invalid JSON data", http.StatusBadRequest)
+		return
+	}
+	req.SenderID=userID
+	// Debugging log
+	fmt.Printf("Received request to mark messages as read: sender_id=%d, receiver_id=%d\n", req.SenderID, req.ReceiverID)
+
+	// Ensure sender and receiver IDs are valid
+	if req.SenderID <= 0 || req.ReceiverID <= 0 {
+		http.Error(w, "Invalid sender or receiver ID", http.StatusBadRequest)
+		return
+	}
+
+	// Update unread messages in the database
+	result, err := DB.Exec(`UPDATE messages SET read = 1 WHERE sender_id = ? AND receiver_id = ? AND read = 0;`, req.ReceiverID,req.SenderID)
+	if err != nil {
+		http.Error(w, "Failed to update messages", http.StatusInternalServerError)
+		return
+	}
+	fmt.Println()
+	// Debugging log
+	rowsAffected, _ := result.RowsAffected()
+	fmt.Printf("Rows affected: %d\n", rowsAffected)
+
+	// Check if any rows were affected
+	if rowsAffected == 0 {
+		// Return success status even if no rows were affected (No unread messages)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{"message": "No unread messages found, but operation completed successfully"})
+		return
+	}
+
+	// Send success response
+	w.WriteHeader(http.StatusOK)
+}
+
+
+
 func GetUserIDByUsername(username string) (int, error) {
 	var id int
 	err := DB.QueryRow("SELECT id FROM users WHERE username = ?", username).Scan(&id)
@@ -309,25 +361,4 @@ func sendPrivateMessage(msg Message) {
 	} else {
 		log.Printf("User %d is not connected", msg.ReceiverID)
 	}
-}
-
-func MarkMessagesAsRead(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		SenderID   int `json:"sender_id"`
-		ReceiverID int `json:"receiver_id"`
-	}
-
-	err := json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
-		return
-	}
-
-	_, err = DB.Exec("UPDATE messages SET read = 1 WHERE sender_id = ? AND receiver_id = ?", req.SenderID, req.ReceiverID)
-	if err != nil {
-		http.Error(w, "Failed to update messages", http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
 }
