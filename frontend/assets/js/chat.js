@@ -237,6 +237,7 @@ export function displayMessage(message, currentUserId) {
   const time = new Date(message.timestamp).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
+    hour12: false
   });
   const isSent = parseInt(message.sender_id) !== parseInt(currentUserId);
   console.log("Is Sent  ;", isSent);

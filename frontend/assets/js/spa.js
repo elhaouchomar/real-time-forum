@@ -14,7 +14,7 @@ export const SPAContainer = document.querySelector(".SPAContainer");
 const headElement = document.querySelector('head')
 export const BodyElement = document.querySelector("body")
 export const AVATAR_URL = 'https://ui-avatars.com/api/?name=';//${userName}
-export const USERNAME = null
+export let USERNAME = null
 export const ListnerMap = new WeakMap()
 
 var MAIN_URL = window.location.pathname.split("/")[1]
@@ -25,6 +25,9 @@ console.log("XXXX", MAIN_URL);
 window.onload = async () => {
     const response = await apiRequest("checker")
     Logged = response.status
+    USERNAME =  response.data.UserName
+    console.log("user Name ", response.data);
+    
     MAIN_URL = Logged ? MAIN_URL : "login"
     console.log(`User Logged Statuse => ${Logged} --> Redirected to ${MAIN_URL}`);
     LoadPage(MAIN_URL)

@@ -113,3 +113,14 @@ func GetUidFromToken(db *sql.DB, token string) (int, error) {
 	}
 	return uid, nil
 }
+
+func GetUsernameByUid(db *sql.DB, uid int) (string, error) {
+	var username string
+	err := db.QueryRow("SELECT username FROM users WHERE id=?", uid).Scan(&username)
+	if err == sql.ErrNoRows {
+		return "", fmt.Errorf("user not found")
+	} else if err != nil {
+		return "", err
+	}
+	return username, nil
+}
