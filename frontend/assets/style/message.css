@@ -51,6 +51,7 @@
 #chat {
   margin-bottom: 70px;
   overflow-y: auto;
+  height: calc(100% - 120px);
 }
 
 .messages {
@@ -62,11 +63,12 @@
 }
 
 .received {
+  position: relative;
   background: var(--Greey);
   color: var(--Black);
   align-self: flex-start;
   border-bottom-left-radius: 0;
-  margin: 15px;
+  margin: 8px;
   min-width: 55px;
 }
 .received-info {
@@ -78,25 +80,47 @@
   justify-content: space-between;
 }
 .sent {
+  position: relative;
   background: var(--BlueGreen);
   color: var(--White);
   align-self: flex-end;
   border-bottom-right-radius: 0;
-  margin: 15px;
+  margin: 8px;
   min-width: 55px;
 }
-.message-time {
-  margin-top: 5px;
+
+
+.message-bubble {
+  display: flex;
+  justify-content: space-between;
 }
-.message-athour,
 .message-time {
+  position: absolute;
+  font-size: 12px;
+  bottom: 1px;
+  right: 2px;
+
+}
+
+.sent .message-author{
   font-size: 10px;
   color: var(--GreeyD);
   position: absolute;
+  right: 2px;
   bottom: -18px;
-  right: 5px;
+}
+.received .message-author{
+  font-size: 10px;
+  color: var(--GreeyD);
+  position: absolute;
+  left: 2px;
+  bottom: -18px;
 }
 
+.message-content {
+  position: relative;
+  margin-right: 30px;
+}
 .chat-footer {
   align-items: center;
   padding: 10px 0;

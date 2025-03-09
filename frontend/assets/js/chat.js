@@ -120,19 +120,12 @@ function connectWebSocket() {
   }
 }
 
-function setCurrentUser(userId) {
-  currentUserId = userId;
-  userID = userId;
-  console.log("Current user set to:", userId);
-}
 
 function handleWebSocketMessage(event) {
   try {
     const data = JSON.parse(event.data);
-    console.log("WebSocket received:", data);
 
     if (data.type === "users_list") {
-      console.log("Updating friends list", data);
       addFriend(
         data.usernames,
         data.user_ids,
@@ -156,10 +149,13 @@ function handleIncomingMessage(data) {
   const time = new Date(data.timestamp || new Date()).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
+    hour12: false,
   });
   let activeUserId = getActiveChatUserId();
 
   console.log("Active User ID:", activeUserId, "Sender ID:", data.sender_id);
+  console.log(data.sender_id, activeUserId);
+  
 
   if (activeUserId === data.sender_id) {
     const messagesContainer =
@@ -179,7 +175,6 @@ function handleIncomingMessage(data) {
     }
   } else {
     console.log("Message is from another user");
-    showNotification(data.username || "Someone");
   }
 }
 
@@ -201,16 +196,6 @@ function getActiveChatUserId() {
   return userID || currentUserId;
 }
 
-function showNotification(username) {
-  if ("Notification" in window && Notification.permission === "granted") {
-    new Notification("New Message", {
-      body: `${username} sent you a message!`,
-    });
-  } else {
-    alert(`${username} sent you a message!`);
-  }
-}
-
 // Message Functions
 function sendMessage() {
   const message = messageInput.value.trim();
@@ -218,6 +203,7 @@ function sendMessage() {
     const time = new Date().toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
+      hour12: false,
     });
     if (ws) {
       ws.send(
@@ -236,14 +222,19 @@ function sendMessage() {
   }
 }
 
-function createMessageElement(content, time, type) {
+function createMessageElement(content, time, type, username) {
   const messageDiv = document.createElement("div");
   messageDiv.className = `messages ${type}`;
+  
+  // Add a line break if content is more than 30 characters
+  const formattedContent = content.length > 30 ? content.replace(/(.{30})/g, "$1<br>") : content;
+
   messageDiv.innerHTML = `
     <div class="message-bubble">
-      <div class="message-content">${content}</div>
+      <div class="message-content">${formattedContent}</div>
       <div class="message-time">${time}</div>
     </div>
+    <div class="message-author">${username}</div>
   `;
   return messageDiv;
 }
@@ -252,14 +243,17 @@ function displayMessage(message, currentUserId) {
   const time = new Date(message.timestamp).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
+    hour12: false,
   });
   const isSent = parseInt(message.sender_id) !== parseInt(currentUserId);
   return createMessageElement(
     message.content,
     time,
-    isSent ? "sent" : "received"
+    isSent ? "sent" : "received",
+    message.username
   );
 }
+
 // Friend List Functions
 function addFriend(
   friends,
@@ -305,7 +299,7 @@ function addFriend(
               <div class="friend-name">${friend}</div>
               <div class="last-message">${
                 lastMessage.length > 30
-                  ? lastMessage.substring(0, 30) + "..."
+                  ? lastMessage.substring(0, 15) + "..."
                   : lastMessage
               }</div>
           </div>
@@ -328,10 +322,8 @@ function handleFriendClick(friend, userId, status, unreadCount) {
   console.log(userId);
 
   console.log("Friend clicked:", friend, "ID:", userId);
-  setCurrentUser(userId);
-  if (unreadCount > 0) {
-    console.log("rr", userId);
-    markMessagesAsRead(userId);
+  if (unreadCount > 0 ) {
+    markMessagesAsRead(userId)
   }
   if (window.messagesArea) {
     window.messagesArea.innerHTML = "";
@@ -401,6 +393,7 @@ async function fetchChatHistory(userId, offset = 0) {
     messageOffset += data.messages.length;
     console.log("Updated messageOffset:", messageOffset);
     const fragment = document.createDocumentFragment();
+    
     data.messages.forEach((message) => {
       const messageDiv = displayMessage(message, userId);
       fragment.prepend(messageDiv);
