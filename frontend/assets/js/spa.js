@@ -27,11 +27,9 @@ window.onload = async () => {
     Logged = response.status
     USERNAME =  response.data.UserName
     console.log("user Name ", response.data);
-    
     MAIN_URL = Logged ? MAIN_URL : "login"
     console.log(`User Logged Statuse => ${Logged} --> Redirected to ${MAIN_URL}`);
-    LoadPage(MAIN_URL)
-   
+    ChangeUrl(MAIN_URL)
 }
 
 var Logged = false
