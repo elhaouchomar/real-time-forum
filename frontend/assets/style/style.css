@@ -1,0 +1,246 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:target {
+  scroll-margin-top: 100px;
+}
+
+body {
+  position: relative;
+  font-family: "Poppins", sans-serif;
+  background-color: var(--Greey);
+  width: 100%;
+}
+
+a {
+  text-decoration: none;
+}
+
+hr {
+  border-top: 1px solid var(--BlueDarker);
+  opacity: 0.2;
+}
+
+.trending p {
+  color: var(--BlueGreen);
+}
+
+::placeholder {
+  color: var(--BlueGreen);
+  opacity: 0.4;
+}
+
+
+
+.main-flex {
+  display: flex;
+  width: 50%;
+  margin-left: 25%;
+  border-right: solid 0.3px var(--WhiteBlue);
+  height: 100%;
+  border-right: solid 0.3px var(--WhiteBlue);
+  padding-bottom: 100px;
+}
+
+.main-feed {
+  width: 97.5%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-right: 3%;
+}
+
+.textarea {
+  background-color: var(--WhiteBlue);
+  font-size: 1.5rem;
+  border: none;
+  color: var(--BlueGreen);
+  outline: none;
+  border-radius: 50px;
+  padding: 2px 31px;
+  /* resize: none; */
+  cursor: pointer;
+  padding: 12px;
+}
+
+.new-tweet {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: 50px;
+  padding: 4px 4px;
+  background-color: var(--White);
+  border-radius: 50px;
+  box-shadow: 0px 3px 10px hwb(0 0% 80% / 0.32);
+}
+
+.textarea::placeholder {
+  position: relative;
+  top: 10px;
+}
+
+.new-tweet .tweet-img {
+  width: 63px;
+  height: 63px;
+  background-size: 63px;
+  cursor: pointer;
+}
+
+.new-tweet .new-post-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  width: calc(100% - 73px);
+  margin-left: 10px;
+}
+
+
+.new-tweet .new-post-header input {
+  height: 150px;
+  max-height: 150px;
+  background-color: var(--WhiteBlue);
+  font-size: 2rem;
+  border: none;
+  color: white;
+  outline: none;
+  border-radius: 5px;
+  padding-left: 10px;
+}
+
+.no-border {
+  border: none;
+  background-color: transparent !important;
+}
+
+.no-border:hover {
+  transform: scale(1);
+}
+
+.react,
+.comment {
+  display: flex;
+  gap: 20px;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.trending-item:hover {
+  background-color: var(--BlueGreen);
+}
+
+.trending-item:hover .item-category p,
+.trending-item:hover span {
+  color: white;
+}
+
+.post-header {
+  display: flex;
+  align-items: flex-start;
+  flex-grow: 1;
+}
+
+.ProfileImage {
+  width: 50px;
+  height: 50px;
+  background-size: 46px;
+  background-repeat: no-repeat;
+}
+
+.closed {
+  display: none !important;
+}
+
+.postContainer {
+  position: fixed;
+  display: flex;
+  top: 0;
+  left: 0;
+  font-family: "Poppins", sans-serif;
+  background-color: var(--GreeyTransparant);
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  z-index: 16;
+  transition: all 1s;
+  overflow-y: auto;
+}
+
+@keyframes fromLeft {
+  0% {
+    left: -100%;
+  }
+
+  100% {
+    left: 0%;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .textarea {
+    font-size: 1.2em;
+    height: 90%;
+    color: var(--BlueGreen);
+    /* background-color: red; */
+    text-align: center;
+    vertical-align: middle;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+  }
+
+
+  .new-tweet {
+    margin: 0px;
+  }
+
+
+
+  .tweet-button {
+    width: 100%;
+  }
+
+  .main-feed {
+    padding-right: 0px;
+  }
+
+  .main-flex {
+    width: 100%;
+    margin-left: 0;
+    padding: 20px;
+  }
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (max-width: 768px) {
+
+  .main-feed {
+    margin-top: 60px;
+  }
+
+
+  
+}
+
+.new-tweet .new-post-header textarea::placeholder {
+  position: relative;
+  top: 25%;
+}
+
+.Profile {
+  font-size: 20px;
+}
+
+
+/* Added By Tawil :  */
+
+.ParentContainer {
+  width: 100%;
+  height: 100%;
+}

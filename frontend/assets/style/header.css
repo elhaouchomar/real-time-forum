@@ -1,0 +1,211 @@
+.Logo {
+    margin-left: 20px;
+    font-size: 25px;
+    color: var(--Black);
+    font-weight: 900;
+    line-height: 20px;
+    border-radius: 20px;
+    padding: 8px;
+}
+
+.Logo span {
+    color: var(--BlueGreen);
+}
+
+.Logo .Name {
+    color: var(--Black);
+}
+
+.RightHeaderSection {
+    display: flex;
+}
+
+.RightHeaderSection li {
+    list-style: none;
+
+}
+
+.main-account .dropdown {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 15px;
+    margin-right: 10px;
+    text-decoration: none;
+    color: #0a5c68;
+    border-radius: 90px;
+}
+
+.dropdown {
+    display: flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.dropdown .content {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: var(--WhiteB);
+    border-radius: 4px;
+    display: none;
+    color: var(--Black);
+    z-index: 22;
+    font-weight: 300;
+    width: max-content;
+    min-width: 120px;
+    box-shadow: var(--shadowLittle);
+}
+
+.ProfileImage {
+    width: 50px;
+    height: 50px;
+    background-size: 46px;
+    background-repeat: no-repeat;
+
+}
+
+
+.tweet-img {
+    width: 49px;
+    height: 50px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 2px solid var(--BlueDarker);
+    transition: all .5s;
+    padding: 5px 1px 5px;
+}
+
+.tweet-img:hover {
+    background-color: #088395;
+    transition: all .5s;
+    transform: scale(1.2);
+}
+
+.content ul {
+    display: block;
+    white-space: nowrap;
+}
+.content ul a {
+    color: var(--Black);
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.content li {
+    list-style: none;
+    padding: 10px 20px;
+}
+
+.content li:nth-child(odd) {
+    border-bottom: 1px solid var(--BlueDarker);
+}
+
+.content li:hover {
+    background-color: var(--BlueGreenWhite);
+}
+
+.SignOptions {
+    padding-right: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.SignOptions .Buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: fit-content;
+    background-color: var(--White);
+    color: var(--BlueGreen);
+    gap: 7px;
+    padding: 10px;
+    border-radius: 10px;
+    transition: all 0.5s;
+    width: fit-content;
+}
+.Buttons:hover {
+    background-color: var(--BlueGreenWhite);
+    color: var(--DarkBlue);
+    transition: all 0.5s;
+}
+.theme-toggle {
+    position: relative;
+    padding: 8px 16px;
+    cursor: pointer;
+    list-style: none;
+}
+
+.theme-toggle label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.theme-toggle input {
+    display: none;
+}
+
+
+#switch:checked+label .toggle:before {
+    transform: translateY(20px);
+    background: #fff;
+}
+.toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    width: 20px;
+    height: 40px;
+    background: var(--BlueDarker);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+.toggle:before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: var(--White);
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.2s ease;
+}
+
+.dark_mode,
+.light_mode {
+    font-size: 16px;
+    color: var(--Greey);
+    padding: 3px 2px 2px;
+}
+
+
+
+
+@media only screen and (max-width: 768px) {
+    .SignOptions .Buttons {
+        display: flex;
+        align-items: center;
+        height: fit-content;
+        background-color: var(--White);
+        color: var(--BlueGreen);
+        border-radius: 10px;
+        transition: all 0.5s;
+        font-size: 11px;
+        width: fit-content;
+    }
+    .Buttons {
+        font-size: 1.3rem;
+    }
+    .Buttons span {
+        display: none;
+    }
+    .theme-toggle{
+        display: none;
+    }
+}
