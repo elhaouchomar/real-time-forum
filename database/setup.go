@@ -2,36 +2,42 @@ package database
 
 import (
 	"database/sql"
+	"database/sql/driver"
 	"fmt"
 	"log"
 	"strings"
 	"time"
 
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/mattn/go-sqlite3"
 )
 
-func OpenDatabase(file string) *sql.DB {
-	db, err := sql.Open("sqlite3", file)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Check if the database is actually accessible
-	err = db.Ping()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Database opened successfully!")
-
-	// Execute PRAGMA statements
-	_, err = db.Exec("PRAGMA foreign_keys = ON")
-	if err != nil {
-		log.Fatalf("Error setting PRAGMA foreign_keys: %v", err)
-	}
-
-	return db
+func init() {
+	sql.Register("sqlite3_with_fk", driverFunc())
 }
 
+func driverFunc() driver.Driver {
+	return &sqlite3.SQLiteDriver{
+		ConnectHook: func(conn *sqlite3.SQLiteConn) error {
+			_, err := conn.Exec("PRAGMA foreign_keys = ON;", nil)
+			return err
+		},
+	}
+}
+
+func OpenDatabase(file string) (*sql.DB, error) {
+	db, err := sql.Open("sqlite3_with_fk", file)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open database: %w", err)
+	}
+
+	if err := db.Ping(); err != nil {
+		db.Close()
+		return nil, fmt.Errorf("failed to ping database: %w", err)
+	}
+
+	fmt.Println("Database opened successfully!")
+	return db, nil
+}
 func CreateTables(db *sql.DB) {
 	for t, c := range tables {
 		_, err := db.Exec(c)
@@ -42,7 +48,6 @@ func CreateTables(db *sql.DB) {
 	}
 	DeleteExpiredSessions(db)
 }
-
 
 func CreateTriggers(db *sql.DB) {
 	for _, c := range trigers {

@@ -9,7 +9,6 @@ const MESSAGES_PER_PAGE = 10;
 // DOM Elements
 const ignore = document.getElementById("message");
 
-
 function initializeDOMElements() {
   window.ignore = document.getElementById("message");
   window.post = document.getElementById("posts");
@@ -31,7 +30,7 @@ function initializeDOMElements() {
 }
 
 export function initChat() {
-  initializeDOMElements()
+  initializeDOMElements();
   const chat = document.getElementById("chat");
   const messageInput = document.getElementById("messageInput");
   const sendButton = document.getElementById("sendButton");
@@ -47,7 +46,8 @@ export function initChat() {
 
     if (friend) friend.addEventListener("click", showChatBox);
     if (back) back.addEventListener("click", showFriendsList);
-    if (close_message) close_message.addEventListener("click", closeMessageArea);
+    if (close_message)
+      close_message.addEventListener("click", closeMessageArea);
   }
 }
 
@@ -110,7 +110,6 @@ export function connectWebSocket() {
   }
 }
 
-
 function handleWebSocketMessage(event) {
   try {
     const data = JSON.parse(event.data);
@@ -146,16 +145,16 @@ function handleIncomingMessage(data) {
   console.log("Active User ID:", activeUserId, "Sender ID:", data.sender_id);
   console.log(data.sender_id, activeUserId);
   console.log("omar : ", data);
-  
+
   if (!activeUserId || activeUserId != data.sender_id) {
-    // TODO ba mohamed if you want show me your creativity 😉😉
+    // TODO ba mohamed if you want show me your creativity 😉😉😉😉
     // create Notification her
     // alert(`${data.username} send you message!`)
-    return
+    return;
   }
   if (activeUserId === data.sender_id) {
-    // Hadi 4at5daaam mnin n7aydo input without select 
-    markMessagesAsRead(activeUserId)
+    // Hadi 4at5daaam mnin n7aydo input without select
+    // markMessagesAsRead(activeUserId);
     const messagesContainer =
       window.messagesArea ||
       document.getElementById("messages") ||
@@ -227,9 +226,10 @@ function sendMessage() {
 function createMessageElement(content, time, type, username) {
   const messageDiv = document.createElement("div");
   messageDiv.className = `messages ${type}`;
-  
+
   // Add a line break if content is more than 30 characters
-  const formattedContent = content.length > 30 ? content.replace(/(.{30})/g, "$1<br>") : content;
+  const formattedContent =
+    content.length > 30 ? content.replace(/(.{30})/g, "$1<br>") : content;
 
   messageDiv.innerHTML = `
     <div class="message-bubble">
@@ -248,8 +248,13 @@ export function displayMessage(message, currentUserId) {
   });
   const isSent = parseInt(message.sender_id) !== parseInt(currentUserId);
   console.log("Is Sent  ;", isSent);
-  
-  return createMessageElement(message.content, time, isSent ? "sent" : "received", message.username);
+
+  return createMessageElement(
+    message.content,
+    time,
+    isSent ? "sent" : "received",
+    message.username
+  );
 }
 
 // Friend List Functions
@@ -272,28 +277,27 @@ function addFriend(
   }
 
   friendsList.innerHTML = "";
-  if (friends){
-
+  if (friends) {
     friends.forEach((friend) => {
       const userId = userIds[friend];
       const status = userStatuses[friend] || "offline";
-    const lastMessage = lastMessages[friend] || "No messages yet";
-    const unreadCount = unreadCounts[friend] || 0;
-    const lastTime = lastTimes[friend]
-      ? new Date(lastTimes[friend]).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        })
-      : "—";
+      const lastMessage = lastMessages[friend] || "No messages yet";
+      const unreadCount = unreadCounts[friend] || 0;
+      const lastTime = lastTimes[friend]
+        ? new Date(lastTimes[friend]).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          })
+        : "—";
 
       const friendElement = document.createElement("div");
       friendElement.className = "friend";
       if (unreadCount > 0) {
-      friendElement.classList.add("has-unread");
-    }
+        friendElement.classList.add("has-unread");
+      }
 
-    friendElement.innerHTML = `
+      friendElement.innerHTML = `
         <div class="friend-avatar">
             <img src="../../assets/images/profile.png" class="profile-img" alt="${friend}">
             <div class="status ${status}" id="user-${userId}"></div>
@@ -302,10 +306,10 @@ function addFriend(
             <div>
               <div class="friend-name">${friend}</div>
                 <div class="last-message">${
-                lastMessage.length > 30
-                  ? lastMessage.substring(0, 15) + "..."
-                  : lastMessage
-              }</div>
+                  lastMessage.length > 30
+                    ? lastMessage.substring(0, 15) + "..."
+                    : lastMessage
+                }</div>
           </div>
           <div class="time-notif">
               <div class="last-time">${lastTime}</div>
@@ -319,6 +323,7 @@ function addFriend(
         handleFriendClick(friend, userId, status, unreadCount)
       );
       friendsList.appendChild(friendElement);
+      messagesArea.scrollTop = messagesArea.scrollHeight;
 
       // const statusElement = friendElement.querySelector(`#user-${userId}`);
       // statusElement.classList.toggle("online", status === "online");
@@ -347,15 +352,14 @@ function addFriend(
       // friendsList.appendChild(friendElement);
     });
   }
-  
 }
 
 function handleFriendClick(friend, userId, status, unreadCount) {
   console.log(userId);
 
   console.log("Friend clicked:", friend, "ID:", userId);
-  if (unreadCount > 0 ) {
-    markMessagesAsRead(userId)
+  if (unreadCount > 0) {
+    markMessagesAsRead(userId);
   }
   if (window.messagesArea) {
     window.messagesArea.innerHTML = "";
@@ -423,11 +427,11 @@ async function fetchChatHistory(userId, offset = 0) {
       return;
     }
     console.log(data);
-    
+
     messageOffset += data.messages.length;
     console.log("Updated messageOffset:", messageOffset);
     const fragment = document.createDocumentFragment();
-    
+
     data.messages.forEach((message) => {
       if (!document.querySelector(`[data-message-id="${message.id}"]`)) {
         const messageDiv = displayMessage(message, userId);

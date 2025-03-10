@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -23,20 +24,22 @@ func main() {
 	}
 
 	// dispatcher := handlers.NewDispatcher(5) // 5 workers
-    // dispatcher.Run()
-    
-   
-    
-    // Example of adding a job
-    // job := handlers.Job{
-    //     ID:      1,
-    //     Type:    "notification",
-    //     Payload: map[string]interface{}{"userId": 123},
-    // }
-    // dispatcher.JobQueue <- job
+	// dispatcher.Run()
+
+	// Example of adding a job
+	// job := handlers.Job{
+	//     ID:      1,
+	//     Type:    "notification",
+	//     Payload: map[string]interface{}{"userId": 123},
+	// }
+	// dispatcher.JobQueue <- job
 
 	fmt.Printf("Creating database at %v...\n", os.Args[1:])
-	db := database.OpenDatabase(os.Args[1])
+	db, err := database.OpenDatabase(os.Args[1])
+	if err != nil {
+		log.Fatalf("Database error: %v", err)
+	}
+	defer db.Close()
 	database.CreateTables(db)
 	database.CreateTriggers(db)
 	fmt.Println("Database setup complete!")
@@ -75,7 +78,7 @@ func main() {
 
 	fmt.Println("Server listening on :9090...")
 	fmt.Println("http://localhost:9090")
-	err := http.ListenAndServe(":9090", nil)
+	err = http.ListenAndServe(":9090", nil)
 	if err != nil {
 		panic(err.Error())
 	}
