@@ -129,6 +129,7 @@ function handleWebSocketMessage(event) {
     if (data.type === "message") {
       handleIncomingMessage(data);
     }
+    
   } catch (error) {
     console.error("Error processing WebSocket message:", error);
   }

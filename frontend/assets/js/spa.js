@@ -7,7 +7,7 @@ import { registerFunctions } from "./register.js";
 import {createPostListner} from "./createPost.js"
 import { ErrorPage } from "./component/error.js";
 import { connectWebSocket, initChat } from "./chat.js";
-
+import {profileEffect} from "./profile.js"
 
 
 export const SPAContainer = document.querySelector(".SPAContainer");
@@ -80,6 +80,7 @@ export async function LoadPage(page = "home", code, msg, skip = false){
         postControlList()
         readPost()
         createPostListner()
+        profileEffect()
         ROUTES["home"]["styles"].forEach(elem => {
             headElement.appendChild(createStyle(elem, page))
         })

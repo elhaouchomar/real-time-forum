@@ -182,6 +182,8 @@ function createDislikeCounter(post) {
 }
 
 export function infiniteScroll() {
+  const themeToggle = document.querySelectorAll("#switch");
+
     console.log("====> infiniteScroll CALLED <======");
 
     var UrlParams = new URLSearchParams(window.location.search);
@@ -220,6 +222,7 @@ export function infiniteScroll() {
                 return
               }
             }
+        
             if (elem.id == "message"){
               document.querySelector("#area-msg").hidden = false
               console.log("aciba");
@@ -231,7 +234,14 @@ export function infiniteScroll() {
             
             ChangeUrl(LinkHref)
             LoadPage(type, null, null, true)            
-            
+            if (elem.parentElement.classList.contains("nav-links")){
+              elem.classList.add("selected")
+              Links.forEach(LinksToDisable => {
+                if (LinksToDisable != elem){
+                  elem.classList.remove("selected")
+                }
+              })
+            }
             //     <a class="CategoriesLinks" href="/?type=category&category={{$key}}">
             //     <!-- TODO // selected-category /// Class For Specific Selected once -->
             //     <div class="trending-item">
@@ -334,7 +344,6 @@ function ListenOncommentButtom() {
   ListnerMap.set(commentButton)
 }
 
-const themeToggle = document.querySelectorAll("#switch");
 const body = document.body;
 
 function toggleDarkMode(isDark) {
