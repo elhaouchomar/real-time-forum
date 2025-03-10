@@ -25,7 +25,10 @@ console.log("XXXX", MAIN_URL);
 window.onload = async () => {
     const response = await apiRequest("checker")
     Logged = response.status
-    USERNAME =  response.data.UserName
+    if(Logged) {
+        USERNAME =  response.data.UserName
+    }
+    
     console.log("user Name ", response.data);
     MAIN_URL = Logged ? MAIN_URL : "login"
     console.log(`User Logged Statuse => ${Logged} --> Redirected to ${MAIN_URL}`);

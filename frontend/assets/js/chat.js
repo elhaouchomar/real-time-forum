@@ -147,8 +147,15 @@ function handleIncomingMessage(data) {
   console.log(data.sender_id, activeUserId);
   console.log("omar : ", data);
   
-
+  if (!activeUserId || activeUserId != data.sender_id) {
+    // TODO ba mohamed if you want show me your creativity 😉😉
+    // create Notification her
+    // alert(`${data.username} send you message!`)
+    return
+  }
   if (activeUserId === data.sender_id) {
+    // Hadi 4at5daaam mnin n7aydo input without select 
+    markMessagesAsRead(activeUserId)
     const messagesContainer =
       window.messagesArea ||
       document.getElementById("messages") ||
@@ -415,13 +422,18 @@ async function fetchChatHistory(userId, offset = 0) {
       }
       return;
     }
+    console.log(data);
+    
     messageOffset += data.messages.length;
     console.log("Updated messageOffset:", messageOffset);
     const fragment = document.createDocumentFragment();
     
     data.messages.forEach((message) => {
-      const messageDiv = displayMessage(message, userId);
-      fragment.prepend(messageDiv);
+      if (!document.querySelector(`[data-message-id="${message.id}"]`)) {
+        const messageDiv = displayMessage(message, userId);
+        messageDiv.setAttribute("data-message-id", message.id);
+        fragment.prepend(messageDiv);
+      }
     });
     window.messagesArea.prepend(fragment);
     if (offset === 0) {
