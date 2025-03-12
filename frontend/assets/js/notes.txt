@@ -1,5 +1,0 @@
-script JS : 
-infiniteScroll();
-fetchPosts(0, type);
-postControlList()
-readPost();

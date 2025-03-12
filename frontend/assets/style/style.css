@@ -45,6 +45,8 @@ hr {
   height: 100%;
   border-right: solid 0.3px var(--WhiteBlue);
   padding-bottom: 100px;
+  z-index: 1;
+  position: relative;
 }
 
 .main-feed {

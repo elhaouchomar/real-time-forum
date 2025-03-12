@@ -16,19 +16,16 @@ export const BodyElement = document.querySelector("body")
 export const AVATAR_URL = 'https://ui-avatars.com/api/?name=';//${userName}
 export let USERNAME = null
 export const ListnerMap = new WeakMap()
+export let previousUrl = document.location.href;
 
 var MAIN_URL = window.location.pathname.split("/")[1]
 MAIN_URL =  MAIN_URL == "" ? "home" : MAIN_URL
-console.log("XXXX", MAIN_URL);
 
 
 window.onload = async () => {
     const response = await apiRequest("checker")
     Logged = response.status
-    if(Logged) {
-        USERNAME =  response.data.UserName
-    }
-    
+    if(Logged) USERNAME =  response.data.UserName
     console.log("user Name ", response.data);
     MAIN_URL = Logged ? MAIN_URL : "login"
     console.log(`User Logged Statuse => ${Logged} --> Redirected to ${MAIN_URL}`);
@@ -68,6 +65,7 @@ function createStyle(src, page){
 export async function LoadPage(page = "home", code, msg, skip = false){
     console.log(`Loading Page => ${page}`);
     if (!skip) ChangeUrl(page)
+    
     clearSPAContainer()
 
     if (page == "home" || page == "category" ||
@@ -125,12 +123,14 @@ function removeScriptElements(){
 
 
 export function ChangeUrl(url, data = {}) {
-    history.pushState(data, "", url)
     console.log("URL Changed to =>", url);
+    history.pushState(data, "", url)
     // LoadPage("home")
 }
 
 navigation.addEventListener("navigate", (event) => {
+    previousUrl = document.location.href;
+    console.log('Previous URL: ', previousUrl);
     const Url = new URL(event.destination.url)
     const params = new URLSearchParams(Url.search)
     var type = params.get("type")
@@ -144,5 +144,5 @@ navigation.addEventListener("navigate", (event) => {
     console.log("  Any changes ",event.destination.url, event.pushState )
     console.log("=====================================")
     console.log("=====================================")
-
+    
 })

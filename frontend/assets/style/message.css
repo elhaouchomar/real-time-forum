@@ -5,12 +5,11 @@
   width: calc(100% - 22.5%);
   height: 100vh;
   overflow: hidden;
-  background: var(--White);
   box-shadow: var(--shadow);
 }
 
 .chat-box {
-  display: none;
+  visibility: hidden;
   width: 65%;
   height: 100%;
   display: flex;

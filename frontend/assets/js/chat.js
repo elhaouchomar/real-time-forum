@@ -7,10 +7,8 @@ let isLoading = false;
 let messageOffset = 0;
 const MESSAGES_PER_PAGE = 10;
 // DOM Elements
-const ignore = document.getElementById("message");
 
 function initializeDOMElements() {
-  window.ignore = document.getElementById("message");
   window.post = document.getElementById("posts");
   window.right_side_bare = document.getElementById("categories");
   window.area_msg = document.getElementById("area-msg");
@@ -60,7 +58,6 @@ function handleDocumentClick(event) {
   if (messageElement) {
     area_msg.style.display = "flex";
     right_side_bare.style.display = "none";
-    post.style.display = "none";
   }
 }
 
@@ -322,6 +319,7 @@ function addFriend(
 
       friendElement.addEventListener("click", () =>
         handleFriendClick(friend, userId, status, unreadCount)
+      
       );
       friendsList.appendChild(friendElement);
       messagesArea.scrollTop = messagesArea.scrollHeight;
@@ -357,7 +355,9 @@ function addFriend(
 
 function handleFriendClick(friend, userId, status, unreadCount) {
   console.log(userId);
-
+  // Show Messages Box once user selected a friend to chat with
+  chat_box.style.visibility = "visible"
+  post.style.display = "none"
   console.log("Friend clicked:", friend, "ID:", userId);
   if (unreadCount > 0) {
     markMessagesAsRead(userId);

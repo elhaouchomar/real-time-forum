@@ -9,6 +9,12 @@ const windowMedia = window.matchMedia("(min-width: 768px)");
 // let errorr = "";
 
 export async function fetchPosts(offset, type) {
+  const response = await apiRequest("checker")
+  const Logged = response.status
+  if (!Logged){
+    LoadPage("login")
+    return
+  }
   const UrlParams = new URLSearchParams(window.location.search);
   var type = UrlParams.get("type");
   const username = UrlParams.get("username");
@@ -181,6 +187,19 @@ function createDislikeCounter(post) {
   return dislikeCounter;
 }
 
+function selectedItem(id){
+  const Links = document.querySelectorAll(".Links")
+    Links.forEach(elem => {
+          if (elem.parentElement.classList.contains("nav-links")){
+            if (elem.id != id){
+              elem.classList.remove("selected")
+            }else{
+              elem.classList.add("selected")
+            }
+          }
+    })
+
+}
 export function infiniteScroll() {
   const themeToggle = document.querySelectorAll("#switch");
 
@@ -225,6 +244,7 @@ export function infiniteScroll() {
         
             if (elem.id == "message"){
               document.querySelector("#area-msg").hidden = false
+              setTimeout(selectedItem(elem.id), 1000) 
               console.log("aciba");
               return
             }
@@ -235,12 +255,7 @@ export function infiniteScroll() {
             ChangeUrl(LinkHref)
             LoadPage(type, null, null, true)            
             if (elem.parentElement.classList.contains("nav-links")){
-              elem.classList.add("selected")
-              Links.forEach(LinksToDisable => {
-                if (LinksToDisable != elem){
-                  elem.classList.remove("selected")
-                }
-              })
+              setTimeout(selectedItem(elem.id), 1000) 
             }
             //     <a class="CategoriesLinks" href="/?type=category&category={{$key}}">
             //     <!-- TODO // selected-category /// Class For Specific Selected once -->

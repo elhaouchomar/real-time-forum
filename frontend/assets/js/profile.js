@@ -1,21 +1,5 @@
-console.log("Sdsdscxxxc");
-console.log("Sdsdscxxxc");
-console.log("Sdsdscxxxc");
-console.log("Sdsdscxxxc");
-console.log("Sdsdscxxxc");
-console.log("Sdsdscxxxc");
-console.log("Sdsdscxxxc");
-console.log("Sdsdscxxxc");
-console.log("Sdsdscxxxc");
-console.log("Sdsdscxxxc");
-console.log("Sdsdscxxxc");
-console.log("Sdsdscxxxc");
-console.log("Sdsdscxxxc");
-console.log("Sdsdscxxxc");
-
 //###////////////////////  Controling The MainSidebar in Profile //////////
 export function profileEffect(){
-
     const switchIcons = document.querySelector(".sub-main")
     const ProfileCard = document.querySelector(".ProfileCard")
     const Categories = document.querySelector(".Categories")
@@ -32,13 +16,10 @@ export function profileEffect(){
         ProfileCard.classList.add("display")
         Categories.classList.remove("display")
     }
-
     switchIcons.addEventListener('click', () => {
         switchIcons.classList.toggle("reverse")
         rotateIcon.classList.toggle("rotate")
         ProfileCard.classList.toggle("display")
         Categories.classList.toggle("display")
     })
-
-
 }

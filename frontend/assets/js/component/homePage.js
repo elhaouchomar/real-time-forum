@@ -1,4 +1,4 @@
-import { AVATAR_URL } from "../spa.js"
+import { AVATAR_URL, previousUrl } from "../spa.js"
 import { Header } from "./header.js"
 import { LeftSideBar } from "./leftSideBar.js"
 import { Messages } from "./messages.js"
@@ -27,6 +27,27 @@ export function HomePage() {
         ${LeftsideBarFile}
         ${RightSideBarFile}
         ${MessagesFile}
+      <div class="notif">
+        <a href="/" class="selected">
+          <i class="material-symbols-outlined">home</i>
+        </a>
+        <a href="#" href="/?type=liked">
+          <i class="material-symbols-outlined">favorite</i>
+        </a>
+        <a id="message" class="selected">
+          <i class="material-symbols-outlined">mail</i>
+        </a>
+        <a href="/" class="selected">
+          <i class="material-symbols-outlined">list</i>
+        </a>
+        <!-- <a href="/" class="disabled">
+          <i class="material-symbols-outlined disabled">notifications</i>
+        </a> -->
+        <a href="/" class="selected">
+          <i class="material-symbols-outlined">person</i>
+        </a>
+
+      </div>
       <div class="main-flex" id="posts">
         <div class="main-feed">
           <!-- Create New Post -->
