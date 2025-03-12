@@ -201,6 +201,7 @@ function selectedItem(id){
 
 }
 export function infiniteScroll() {
+
   const themeToggle = document.querySelectorAll("#switch");
 
     console.log("====> infiniteScroll CALLED <======");
@@ -372,42 +373,6 @@ const darkModeStored = localStorage.getItem("darkMode") === "true";
 toggleDarkMode(darkModeStored);
 
 
-
-function timeAgo(date) {
-  const seconds = Math.floor((new Date() - new Date(date)) / 1000);
-  if (seconds < 60) return "just now";
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-  if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
-  if (seconds < 2592000) return `${Math.floor(seconds / 604800)}w ago`;
-  if (seconds < 31536000) return `${Math.floor(seconds / 2592000)}mo ago`;
-  return `${Math.floor(seconds / 31536000)}y ago`;
-}
-
-function updateAllTimes() {
-  const timeElements = document.querySelectorAll(
-    ".post-time, .commentTime, .postDate"
-  );
-  timeElements.forEach((el) => {
-    if (el.dataset.time) {
-      el.textContent = timeAgo(el.dataset.time);
-    }
-  });
-}
-
-const observer = new MutationObserver(() => {
-  updateAllTimes();
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  updateAllTimes();
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-  });
-  setInterval(updateAllTimes, 50000);
-});
-
 //////////////// Start Listning dropDown List For Posts ////////////
 export function postControlList() {
   console.log("====> postControlList CALLED <======");
@@ -437,3 +402,46 @@ export function postControlList() {
       ListnerMap.set(document, handleClickOutside);
   })
 }
+
+function handleClickNotify(ele){
+  const postContainer = document.getElementById("posts");
+  const messagesContainer = document.getElementById("area-msg");
+  const sidebarRight = document.querySelector(".sidebar-right")
+  ele.preventDefault()
+  if (ele.target.id == "home"){
+    ChangeUrl("home")
+  }else if (ele.target.id == "liked"){
+    ChangeUrl("?type=liked")
+  }else if (ele.target.id == "profile"){
+    ChangeUrl("?type=profile")
+  }else if (ele.target.id == "category"){
+    sidebarRight.style.display = "flex"
+    messagesContainer.style.display = "none"
+    postContainer.style.display = "none"
+  }
+  console.log(ele.target, "|Im /here>D|");
+  
+}
+
+export function NotifyButtons(){
+  
+  const notifyButtons = document.querySelectorAll(".notif a")
+  console.log("inside notify",notifyButtons);
+  notifyButtons.forEach(button => {
+    if (ListnerMap.has(button)){
+      button.removeEventListener('click', ListnerMap.get(button))
+    }
+    button.addEventListener('click', handleClickNotify)
+    ListnerMap.set(button, handleClickNotify)
+  })
+  
+}
+
+
+function handleMediaChange(event){
+  const friendsList = document.querySelector(".friends-list");
+  if (event.matches){
+    friendsList.style.display = "block"
+  }
+}
+windowMedia.addEventListener('change', handleMediaChange)

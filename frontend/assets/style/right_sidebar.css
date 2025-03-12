@@ -204,3 +204,18 @@ span.postCounts a {
     font-size: 1.1rem;
     color: var(--BlueGreen);
 }
+
+.notif a:hover{
+    background: var(--accent-dark);
+    cursor: pointer;
+    color: var(--BlueDarker);
+}
+@media only screen and (max-width: 768px){
+    .sidebar-right {
+        display: none;
+        right: 0;
+        width: 100%;
+        left: 0px;
+        margin-top: 65px;
+    }
+}

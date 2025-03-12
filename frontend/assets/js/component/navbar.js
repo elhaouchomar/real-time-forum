@@ -1,25 +1,20 @@
 export function NavBar(){
-    const tmp = document.createElement('div')
-    tmp.innerHTML = `
+    return `
     <div class="notif">
-        <a href="/"  class="selected" >
-            <i class="material-symbols-outlined">home</i>
+        <a href="/"  class="selected">
+            <i  id="home" class="material-symbols-outlined">home</i>
         </a>
         <a  href="#"  href="/?type=liked">
-            <i class="material-symbols-outlined">favorite</i>
+            <i id="liked" class="material-symbols-outlined">favorite</i>
         </a>
-        <a  id="message" class="selected" >
+        <a  id="message" class="selected">
             <i class="material-symbols-outlined">mail</i>
         </a>
-        <a href="/" class="selected">
-        <i class="material-symbols-outlined">list</i>
+        <a href="/" class="selected"  id="category">
+        <i id="category" class="material-symbols-outlined">list</i>
         </a>
-        <!-- <a href="/" class="disabled">
-        <i class="material-symbols-outlined disabled">notifications</i>
-        </a> -->
         <a href="/"  class="selected" >
-            <i class="material-symbols-outlined">person</i>
+            <i id="profile" class="material-symbols-outlined">person</i>
         </a>
     </div> `
-    return tmp.firstChild
 }

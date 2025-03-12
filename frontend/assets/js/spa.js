@@ -2,7 +2,7 @@ import { HomePage } from "./component/homePage.js";
 import { LoginPage } from "./component/loginPage.js"
 import { apiRequest } from "./apiRequest.js"
 import { ROUTES } from "./routes/routes.js";
-import { fetchPosts, infiniteScroll, postControlList, readPost } from "./script.js";
+import { NotifyButtons, fetchPosts, infiniteScroll, postControlList, readPost } from "./script.js";
 import { registerFunctions } from "./register.js";
 import {createPostListner} from "./createPost.js"
 import { ErrorPage } from "./component/error.js";
@@ -79,6 +79,7 @@ export async function LoadPage(page = "home", code, msg, skip = false){
         readPost()
         createPostListner()
         profileEffect()
+        NotifyButtons()
         ROUTES["home"]["styles"].forEach(elem => {
             headElement.appendChild(createStyle(elem, page))
         })

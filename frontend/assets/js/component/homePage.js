@@ -2,6 +2,7 @@ import { AVATAR_URL, previousUrl } from "../spa.js"
 import { Header } from "./header.js"
 import { LeftSideBar } from "./leftSideBar.js"
 import { Messages } from "./messages.js"
+import { NavBar } from "./navbar.js"
 import { RightSideBar } from "./rightSideBar.js"
 
 export function HomePage() {
@@ -10,6 +11,7 @@ export function HomePage() {
     const LeftsideBarFile = LeftSideBar()
     const MessagesFile = Messages()
     const tmp = document.createElement('div')
+    const NavBarFile = NavBar()
     const userName = "Mohamed Tawil"
     tmp.innerHTML = `
     
@@ -27,27 +29,7 @@ export function HomePage() {
         ${LeftsideBarFile}
         ${RightSideBarFile}
         ${MessagesFile}
-      <div class="notif">
-        <a href="/" class="selected">
-          <i class="material-symbols-outlined">home</i>
-        </a>
-        <a href="#" href="/?type=liked">
-          <i class="material-symbols-outlined">favorite</i>
-        </a>
-        <a id="message" class="selected">
-          <i class="material-symbols-outlined">mail</i>
-        </a>
-        <a href="/" class="selected">
-          <i class="material-symbols-outlined">list</i>
-        </a>
-        <!-- <a href="/" class="disabled">
-          <i class="material-symbols-outlined disabled">notifications</i>
-        </a> -->
-        <a href="/" class="selected">
-          <i class="material-symbols-outlined">person</i>
-        </a>
-
-      </div>
+        ${NavBarFile}
       <div class="main-flex" id="posts">
         <div class="main-feed">
           <!-- Create New Post -->

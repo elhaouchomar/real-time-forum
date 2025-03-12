@@ -25,7 +25,11 @@ function initializeDOMElements() {
   window.friend_avatar =
     document.querySelector(".friend-profile") ||
     document.querySelector(".friend-avatar");
+
+
+ 
 }
+
 
 export function initChat() {
   initializeDOMElements();
@@ -58,6 +62,7 @@ function handleDocumentClick(event) {
   if (messageElement) {
     area_msg.style.display = "flex";
     right_side_bare.style.display = "none";
+    post.style.display = "none"
   }
 }
 
@@ -357,7 +362,7 @@ function handleFriendClick(friend, userId, status, unreadCount) {
   console.log(userId);
   // Show Messages Box once user selected a friend to chat with
   chat_box.style.visibility = "visible"
-  post.style.display = "none"
+  window.post.style.display = "none"
   console.log("Friend clicked:", friend, "ID:", userId);
   if (unreadCount > 0) {
     markMessagesAsRead(userId);
