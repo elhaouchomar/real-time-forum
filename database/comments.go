@@ -51,6 +51,7 @@ func GetCommentsByPost(db *sql.DB, userId, postId int) ([]structs.Comment, error
 		if err != nil {
 			return res, err
 		}
+		comment.CreatedAtString = comment.CreatedAt.Format("15:04 01/02/06")
 		res = append(res, comment)
 	}
 

@@ -1,4 +1,4 @@
-import { AVATAR_URL, USERNAME } from "../spa.js";
+import { AVATAR_URL, USRNAME } from "../spa.js";
 
 export function Header(){
     return    `<nav>
@@ -10,12 +10,12 @@ export function Header(){
             <div class="main-account">
                 <div class="dropdown">
                     <div class="ProfileImage tweet-img"
-                        style="background-image: url('${AVATAR_URL}${USERNAME}')">
+                        style="background-image: url('${AVATAR_URL}${USRNAME}')">
                     </div>
                     <div class="content">
                         <!-- Control Posts -->
                         <ul>
-                            <a class="Links" id="profile" href="/type=profile?username=${USERNAME}">
+                            <a class="Links" id="profile" href="/type=profile?username=${USRNAME}">
                                 <li><span class="material-symbols-outlined">account_circle</span>Profile</li>
                             </a>
                             <!-- Darck && light mode -->

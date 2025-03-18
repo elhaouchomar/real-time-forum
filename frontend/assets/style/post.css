@@ -435,23 +435,8 @@ select .DisableUserSelect {
 .CommentButton:hover{
     color: var(--BlueGreen);
 }
-.PostButton {
-    display: none;
-    /* align-items: center; */
-    /* justify-content: center; */
-    /* padding: 5px; */
-    border-radius: 5px;
-    /* background-color: var(--BlueGreen); */
-    color: var(--BlueDarker);
-    cursor: pointer;
-    transition: all 0.3s;
-    /* width: 115px; */
-}
-.PostButton .material-symbols-outlined,
+
 .close-post {
-    position: absolute;
-    /* top: 5px;
-    right: -2px; */
     color: var(--BlueDarker);
     background-color: var(--BlueGreenWhite);
     border-radius: 50%;
@@ -462,6 +447,17 @@ select .DisableUserSelect {
     cursor: pointer;
     transition: all 0.5s;
     right: 20px;
+}
+.PostButton {
+    color: var(--BlueDarker);
+    background-color: var(--BlueGreenWhite);
+    border-radius: 50%;
+    height: 30px;
+    width: 30px;
+    font-weight: 300;
+    cursor: pointer;
+    transition: all 0.5s;
+    align-items: center;
 }
 
 .close-post:hover {

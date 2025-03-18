@@ -18,14 +18,6 @@ var userCommmentCreationTime = make(map[int]time.Time)
 var userCommmentCreationCount = make(map[int]int)
 
 func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		ErrorJs(w, http.StatusMethodNotAllowed, errors.New("invalid method"))
-		return
-	}
-	if r.Header.Get("Content-Type") != "application/json" {
-		ErrorJs(w, http.StatusBadRequest, errors.New(r.Header.Get("Content-Type")))
-		return
-	}
 	session, err := r.Cookie("session")
 	if err != nil {
 		ErrorJs(w, http.StatusUnauthorized, errors.New("unauthorized"))

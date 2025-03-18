@@ -30,6 +30,5 @@ func GetUserProfile[T string | int](db *sql.DB, userSpecific T) (structs.Profile
 	if err != nil {
 		return userProfile, errors.New("GetUserProfile 2 " + err.Error())
 	}
-
 	return userProfile, nil
 }

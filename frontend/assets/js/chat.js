@@ -97,7 +97,7 @@ function closeMessageArea() {
 // WebSocket Functions
 export function connectWebSocket() {
   try {
-    ws = new WebSocket("ws://localhost:9090/ws");
+    ws = new WebSocket("ws://localhost:8080/ws");
 
     ws.onopen = () => console.log("Connected to chat server");
     ws.onmessage = handleWebSocketMessage;
@@ -302,7 +302,7 @@ function addFriend(
 
       friendElement.innerHTML = `
         <div class="friend-avatar">
-            <img src="../../assets/images/profile.png" class="profile-img" alt="${friend}">
+            <img src="https://ui-avatars.com/api/?name=${friend}" class="profile-img" alt="${friend}">
             <div class="status ${status}" id="user-${userId}"></div>
         </div>
         <div class="friend-info">
@@ -382,7 +382,7 @@ function handleFriendClick(friend, userId, status, unreadCount) {
   if (window.friend_avatar) {
     window.friend_avatar.innerHTML = `
       <div class="friend-avatar">
-        <img src="../../assets/images/profile.png" class="profile-img" alt="${friend}">
+        <img src="https://ui-avatars.com/api/?name=${friend}" class="profile-img" alt="${friend}">
         <div class="status ${status}" id="user-status-${userId}"></div>
       </div>`;
   }
@@ -410,15 +410,21 @@ function setupScrollListener(userId) {
 
 // Chat History Functions
 async function fetchChatHistory(userId, offset = 0) {
+
   try {
+    
     const response = await fetch(
-      `/api/chat/history?user_id=${userId}&offset=${offset}`
+      `/api/chat/history?user_id=${userId}&offset=${offset}`, {
+        mode: "no-cors",
+      }
     );
 
     if (!response.ok) {
       throw new Error(`Error fetching chat history: ${response.statusText}`);
     }
     const data = await response.json();
+    console.log("Message History", data);
+    
     if (!window.messagesArea) {
       console.error("Messages area not found!");
       return;

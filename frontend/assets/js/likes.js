@@ -1,10 +1,16 @@
-import { LoadPage } from "./spa.js";
+import { apiRequest } from "./apiRequest.js";
+import { ChangeUrl, LoadPage } from "./spa.js";
 
 // Store handler references
 const likeHandlers = new WeakMap();
 const dislikeHandlers = new WeakMap();
 
 async function handleReaction(btn, type) {
+    const response = await apiRequest("checker")
+    if (!response || !response.status){
+        ChangeUrl("login")
+        return
+    }
     const postId = btn.id;
     const postOrComment = btn.getAttribute('isPost') === "true";
     
@@ -49,7 +55,12 @@ async function handleReaction(btn, type) {
 const LikePostAndComments = btn => handleReaction(btn, "like");
 const DisLikePostAndComments = btn => handleReaction(btn, "dislike");
 
-export function HandleLikes() {
+export async function HandleLikes() {
+    const response = await apiRequest("checker")
+    if (!response || !response.status){
+    ChangeUrl("login")
+    return
+    }
     const likeBtns = document.querySelectorAll('.like');
     const dislikeBtns = document.querySelectorAll('.dislike');
 

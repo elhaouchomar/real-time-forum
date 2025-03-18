@@ -19,7 +19,6 @@ export function RightSideBar(){
                 <img src="/assets/images/profile.png" alt="">
             </div>
             <div class="profileName">
-                Please Login first
             </div>
             <div class="profileStatics">
                 <span class="analytics">analytics</span>

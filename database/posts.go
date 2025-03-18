@@ -31,6 +31,7 @@ func QueryPosts(db *sql.DB, query string, args ...interface{}) ([]structs.Post, 
 		if categories.Valid {
 			post.Categories = strings.Split(categories.String, "|")
 		}
+		post.CreatedAtString = post.CreatedAt.Format("15:04 01/02/06")
 		res = append(res, post)
 	}
 	if err = rows.Err(); err != nil {
@@ -118,5 +119,6 @@ func GetPostByID(db *sql.DB, Postid, UserID int) (structs.Post, error) {
 	if categories.Valid {
 		post.Categories = strings.Split(categories.String, "|")
 	}
+	post.CreatedAtString = post.CreatedAt.Format("15:04 01/02/06")
 	return post, nil
 }

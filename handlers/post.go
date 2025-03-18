@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -14,61 +13,36 @@ import (
 )
 
 func GetPost(w http.ResponseWriter, r *http.Request) {
-	template, err := template.ParseGlob("./frontend/templates/*.html")
-	if err != nil {
-		log.Fatal(err, "Error Parsing Data from Template hTl")
-	}
-	template, err = template.ParseGlob("./frontend/templates/components/*.html")
-	if err != nil {
-		log.Fatal(err, "Error Parsing Data from Template hTl")
-	}
+	template := getHtmlTemplate()
 
 	var Postid int
-	// TODO check for edge cases
+
 	c, err := r.Cookie("session")
-	if err != nil && err.Error() != "http: named cookie not present" {
-		ErrorPage(w, "error.html", map[string]interface{}{
-			"StatuCode":    http.StatusUnauthorized,
-			"MessageError": "unauthorized " + err.Error(),
-		})
-		fmt.Println(err)
-		return
-	}
 	if err != nil {
 		c = &http.Cookie{}
+		w.WriteHeader(http.StatusUnauthorized)
+		return
 	}
-
 	uid, err := database.GetUidFromToken(DB, c.Value)
 	if err != nil {
-		ErrorPage(w, "error.html", map[string]interface{}{
-			"StatuCode":    http.StatusUnauthorized,
-			"MessageError": "unauthorized " + err.Error(),
-		})
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	Postid, err = strconv.Atoi(r.PathValue("id"))
 	if err != nil || Postid < 0 {
-		ErrorPage(w, "error.html", map[string]interface{}{
-			"StatuCode":    http.StatusBadRequest,
-			"MessageError": "Badrequest invalid post id " + err.Error(),
-		})
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	post, err := database.GetPostByID(DB, Postid, uid)
 	if err != nil {
-		ErrorPage(w, "error.html", map[string]interface{}{
-			"StatuCode":    http.StatusInternalServerError,
-			"MessageError": "internal server error" + err.Error(),
-		})
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	comments, err := database.GetCommentsByPost(DB, uid, post.ID)
 	if err != nil {
-		ErrorPage(w, "error.html", map[string]interface{}{
-			"StatuCode":    http.StatusInternalServerError,
-			"MessageError": "internal server error trying to get comments " + err.Error(),
-		})
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	template.ExecuteTemplate(w, "post.html", struct {
@@ -78,29 +52,19 @@ func GetPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func InfiniteScroll(w http.ResponseWriter, r *http.Request) {
-	c, err := r.Cookie("session")
-	if err != nil && err.Error() != "http: named cookie not present" {
-		ErrorJs(w, http.StatusUnauthorized, errors.New("unauthorized"))
-		return
-	}
-	if err != nil {
-		c = &http.Cookie{}
-	}
-
-	uid, err := database.GetUidFromToken(DB, c.Value)
-	if err != nil {
-		ErrorJs(w, http.StatusUnauthorized, errors.New("unauthorized "))
+	check, uid := MiddleWear(w, r)
+	if !check || uid == 0 {
+		JsResponse(w, 401, false, nil)
 		return
 	}
 
 	var profile structs.Profile
-	if uid != 0 {
-		fmt.Println("Getting Profile Information...")
-		profile, err = database.GetUserProfile(DB, uid)
-		if err != nil {
-			log.Fatal(err)
-		}
+	var err error
+	profile, err = database.GetUserProfile(DB, uid)
+	if err != nil {
+		log.Fatal(err)
 	}
+
 	typeQuery := r.URL.Query().Get("type")
 	offset_str := r.URL.Query().Get("offset")
 	fmt.Println("typeQuery", typeQuery, "offset_str", offset_str)
@@ -127,7 +91,6 @@ func InfiniteScroll(w http.ResponseWriter, r *http.Request) {
 	case "profile":
 		username := r.URL.Query().Get("username")
 		if username == "" {
-			fmt.Println("--------5----------", username)
 			username = profile.UserName
 		}
 		profile, err = database.GetUserProfile(DB, username)
@@ -137,10 +100,6 @@ func InfiniteScroll(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		posts, err = database.QuerryPostsbyUser(DB, username, uid, structs.Limit, offset)
-		// if len(posts) > 0 {
-		// 	posts[0].UserPostsCounts = profile.ArticleCount
-		// 	posts[0].UsersCommentsCounts = profile.CommentCount
-		// }
 		if err != nil {
 			ErrorJs(w, http.StatusInternalServerError, errors.New("error fetching posts "))
 			return
@@ -173,10 +132,8 @@ func InfiniteScroll(w http.ResponseWriter, r *http.Request) {
 		ErrorJs(w, http.StatusInternalServerError, err)
 		return
 	}
-	// Set the content type header to application/json
 	w.Header().Add("Content-Type", "application/json")
 
-	// Optionally set the status code to 200 OK
 	w.WriteHeader(http.StatusOK)
 
 	err = json.NewEncoder(w).Encode(struct {

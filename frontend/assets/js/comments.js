@@ -84,7 +84,7 @@ async function handleCommentEvent(e) {
                         <span class="commentAuthorName">
                             @${data["UserName"]}
                             <span class="commentTime">
-                                ${data["CreatedAt"]}
+                                now
                             </span>
                         </span>
                         <div class="commentReaction DisableUserSelect">
@@ -146,13 +146,13 @@ function DisplayComments() {
 }
 
 
-function PostButtonSwitcher(){
+export function PostButtonSwitcher(){
     const postButton = document.querySelector('.PostButton');
-    if (eventListenerMapx.has(postButton)) {
-        postButton.removeEventListener('click', eventListenerMapx.get(postButton));
+    if (ListnerMap.has(postButton)) {
+        postButton.removeEventListener('click', ListnerMap.get(postButton));
     }
 
     const handleDisplayComments = () => DisplayComments();
-    eventListenerMapx.set(postButton, handleDisplayComments);
+    ListnerMap.set(postButton, handleDisplayComments);
     postButton.addEventListener('click', handleDisplayComments);
 }

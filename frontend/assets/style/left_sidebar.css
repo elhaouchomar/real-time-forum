@@ -76,9 +76,7 @@ nav {
     color: var(--GreeyD);
 }
 
-.theme-toggle-mobile {
-    display: none !important;
-}
+
 
 .theme {
     color: var(--Black);
@@ -135,10 +133,6 @@ nav {
     .nav-links.margin-top {
         margin-top: 0px;
         background-color: var(--WhiteBlue);
-    }
-
-    .theme-toggle-mobile {
-        display: flex !important;
     }
 
     nav {

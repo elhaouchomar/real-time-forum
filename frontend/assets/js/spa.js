@@ -14,41 +14,32 @@ export const SPAContainer = document.querySelector(".SPAContainer");
 const headElement = document.querySelector('head')
 export const BodyElement = document.querySelector("body")
 export const AVATAR_URL = 'https://ui-avatars.com/api/?name=';//${userName}
-export let USERNAME = null
+export let USRNAME  = ""
 export const ListnerMap = new WeakMap()
 export let previousUrl = document.location.href;
+var Logged = false
+var MAIN_URL = window.location.href.split("/")[3]
 
-var MAIN_URL = window.location.pathname.split("/")[1]
 MAIN_URL =  MAIN_URL == "" ? "home" : MAIN_URL
-
-
 window.onload = async () => {
     const response = await apiRequest("checker")
-    Logged = response.status
-    if(Logged) USERNAME =  response.data.UserName
-    console.log("user Name ", response.data);
-    MAIN_URL = Logged ? MAIN_URL : "login"
-    console.log(`User Logged Statuse => ${Logged} --> Redirected to ${MAIN_URL}`);
-    ChangeUrl(MAIN_URL)
+    if (response){
+        console.log("Response of Checker" , response);
+        Logged = response.status
+        if(Logged) USRNAME =  response.data.UserName
+        console.log("user Name ", response.data);
+   }
+   MAIN_URL = Logged ? MAIN_URL : "login"
+   console.log(`User Logged Statuse => ${Logged} --> Redirected to ${MAIN_URL}`);
+   ChangeUrl(MAIN_URL)
 }
 
-var Logged = false
 
 function clearSPAContainer(){
     SPAContainer.innerHTML = ""
     console.log(`Clear Main Container`);
 }
 
-function createScript(src, type = "text/javascript"){
-    console.log(`Create JS Script File = ${src} - Type = ${type}`);
-    const temp = document.createElement("div")
-    const mainScript = document.createElement('script')
-    mainScript.src = `/assets/js/${src}.js`
-    mainScript.type = type
-    mainScript.id = src
-    temp.append(mainScript) 
-    return temp.firstChild
-}
 
 function createStyle(src, page){
     console.log(`Create Css Style File = ${src} - page = ${page}`);
@@ -64,6 +55,14 @@ function createStyle(src, page){
 
 export async function LoadPage(page = "home", code, msg, skip = false){
     console.log(`Loading Page => ${page}`);
+
+    const response = await apiRequest("checker")
+    if (!response || !response.status){
+       page = "login"
+    }else{
+        USRNAME = response.data.UserName
+    }
+
     if (!skip) ChangeUrl(page)
     
     clearSPAContainer()
@@ -71,6 +70,9 @@ export async function LoadPage(page = "home", code, msg, skip = false){
     if (page == "home" || page == "category" ||
          page == "trending" || page == "profile" || page == "liked"){
         removeStyleElements()
+        ROUTES["home"]["styles"].forEach(elem => {
+            headElement.appendChild(createStyle(elem, page))
+        })
         SPAContainer.appendChild(HomePage())
         console.log("Append HomePage");
         infiniteScroll()
@@ -80,9 +82,6 @@ export async function LoadPage(page = "home", code, msg, skip = false){
         createPostListner()
         profileEffect()
         NotifyButtons()
-        ROUTES["home"]["styles"].forEach(elem => {
-            headElement.appendChild(createStyle(elem, page))
-        })
         connectWebSocket()
         initChat()
     } else if (page == "login") {
@@ -126,23 +125,26 @@ function removeScriptElements(){
 export function ChangeUrl(url, data = {}) {
     console.log("URL Changed to =>", url);
     history.pushState(data, "", url)
+    window.dispatchEvent(new PopStateEvent("popstate"));
+
     // LoadPage("home")
 }
 
-navigation.addEventListener("navigate", (event) => {
+window.addEventListener("popstate", async (event) => {
+    
     previousUrl = document.location.href;
     console.log('Previous URL: ', previousUrl);
-    const Url = new URL(event.destination.url)
+    const Url = new URL(document.location.href)
     const params = new URLSearchParams(Url.search)
     var type = params.get("type")
-    var category = params.get("category")
     if (!type){
         type = Url.pathname.split("/")[1]
     }
+    console.log("=====================================", type)
+
     LoadPage(type, null, null, true)
     console.log("=====================================")
     console.log("=====================================")
-    console.log("  Any changes ",event.destination.url, event.pushState )
     console.log("=====================================")
     console.log("=====================================")
     

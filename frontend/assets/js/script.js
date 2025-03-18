@@ -1,7 +1,7 @@
 import { apiRequest } from "./apiRequest.js";
-import { CommentInputEventListenner, ExpandComments } from "./comments.js";
+import { CommentInputEventListenner, ExpandComments, PostButtonSwitcher } from "./comments.js";
 import { HandleLikes } from "./likes.js";
-import { AVATAR_URL, BodyElement, ChangeUrl, ListnerMap, LoadPage } from "./spa.js";
+import { AVATAR_URL, BodyElement, ChangeUrl, ListnerMap, LoadPage, USRNAME } from "./spa.js";
 
 // const sidebardLeft = document.querySelector(".sidebar-left");
 const windowMedia = window.matchMedia("(min-width: 768px)");
@@ -11,7 +11,7 @@ const windowMedia = window.matchMedia("(min-width: 768px)");
 export async function fetchPosts(offset, type) {
   const response = await apiRequest("checker")
   const Logged = response.status
-  if (!Logged){
+  if (!Logged) {
     LoadPage("login")
     return
   }
@@ -24,21 +24,20 @@ export async function fetchPosts(offset, type) {
   let category_name = UrlParams.get("category");
   console.log("Category name ", category_name);
   console.log("type name ", type, window.location.search);
-  
+
   const postsContainer = document.querySelector(".main-feed");
   try {
     const response = await fetch(
-      `/infinite-scroll?offset=${offset}&type=${type}${
-        category_name ? `&category=${category_name}` : ""
+      `/infinite-scroll?offset=${offset}&type=${type}${category_name ? `&category=${category_name}` : ""
       }${username ? `&username=${username}` : ""}`
     );
     const posts = await response.json();
     console.log("POST +>>>>>>>", posts);
-    
+
     if (posts) {
       updateProfile(posts.profile);
       updateCategoriesCount(posts.categories)
-      if (posts.posts){
+      if (posts.posts) {
         posts.posts.forEach((post) => {
           postsContainer.append(createPostCard(post));
         });
@@ -52,7 +51,7 @@ export async function fetchPosts(offset, type) {
   }
 }
 
-function updateCategoriesCount(categoriesCount){
+function updateCategoriesCount(categoriesCount) {
   const categories = document.querySelectorAll(".Categories .trending-item span");
   categories.forEach((category) => {
     const categoryName = category.parentElement.querySelector(".item-category p").textContent.trim();
@@ -68,10 +67,11 @@ function updateProfile(profile) {
   const pName = document.querySelector(".profileName");
   const pCounts = document.querySelector(".posts .postCounts");
   const cCounts = document.querySelector(".comments .postCounts");
-  pImage.src =`${AVATAR_URL}${userName}`
+  pImage.src = `${AVATAR_URL}${userName}`
   pName.textContent = userName
   pCounts.textContent = `${profile.ArticleCount} Articles`;
   cCounts.textContent = `${profile.CommentCount} Comments`;
+
 }
 
 function createPostCard(post) {
@@ -114,14 +114,16 @@ function createRowTweet(post) {
   const tweeterName = document.createElement("span");
   tweeterName.className = "tweeter-name post";
   tweeterName.id = post.post_id;
+  console.log("Post Details:");
+  console.log(post);
+
   tweeterName.innerHTML = `${post.post_title
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")}<br>
         <span class="tweeter-handle">@${post.author_username}</span>
         <span class="material-symbols-outlined" id="timer">schedule</span>
-        <span class="post-time" data-time="${post.post_creation_time}"> ${
-    post.post_creation_time
-  }</span>`;
+        <span class="post-time" data-time="${post.CreatedAtString}"> ${post.CreatedAtString
+    }</span>`;
   postHeader.appendChild(tweeterName);
   rowTweet.append(postHeader);
   return rowTweet;
@@ -168,9 +170,8 @@ function createPostFooter(post) {
 function createLikeCounter(post) {
   const likeCounter = document.createElement("div");
   likeCounter.setAttribute("isPost", "true");
-  likeCounter.className = `counters like ${
-    post.view && post.view === "1" ? "FILL" : ""
-  }`;
+  likeCounter.className = `counters like ${post.view && post.view === "1" ? "FILL" : ""
+    }`;
   likeCounter.id = post.post_id;
   likeCounter.innerHTML = `<i class="material-symbols-outlined popup-icon" id="${post.ID}">thumb_up</i><span id="${post.post_id}">${post.like_count}</span>`;
   return likeCounter;
@@ -179,96 +180,99 @@ function createLikeCounter(post) {
 function createDislikeCounter(post) {
   const dislikeCounter = document.createElement("div");
   dislikeCounter.setAttribute("isPost", "true");
-  dislikeCounter.className = `counters dislike ${
-    post.view && post.view === "0" ? "FILL" : ""
-  }`;
+  dislikeCounter.className = `counters dislike ${post.view && post.view === "0" ? "FILL" : ""
+    }`;
   dislikeCounter.id = post.post_id;
   dislikeCounter.innerHTML = `<i class="material-symbols-outlined popup-icon" id="${post.ID}">thumb_down</i><span id="${post.post_id}">${post.dislike_count}</span>`;
   return dislikeCounter;
 }
 
-function selectedItem(id){
+function selectedItem(id) {
+  console.log("Element Selected", id);
+  
   const Links = document.querySelectorAll(".Links")
-    Links.forEach(elem => {
-          if (elem.parentElement.classList.contains("nav-links")){
-            if (elem.id != id){
-              elem.classList.remove("selected")
-            }else{
-              elem.classList.add("selected")
-            }
-          }
-    })
+  Links.forEach(elem => {
+    if (elem.parentElement.classList.contains("nav-links")) {
+    console.log("", id);
+
+      if (elem.id != id) {
+        elem.classList.remove("selected")
+      } else {
+        elem.classList.add("selected")
+      }
+    }
+  })
 
 }
 export function infiniteScroll() {
 
   const themeToggle = document.querySelectorAll("#switch");
 
-    console.log("====> infiniteScroll CALLED <======");
+  console.log("====> infiniteScroll CALLED <======");
 
-    var UrlParams = new URLSearchParams(window.location.search);
-    const type = UrlParams.get("type");
-    
-    let offset = 10;
-    let timeout = null;
-    window.addEventListener("scroll", () => {
-      clearTimeout(timeout);
-      timeout = setTimeout(async () => {
-        const { scrollTop, scrollHeight, clientHeight } =
-          document.documentElement;
-        if (scrollTop + clientHeight >= scrollHeight - 5) {
-          await fetchPosts(offset, type);
+  var UrlParams = new URLSearchParams(window.location.search);
+  const type = UrlParams.get("type");
+
+  let offset = 10;
+  let timeout = null;
+  window.addEventListener("scroll", () => {
+    clearTimeout(timeout);
+    timeout = setTimeout(async () => {
+      const { scrollTop, scrollHeight, clientHeight } =
+        document.documentElement;
+      if (scrollTop + clientHeight >= scrollHeight - 5) {
+        await fetchPosts(offset, type);
+      }
+    }, 1000);
+  });
+
+  themeToggle.forEach((elem) => {
+    elem.checked = darkModeStored;
+    elem.addEventListener("change", () => {
+      toggleDarkMode(elem.checked);
+    });
+  });
+
+  const Links = document.querySelectorAll(".Links")
+  Links.forEach(elem => {
+    elem.addEventListener("click", async (event) => {
+      event.preventDefault();
+      const response = await apiRequest("checker")
+      if (!response || !response.status) {
+        ChangeUrl("login")
+        return
+      }
+      if (elem.id == "logout") {
+        const respons = await apiRequest("logout")
+        console.log(respons);
+        if (respons.status) {
+          console.log("Clicked on logout icon");
+          LoadPage("login")
+          return
         }
-      }, 1000);
-    });
+      }
 
-    themeToggle.forEach((elem) => {
-      elem.checked = darkModeStored;
-      elem.addEventListener("change", () => {
-        toggleDarkMode(elem.checked);
-      });
-    });
+      if (elem.id == "message") {
+        document.querySelector("#area-msg").hidden = false
+        setTimeout(selectedItem(elem.id), 2000)
+        console.log("aciba");
+        return
+      }
+      if (elem.id == "profile") {
+        ChangeUrl(`?type=profile&username=${USRNAME}`)
+        return
+      }
 
-    const Links = document.querySelectorAll(".Links")
-    Links.forEach(elem => {
-        elem.addEventListener("click", async (event)=>{
-            event.preventDefault();
-            if (elem.id == "logout") {
-              const respons = await apiRequest("logout")
-              console.log(respons);
-              if (respons.status){
-                console.log("Clicked on logout icon");
-                LoadPage("login")
-                return
-              }
-            }
-        
-            if (elem.id == "message"){
-              document.querySelector("#area-msg").hidden = false
-              setTimeout(selectedItem(elem.id), 1000) 
-              console.log("aciba");
-              return
-            }
-            const LinkHref = elem.getAttribute("href")
-            const params = new URLSearchParams(LinkHref.split("?")[1])
-            const type = params.get("type") || "home"
-            
-            ChangeUrl(LinkHref)
-            LoadPage(type, null, null, true)            
-            if (elem.parentElement.classList.contains("nav-links")){
-              setTimeout(selectedItem(elem.id), 1000) 
-            }
-            //     <a class="CategoriesLinks" href="/?type=category&category={{$key}}">
-            //     <!-- TODO // selected-category /// Class For Specific Selected once -->
-            //     <div class="trending-item">
-            //         <div class="item-category">
-            //             <p>{{$key}}</p>
-            //         </div>
-            //         <span>{{$value}} Posts</span>
-            //     </div>
-            // </a>
-        })
+      const LinkHref = elem.getAttribute("href")
+      const params = new URLSearchParams(LinkHref.split("?")[1])
+      const type = params.get("type") || "home"
+
+      ChangeUrl(LinkHref)
+      LoadPage(type, null, null, true)
+      setTimeout(selectedItem(elem.id), 2000)
+
     })
+  })
 
 }
 
@@ -276,6 +280,8 @@ async function fetchPost(url) {
   try {
     const response = await fetch(url);
     if (response.status === 401) return LoadPage("login")
+    if (response.status === 400) return LoadPage("error", 400, "Bad request")
+    if (response.status === 500) return LoadPage("error", 500, "Internal server error")
     if (response.status != 200) {
       LoadPage("error", 404, "Page Not Found")
       return false;
@@ -289,10 +295,10 @@ async function fetchPost(url) {
 
 export function readPost() {
   console.log("====> readPost CALLED <======");
-  
+
   document.querySelectorAll(".post").forEach((elem) => {
     const handler = () => loadPostContent(elem)
-    if (ListnerMap.has(elem)){
+    if (ListnerMap.has(elem)) {
       elem.removeEventListener('click', ListnerMap.get(elem))
     }
     elem.addEventListener("click", handler);
@@ -302,43 +308,46 @@ export function readPost() {
 
 async function loadPostContent(elem) {
   console.log("====> loadPostContent CALLED <======");
-  
-  
-    const html = await fetchPost(`/post/${elem.id}`);
-    if (!html) return;
-    console.log("Post content :", html);
-    
-    const postContent = document.createElement("div");
-    postContent.classList.add("postContainer")
-    postContent.innerHTML = html;
-    BodyElement.appendChild(postContent)
-    BodyElement.classList.add("stop-scrolling");
-    CommentInputEventListenner()
-    ExpandComments()
+  const response = await apiRequest("checker")
+  if (!response || !response.status) {
+    ChangeUrl("login")
+    return
+  }
+  const html = await fetchPost(`/post/${elem.id}`);
+  if (!html) return;
+  console.log("Post content :", html);
 
-    const handleClick = (event) => {
-      if (
+  const postContent = document.createElement("div");
+  postContent.classList.add("postContainer")
+  postContent.innerHTML = html;
+  BodyElement.appendChild(postContent)
+  BodyElement.classList.add("stop-scrolling");
+  CommentInputEventListenner()
+  ExpandComments()
+
+  const handleClick = (event) => {
+    if (
       event.target == postContent ||
       event.target.classList.contains("close-post")
-      ) {
+    ) {
       ExpandComments(false);
       postContent.innerHTML = "";
       postContent.classList.add("closed");
       document.body.classList.remove("stop-scrolling");
       if (document.getElementById("ScriptInjected"))
         document.getElementById("ScriptInjected").remove();
-      }
-    };
-
-    if (ListnerMap.has(document)) {
-      document.removeEventListener("click", ListnerMap.get(document));
     }
+  };
 
-    document.addEventListener("click", handleClick);
-    ListnerMap.set(document, handleClick);
-    postContent.classList.remove("closed");
-    ListenOncommentButtom();
-    HandleLikes();
+  if (ListnerMap.has(document)) {
+    document.removeEventListener("click", ListnerMap.get(document));
+  }
+
+  document.addEventListener("click", handleClick);
+  ListnerMap.set(document, handleClick);
+  postContent.classList.remove("closed");
+  ListenOncommentButtom();
+  HandleLikes();
 }
 
 function DisplayPost() {
@@ -355,7 +364,7 @@ function ListenOncommentButtom() {
   const commentButton = document.querySelector(".CommentButton");
   if (ListnerMap.has(commentButton)) {
     commentButton.removeEventListener("click", ListnerMap.get(commentButton));
-  } 
+  }
   commentButton.addEventListener("click", DisplayPost);
   ListnerMap.set(commentButton)
 }
@@ -379,69 +388,90 @@ export function postControlList() {
 
   const dropdown = document.querySelectorAll('.dropdown i, .dropdown .ProfileImage')
   dropdown.forEach(drop => {
-      
-      if (ListnerMap.has(drop)) {
-          drop.removeEventListener('click', ListnerMap.get(drop));
-          document.removeEventListener('click', ListnerMap.get(drop));
+
+    if (ListnerMap.has(drop)) {
+      drop.removeEventListener('click', ListnerMap.get(drop));
+      document.removeEventListener('click', ListnerMap.get(drop));
+    }
+
+    let contentSibling = drop.nextElementSibling;
+    const handleClick = () => {
+      contentSibling.classList.toggle("show");
+    };
+    const handleClickOutside = (event) => {
+      if (!contentSibling.contains(event.target) && !drop.contains(event.target) && contentSibling.classList.contains("show")) {
+        contentSibling.classList.remove('show');
       }
+      const dropDown = document.querySelector(".dropMenu")
+      if (dropDown && event.target != dropDown) {
+        dropDown.style.display = "none"
+      }
+    };
 
-      let contentSibling = drop.nextElementSibling;
-      const handleClick = () => {
-          contentSibling.classList.toggle("show");
-      };
-      const handleClickOutside = (event) => {
-          if (!contentSibling.contains(event.target) && !drop.contains(event.target) && contentSibling.classList.contains("show")) {
-          contentSibling.classList.remove('show');
-          }
-      };
+    drop.addEventListener('click', handleClick);
+    document.addEventListener('click', handleClickOutside);
 
-      drop.addEventListener('click', handleClick);
-      document.addEventListener('click', handleClickOutside);
-
-      ListnerMap.set(drop, handleClick);
-      ListnerMap.set(document, handleClickOutside);
+    ListnerMap.set(drop, handleClick);
+    ListnerMap.set(document, handleClickOutside);
   })
 }
 
-function handleClickNotify(ele){
+async function handleClickNotify(ele) {
+  ele.preventDefault()
+  const response = await apiRequest("checker")
+  if (!response || !response.status) {
+    ChangeUrl("login")
+    return
+  }
   const postContainer = document.getElementById("posts");
   const messagesContainer = document.getElementById("area-msg");
   const sidebarRight = document.querySelector(".sidebar-right")
-  ele.preventDefault()
-  if (ele.target.id == "home"){
+  if (ele.target.id == "home") {
     ChangeUrl("home")
-  }else if (ele.target.id == "liked"){
+  } else if (ele.target.id == "liked") {
     ChangeUrl("?type=liked")
-  }else if (ele.target.id == "profile"){
-    ChangeUrl("?type=profile")
-  }else if (ele.target.id == "category"){
+  } else if (ele.target.id == "profile") {
+    const dropMenu = document.querySelector(".dropMenu")
+    if (dropMenu) {
+      dropMenu.style.display = "block"
+    }
+
+  } else if (ele.target.id == "category") {
     sidebarRight.style.display = "flex"
     messagesContainer.style.display = "none"
     postContainer.style.display = "none"
   }
   console.log(ele.target, "|Im /here>D|");
-  
+
 }
 
-export function NotifyButtons(){
-  
+export function NotifyButtons() {
+
   const notifyButtons = document.querySelectorAll(".notif a")
-  console.log("inside notify",notifyButtons);
+  console.log("inside notify", notifyButtons);
   notifyButtons.forEach(button => {
-    if (ListnerMap.has(button)){
+    if (ListnerMap.has(button)) {
       button.removeEventListener('click', ListnerMap.get(button))
     }
     button.addEventListener('click', handleClickNotify)
     ListnerMap.set(button, handleClickNotify)
   })
-  
+
 }
 
-
-function handleMediaChange(event){
+function handleMediaChange(event) {
+  const commentSection = document.querySelector(".postComments");
+  const postSection = document.querySelector(".ProfileAndPost");
   const friendsList = document.querySelector(".friends-list");
-  if (event.matches){
+  if (event.matches) {
     friendsList.style.display = "block"
+    if (postSection) {
+      postSection.style.display = "flex"
+      commentSection.style.display = "flex"
+    }
+
+  } else {
+    commentSection.style.display = "none"
   }
 }
 windowMedia.addEventListener('change', handleMediaChange)

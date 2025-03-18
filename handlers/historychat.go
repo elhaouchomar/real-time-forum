@@ -8,13 +8,12 @@ import (
 )
 
 func GetChatHistory(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		ErrorJs(w, http.StatusMethodNotAllowed, errors.New("invalid method"))
-		return
-	}
-	userID, err := CheckAuthentication(w, r)
-	if err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	fmt.Println("Request Headers:", r.Header)
+	fmt.Println("Request URL with Domain:", r.Host+r.URL.String())
+	fmt.Println("Request Cookies:", r.Cookies())
+	check, userID := MiddleWear(w, r)
+	if !check {
+		ErrorJs(w, http.StatusUnauthorized, errors.New("not authorized"))
 		return
 	}
 
@@ -22,7 +21,7 @@ func GetChatHistory(w http.ResponseWriter, r *http.Request) {
 	offSet := r.URL.Query().Get("offset")
 
 	if otherUserID == "" {
-		http.Error(w, "Missing user_id parameter", http.StatusBadRequest)
+		ErrorJs(w, http.StatusBadRequest, errors.New("missing user_id parameter"))
 		return
 	}
 
@@ -46,7 +45,7 @@ func GetChatHistory(w http.ResponseWriter, r *http.Request) {
 	rows, err := DB.Query(query, userID, otherUserID, otherUserID, userID, offSet)
 	if err != nil {
 		fmt.Println("GetChatHistory", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		ErrorJs(w, http.StatusInternalServerError, errors.New("error apply query"))
 		return
 	}
 	defer rows.Close()
@@ -63,7 +62,7 @@ func GetChatHistory(w http.ResponseWriter, r *http.Request) {
 			&msg.Username,
 		)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			ErrorJs(w, http.StatusInternalServerError, errors.New("internale server error "))
 			return
 		}
 		messages = append(messages, msg)

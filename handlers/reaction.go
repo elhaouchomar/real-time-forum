@@ -10,14 +10,6 @@ import (
 )
 
 func PostReaction(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		ErrorJs(w, http.StatusMethodNotAllowed, errors.New("invalid method"))
-		return
-	}
-	if r.Header.Get("Content-Type") != "application/json" {
-		ErrorJs(w, http.StatusBadRequest, errors.New(r.Header.Get("Content-Type")))
-		return
-	}
 	UserId, err := CheckAuthentication(w, r)
 	if err != nil || UserId == 0 {
 		ErrorJs(w, http.StatusUnauthorized, errors.New("unauthorized "))

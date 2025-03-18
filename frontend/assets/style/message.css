@@ -30,6 +30,7 @@
   font-size: 1.2rem;
   color: var(--Black);
   font-style: bold;
+  cursor: pointer;
 }
 .profile-img {
   width: 50px;
@@ -280,6 +281,7 @@
 
 .close-message {
   display: none;
+  cursor: pointer;
 }
 
 @media only screen and (max-width: 780px) {
@@ -313,6 +315,33 @@
   .notif {
     display: flex;
   }
+}
+
+
+.dropMenu {
+  display: none;
+  background-color: var(--DarkBlue);
+  position: absolute;
+  right: 5px;
+  font-size: 25px;
+  border-radius: 5px;
+  top: 34px;
+}
+.dropMenu .Links:hover{
+  color: var(--BlueGreen);
+  background-color: var(--WhiteBlue);
+}
+.theme-toggle:hover{
+  color: var(--BlueGreen);
+  background-color: var(--WhiteBlue);
+}
+.dropMenu .Links{
+  cursor: pointer;
+  padding: 3px 12px;
+}
+
+.notif a.selected {
+  position: relative;
 }
 
 .messages-container {

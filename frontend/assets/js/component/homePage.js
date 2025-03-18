@@ -1,4 +1,4 @@
-import { AVATAR_URL, previousUrl } from "../spa.js"
+import { AVATAR_URL, USRNAME } from "../spa.js"
 import { Header } from "./header.js"
 import { LeftSideBar } from "./leftSideBar.js"
 import { Messages } from "./messages.js"
@@ -12,10 +12,8 @@ export function HomePage() {
     const MessagesFile = Messages()
     const tmp = document.createElement('div')
     const NavBarFile = NavBar()
-    const userName = "Mohamed Tawil"
     tmp.innerHTML = `
     
-    <!--TODO PostContainer to be Enabled <div class="postContainer closed"></div> -->
     <div class="ParentContainer">
       ${HeaderFile}
       <!-- <div class="nav-mobile" id="right-side">
@@ -34,10 +32,9 @@ export function HomePage() {
         <div class="main-feed">
           <!-- Create New Post -->
           <div class="new-tweet">
-            <!-- TODO User image -->
             <div
               class="ProfileImage tweet-img no-border"
-              style="background-image: url('${AVATAR_URL}${userName}')"
+              style="background-image: url('${AVATAR_URL}${USRNAME}')"
             ></div>
             <div class="new-post-header">
               <div class="textarea">What's happening?</div>

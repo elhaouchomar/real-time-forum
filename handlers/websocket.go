@@ -17,6 +17,9 @@ var (
 	upgrader = wsLib.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			return true // Allow all origins
+		},
 	}
 
 	// Thread-safe connected users map
@@ -60,13 +63,14 @@ func GetUsers(userID int) ([]string, error) {
 }
 
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
-	userID, err := CheckAuthentication(w, r)
-	if err != nil {
+	check, userID := MiddleWear(w, r)
+
+	if !check {
 		return
 	}
 
 	var username string
-	err = DB.QueryRow("SELECT username FROM users WHERE id = ?;", userID).Scan(&username)
+	err := DB.QueryRow("SELECT username FROM users WHERE id = ?;", userID).Scan(&username)
 	if err != nil {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
@@ -292,9 +296,9 @@ func MarkMessagesAsRead(w http.ResponseWriter, r *http.Request) {
 		"message": "",
 	}
 
-	userID, err := CheckAuthentication(w, r)
-	if err != nil {
-		Data["message"] = "Authonticatoin Not found"
+	check, userID := MiddleWear(w, r)
+	if !check {
+		Data["message"] = "Authontication  Not found"
 		JsResponse(w, http.StatusInternalServerError, false, Data)
 		return
 	}
@@ -304,7 +308,7 @@ func MarkMessagesAsRead(w http.ResponseWriter, r *http.Request) {
 		ReceiverID int `json:"receiver_id"`
 	}
 
-	err = json.NewDecoder(r.Body).Decode(&req)
+	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		Data["message"] = "Invalid JSON data"
 		JsResponse(w, http.StatusBadRequest, false, Data)

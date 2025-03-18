@@ -18,16 +18,6 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		"status":  false,
 		"message": "",
 	}
-	if r.Method != "POST" {
-		DATA["message"] = "invalid method"
-		JsResponse(w, http.StatusMethodNotAllowed, false, DATA)
-		return
-	}
-	if r.Header.Get("Content-Type") != "application/json" {
-		DATA["message"] = "invalid content type"
-		JsResponse(w, http.StatusBadRequest, false, DATA)
-		return
-	}
 
 	UserId, err := CheckAuthentication(w, r)
 	if err != nil {

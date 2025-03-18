@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"forum/database/querries"
 	"forum/structs"
+	"slices"
 )
 
 func GetCategoriesWithPostCount(db *sql.DB) (map[string]int, error) {
@@ -41,10 +42,5 @@ func QuerryLatestPostsByCategory(db *sql.DB, user_id int, c_name string, offset 
 
 func IsCategoryValid(category string) bool {
 	categories := []string{"General", "Entertainment", "Health", "Business", "Sports", "Technology"}
-	for _, c := range categories {
-		if c == category {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(categories, category)
 }
