@@ -152,7 +152,7 @@ function handleIncomingMessage(data) {
   if (!activeUserId || activeUserId != data.sender_id) {
     // TODO ba mohamed if you want show me your creativity 😉😉😉😉
     // create Notification her
-    // alert(`${data.username} send you message!`)
+    alert(`${data.username} send you message!`)
     return;
   }
   if (activeUserId === data.sender_id) {
@@ -328,32 +328,6 @@ function addFriend(
       );
       friendsList.appendChild(friendElement);
       messagesArea.scrollTop = messagesArea.scrollHeight;
-
-      // const statusElement = friendElement.querySelector(`#user-${userId}`);
-      // statusElement.classList.toggle("online", status === "online");
-      // statusElement.classList.toggle("offline", status === "offline");
-
-      // friendElement.addEventListener("click", () => {
-      //   messagesArea.innerHTML = "";
-      //   const show_user = document.getElementById("user-receiver");
-      //   friends_list.style.display = window.innerWidth <= 780 ? "none" : "block";
-      //   chat_box.style.display = "flex";
-      //   show_user.innerText = friend;
-      //   messageOffset = 0;
-      //   fetchChatHistory(userId, messageOffset);
-      //   if (messagesArea && userID == 0) {
-      //     userID = userId;
-      //     messagesArea.addEventListener("scroll", async () => {
-      //       if (messagesArea.scrollTop === 0 && !isLoading && userID !== 0) {
-      //         isLoading = true;
-      //         await fetchChatHistory(userID, messageOffset);
-      //         isLoading = false;
-      //       }
-      //     });
-      //   }
-      // });
-
-      // friendsList.appendChild(friendElement);
     });
   }
 }
@@ -391,6 +365,7 @@ function handleFriendClick(friend, userId, status, unreadCount) {
   setupScrollListener(userId);
 }
 
+
 function setupScrollListener(userId) {
   if (!window.messagesArea) return;
 
@@ -403,7 +378,10 @@ function setupScrollListener(userId) {
     if (window.messagesArea.scrollTop === 0 && !isLoading) {
       isLoading = true;
       await fetchChatHistory(userId, messageOffset);
-      isLoading = false;
+      setTimeout(() => {
+        window.messagesArea.scrollTop = 60;
+        isLoading = false;
+      }, 1000);
     }
   });
 }

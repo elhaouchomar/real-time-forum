@@ -138,7 +138,8 @@ window.addEventListener("popstate", async (event) => {
     const params = new URLSearchParams(Url.search)
     var type = params.get("type")
     if (!type){
-        type = Url.pathname.split("/")[1]
+        const tmp = Url.pathname.split("/")[1]
+        type = tmp == "" ? "home" : tmp
     }
     console.log("=====================================", type)
 

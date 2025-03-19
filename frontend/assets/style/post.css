@@ -447,6 +447,7 @@ select .DisableUserSelect {
     cursor: pointer;
     transition: all 0.5s;
     right: 20px;
+    margin-left: 5px;
 }
 .PostButton {
     color: var(--BlueDarker);

@@ -46,7 +46,9 @@
 
 .titleInput, .postInput {
     padding: 5px;
-    width: 93%;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .titleInput input:focus, .postInput textarea:focus {
@@ -60,7 +62,7 @@
     font-size: 1rem;
     outline: none;
     border: none;
-    width: 100%;
+    width: calc(100% - 35px);
     resize: none;
     background-color: var(--Greey);
 }
