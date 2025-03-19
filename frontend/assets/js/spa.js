@@ -15,9 +15,10 @@ const headElement = document.querySelector('head')
 export const BodyElement = document.querySelector("body")
 export const AVATAR_URL = 'https://ui-avatars.com/api/?name=';//${userName}
 export let USRNAME  = ""
+export let ID  = 0
 export const ListnerMap = new WeakMap()
 export let previousUrl = document.location.href;
-var Logged = false
+export var Logged = false
 var MAIN_URL = window.location.href.split("/")[3]
 
 MAIN_URL =  MAIN_URL == "" ? "home" : MAIN_URL
@@ -26,7 +27,10 @@ window.onload = async () => {
     if (response){
         console.log("Response of Checker" , response);
         Logged = response.status
-        if(Logged) USRNAME =  response.data.UserName
+        if(Logged){
+            USRNAME =  response.data.UserName
+            ID = response.data.ID
+        }
         console.log("user Name ", response.data);
    }
    MAIN_URL = Logged ? MAIN_URL : "login"
@@ -61,6 +65,8 @@ export async function LoadPage(page = "home", code, msg, skip = false){
        page = "login"
     }else{
         USRNAME = response.data.UserName
+        Logged = response.status
+        ID = response.data.ID
     }
 
     if (!skip) ChangeUrl(page)
@@ -88,6 +94,7 @@ export async function LoadPage(page = "home", code, msg, skip = false){
             LoadPage("home")
             return
         }
+        Logged = false
         removeStyleElements();
         SPAContainer.appendChild(LoginPage());
         console.log("Append LoginPage");

@@ -1,4 +1,6 @@
+import { apiRequest } from "./apiRequest.js";
 import * as spa from "./spa.js";
+
 
 // Chat Vars
 export let ws;
@@ -27,7 +29,7 @@ function initializeDOMElements() {
     document.querySelector(".friend-avatar");
 
 
- 
+
 }
 
 
@@ -96,9 +98,12 @@ function closeMessageArea() {
 
 // WebSocket Functions
 export function connectWebSocket() {
+
   try {
     ws = new WebSocket("ws://localhost:8080/ws");
-
+    if (!spa.Logged) {
+      ws.close();
+    }
     ws.onopen = () => console.log("Connected to chat server");
     ws.onmessage = handleWebSocketMessage;
     ws.onerror = (event) => console.error("WebSocket error:", event);
@@ -112,7 +117,12 @@ export function connectWebSocket() {
   }
 }
 
-function handleWebSocketMessage(event) {
+async function handleWebSocketMessage(event) {
+  const response = await apiRequest("checker")
+  if (!response || !response.status) {
+    spa.ChangeUrl("login")
+    return
+  }
   try {
     const data = JSON.parse(event.data);
 
@@ -131,7 +141,7 @@ function handleWebSocketMessage(event) {
     if (data.type === "message") {
       handleIncomingMessage(data);
     }
-    
+
   } catch (error) {
     console.error("Error processing WebSocket message:", error);
   }
@@ -145,19 +155,12 @@ function handleIncomingMessage(data) {
   });
   let activeUserId = getActiveChatUserId();
 
-  console.log("Active User ID:", activeUserId, "Sender ID:", data.sender_id);
+  console.log("Active User ID:", activeUserId, "Sender ID:", data.receiver_id);
   console.log(data.sender_id, activeUserId);
   console.log("omar : ", data);
 
-  if (!activeUserId || activeUserId != data.sender_id) {
-    // TODO ba mohamed if you want show me your creativity 😉😉😉😉
-    // create Notification her
-    alert(`${data.username} send you message!`)
-    return;
-  }
   if (activeUserId === data.sender_id) {
-    // Hadi 4at5daaam mnin n7aydo input without select
-    // markMessagesAsRead(activeUserId);
+    markMessagesAsRead(activeUserId)
     const messagesContainer =
       window.messagesArea ||
       document.getElementById("messages") ||
@@ -209,7 +212,7 @@ function sendMessage() {
       minute: "2-digit",
       hour12: false,
     });
-    if (ws) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(
         JSON.stringify({
           type: "message",
@@ -219,7 +222,7 @@ function sendMessage() {
         })
       );
     }
-    const messageDiv = createMessageElement(message, time, "sent", "You");
+    const messageDiv = createMessageElement(message, time, "sent", spa.USRNAME);
     messagesArea.appendChild(messageDiv);
     messageInput.value = "";
     messagesArea.scrollTop = messagesArea.scrollHeight;
@@ -271,6 +274,8 @@ function addFriend(
 ) {
   const friendsList = document.querySelector(".allfriends");
   const messagesArea = document.getElementById("messages");
+  const friends_list = document.querySelector(".friends-list");
+  const chat_box = document.querySelector(".chat-box");
 
   if (!friendsList) {
     console.error("friendsList is not found in the DOM!");
@@ -286,10 +291,10 @@ function addFriend(
       const unreadCount = unreadCounts[friend] || 0;
       const lastTime = lastTimes[friend]
         ? new Date(lastTimes[friend]).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          })
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        })
         : "—";
 
       const friendElement = document.createElement("div");
@@ -306,57 +311,34 @@ function addFriend(
         <div class="friend-info">
             <div>
               <div class="friend-name">${friend}</div>
-                <div class="last-message">${
-                  lastMessage.length > 30
-                    ? lastMessage.substring(0, 15) + "..."
-                    : lastMessage
-                }</div>
+                <div class="last-message">${lastMessage.length > 15
+          ? lastMessage.substring(0, 15) + "..."
+          : lastMessage
+        }</div>
           </div>
           <div class="time-notif">
               <div class="last-time">${lastTime}</div>
-              <div class="notification ${
-                unreadCount === 0 ? "hidden" : ""
-              }">${unreadCount}</div>
+              <div class="notification ${unreadCount === 0 ? "hidden" : ""
+        }">${unreadCount}</div>
           </div>
       </div>`;
 
       friendElement.addEventListener("click", () =>
         handleFriendClick(friend, userId, status, unreadCount)
-      
+
       );
       friendsList.appendChild(friendElement);
       messagesArea.scrollTop = messagesArea.scrollHeight;
-
-      // const statusElement = friendElement.querySelector(`#user-${userId}`);
-      // statusElement.classList.toggle("online", status === "online");
-      // statusElement.classList.toggle("offline", status === "offline");
-
-      // friendElement.addEventListener("click", () => {
-      //   messagesArea.innerHTML = "";
-      //   const show_user = document.getElementById("user-receiver");
-      //   friends_list.style.display = window.innerWidth <= 780 ? "none" : "block";
-      //   chat_box.style.display = "flex";
-      //   show_user.innerText = friend;
-      //   messageOffset = 0;
-      //   fetchChatHistory(userId, messageOffset);
-      //   if (messagesArea && userID == 0) {
-      //     userID = userId;
-      //     messagesArea.addEventListener("scroll", async () => {
-      //       if (messagesArea.scrollTop === 0 && !isLoading && userID !== 0) {
-      //         isLoading = true;
-      //         await fetchChatHistory(userID, messageOffset);
-      //         isLoading = false;
-      //       }
-      //     });
-      //   }
-      // });
-
-      // friendsList.appendChild(friendElement);
     });
   }
 }
 
-function handleFriendClick(friend, userId, status, unreadCount) {
+async function handleFriendClick(friend, userId, status, unreadCount) {
+  const response = await apiRequest("checker")
+  if (!response || !response.status) {
+    spa.ChangeUrl("login")
+    return
+  }
   console.log(userId);
   // Show Messages Box once user selected a friend to chat with
   chat_box.style.visibility = "visible"
@@ -385,6 +367,7 @@ function handleFriendClick(friend, userId, status, unreadCount) {
       </div>`;
   }
   messageOffset = 0;
+
   fetchChatHistory(userId, messageOffset);
   setupScrollListener(userId);
 }
@@ -414,11 +397,11 @@ function setupScrollListener(userId) {
 async function fetchChatHistory(userId, offset = 0) {
 
   try {
-    
+
     const response = await fetch(
       `/api/chat/history?user_id=${userId}&offset=${offset}`, {
-        mode: "no-cors",
-      }
+      mode: "no-cors",
+    }
     );
 
     if (!response.ok) {
@@ -426,7 +409,7 @@ async function fetchChatHistory(userId, offset = 0) {
     }
     const data = await response.json();
     console.log("Message History", data);
-    
+
     if (!window.messagesArea) {
       console.error("Messages area not found!");
       return;

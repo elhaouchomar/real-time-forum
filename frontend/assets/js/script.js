@@ -1,7 +1,7 @@
 import { apiRequest } from "./apiRequest.js";
 import { CommentInputEventListenner, ExpandComments, PostButtonSwitcher } from "./comments.js";
 import { HandleLikes } from "./likes.js";
-import { AVATAR_URL, BodyElement, ChangeUrl, ListnerMap, LoadPage, USRNAME } from "./spa.js";
+import { AVATAR_URL, BodyElement, ChangeUrl, ListnerMap, LoadPage, Logged, USRNAME } from "./spa.js";
 
 // const sidebardLeft = document.querySelector(".sidebar-left");
 const windowMedia = window.matchMedia("(min-width: 768px)");
@@ -246,6 +246,8 @@ export function infiniteScroll(where) {
           LoadPage("login")
           return
         }
+        Logged = false
+        ws.close()
       }
 
       if (elem.id == "message") {
