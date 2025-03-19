@@ -64,7 +64,6 @@ export async function LoadPage(page = "home", code, msg, skip = false){
     }
 
     if (!skip) ChangeUrl(page)
-    
     clearSPAContainer()
 
     if (page == "home" || page == "category" ||
@@ -75,8 +74,8 @@ export async function LoadPage(page = "home", code, msg, skip = false){
         })
         SPAContainer.appendChild(HomePage())
         console.log("Append HomePage");
-        infiniteScroll()
-        fetchPosts(0, page)
+        infiniteScroll("spa")
+        fetchPosts(0, page, "LoadPage")
         postControlList()
         readPost()
         createPostListner()
@@ -85,6 +84,10 @@ export async function LoadPage(page = "home", code, msg, skip = false){
         connectWebSocket()
         initChat()
     } else if (page == "login") {
+        if (response.status){
+            LoadPage("home")
+            return
+        }
         removeStyleElements();
         SPAContainer.appendChild(LoginPage());
         console.log("Append LoginPage");
@@ -131,7 +134,6 @@ export function ChangeUrl(url, data = {}) {
 }
 
 window.addEventListener("popstate", async (event) => {
-    
     previousUrl = document.location.href;
     console.log('Previous URL: ', previousUrl);
     const Url = new URL(document.location.href)
@@ -139,7 +141,7 @@ window.addEventListener("popstate", async (event) => {
     var type = params.get("type")
     if (!type){
         const tmp = Url.pathname.split("/")[1]
-        type = tmp == "" ? "home" : tmp
+        type =  tmp == "" ? "home" : tmp
     }
     console.log("=====================================", type)
 

@@ -9,11 +9,10 @@ export async function apiRequest(url){
         const textResponse = await response.text();
         try {
             const jsResponse = JSON.parse(textResponse);
-            console.log("ResponseJs", jsResponse);
+            console.log("Result of jsResponse ", jsResponse);
             return jsResponse;
         } catch (error) {
             console.log("Response is not valid JSON:", textResponse);
-            console.log("END:");
             throw error;
         }
         

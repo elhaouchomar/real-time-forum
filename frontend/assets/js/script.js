@@ -8,18 +8,13 @@ const windowMedia = window.matchMedia("(min-width: 768px)");
 
 // let errorr = "";
 
-export async function fetchPosts(offset, type) {
-  const response = await apiRequest("checker")
-  const Logged = response.status
-  if (!Logged) {
-    LoadPage("login")
-    return
-  }
+export async function fetchPosts(offset, type, where) {
+  console.log("This is called from ", where);
+  
   const UrlParams = new URLSearchParams(window.location.search);
   var type = UrlParams.get("type");
   const username = UrlParams.get("username");
   console.log("====> fetchPosts CALLED <======", username);
-
   type = type || "home";
   let category_name = UrlParams.get("category");
   console.log("Category name ", category_name);
@@ -204,8 +199,8 @@ function selectedItem(id) {
   })
 
 }
-export function infiniteScroll() {
-
+export function infiniteScroll(where) {
+  console.log("infiniteScroll This is called from ", where);
   const themeToggle = document.querySelectorAll("#switch");
 
   console.log("====> infiniteScroll CALLED <======");
@@ -221,7 +216,8 @@ export function infiniteScroll() {
       const { scrollTop, scrollHeight, clientHeight } =
         document.documentElement;
       if (scrollTop + clientHeight >= scrollHeight - 5) {
-        await fetchPosts(offset, type);
+        await fetchPosts(offset, type, "infiniteScroll");
+
       }
     }, 1000);
   });

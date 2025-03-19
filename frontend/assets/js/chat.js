@@ -271,8 +271,6 @@ function addFriend(
 ) {
   const friendsList = document.querySelector(".allfriends");
   const messagesArea = document.getElementById("messages");
-  const friends_list = document.querySelector(".friends-list");
-  const chat_box = document.querySelector(".chat-box");
 
   if (!friendsList) {
     console.error("friendsList is not found in the DOM!");
@@ -328,6 +326,32 @@ function addFriend(
       );
       friendsList.appendChild(friendElement);
       messagesArea.scrollTop = messagesArea.scrollHeight;
+
+      // const statusElement = friendElement.querySelector(`#user-${userId}`);
+      // statusElement.classList.toggle("online", status === "online");
+      // statusElement.classList.toggle("offline", status === "offline");
+
+      // friendElement.addEventListener("click", () => {
+      //   messagesArea.innerHTML = "";
+      //   const show_user = document.getElementById("user-receiver");
+      //   friends_list.style.display = window.innerWidth <= 780 ? "none" : "block";
+      //   chat_box.style.display = "flex";
+      //   show_user.innerText = friend;
+      //   messageOffset = 0;
+      //   fetchChatHistory(userId, messageOffset);
+      //   if (messagesArea && userID == 0) {
+      //     userID = userId;
+      //     messagesArea.addEventListener("scroll", async () => {
+      //       if (messagesArea.scrollTop === 0 && !isLoading && userID !== 0) {
+      //         isLoading = true;
+      //         await fetchChatHistory(userID, messageOffset);
+      //         isLoading = false;
+      //       }
+      //     });
+      //   }
+      // });
+
+      // friendsList.appendChild(friendElement);
     });
   }
 }
