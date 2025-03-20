@@ -178,8 +178,8 @@ function handleIncomingMessage(data) {
       console.error("Messages container not found!");
     }
   } else {
-    alert(`${data.username} send message`)
-    console.log("Message is from another user");
+    showNotification()
+    console.log("Message has been recived from", data.username);
   }
 }
 
@@ -192,7 +192,23 @@ function getActiveChatUserId() {
     }
   }
 }
-
+function showNotification(){
+    const notificationPopup = document.createElement("div");
+    notificationPopup.className = "notification-popup";
+    notificationPopup.innerHTML = `
+      <div class="popup-content">
+        <p>You have received a new message!</p>
+        <button class="close-popup">Close</button>
+      </div>
+    `;
+    document.body.appendChild(notificationPopup);
+    notificationPopup.querySelector(".close-popup").addEventListener("click", () => {
+      notificationPopup.remove();
+    });
+  setTimeout(() => {
+    notificationPopup.remove();
+  }, 5000);
+}
 // Message Functions
 function sendMessage() {
   const message = messageInput.value.trim();
@@ -240,7 +256,10 @@ function createMessageElement(content, time, type, username) {
   return messageDiv;
 }
 export function displayMessage(message, currentUserId) {
-  const time = new Date(message.timestamp).toLocaleTimeString([], {
+  const time = new Date(message.timestamp).toLocaleString([], {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,

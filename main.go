@@ -61,7 +61,7 @@ func MainServerHandler(Main *http.ServeMux) {
 }
 
 func creatingDatabase() (*sql.DB, *time.Ticker) {
-	db, err := database.OpenDatabase("basexx.db")
+	db, err := database.OpenDatabase("base.db")
 	if err != nil {
 		log.Fatalf("Database error: %v", err)
 	}

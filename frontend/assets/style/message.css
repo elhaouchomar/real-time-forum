@@ -69,7 +69,7 @@
   align-self: flex-start;
   border-bottom-left-radius: 0;
   margin: 8px;
-  min-width: 55px;
+  min-width: 87px;
 }
 .received-info {
   font-size: 12px;
@@ -86,7 +86,7 @@
   align-self: flex-end;
   border-bottom-right-radius: 0;
   margin: 8px;
-  min-width: 55px;
+  min-width: 87px;
 }
 
 
@@ -327,6 +327,41 @@
   border-radius: 5px;
   top: 34px;
 }
+.notification-popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  align-items: center;
+}
+
+.notification-popup .popup-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.notification-popup .close-popup {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.notification-popup .close-popup:hover {
+  background-color: #0056b3;
+}
+
 .dropMenu .Links:hover{
   color: var(--BlueGreen);
   background-color: var(--WhiteBlue);
