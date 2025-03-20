@@ -149,6 +149,9 @@ async function handleWebSocketMessage(event) {
 
 function handleIncomingMessage(data) {
   const time = new Date(data.timestamp || new Date()).toLocaleTimeString([], {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
@@ -217,6 +220,9 @@ function sendMessage() {
 
   if (message) {
     const time = new Date().toLocaleTimeString([], {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
       hour12: false,
@@ -304,6 +310,9 @@ function addFriend(
       const unreadCount = unreadCounts[friend] || 0;
       const lastTime = lastTimes[friend]
         ? new Date(lastTimes[friend]).toLocaleTimeString([], {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
           hour: "2-digit",
           minute: "2-digit",
           hour12: false,
@@ -398,13 +407,20 @@ function setupScrollListener(userId) {
   window.messagesArea = newElement;
 
   window.messagesArea.addEventListener("scroll", async () => {
+    let throttleTimeout;
     if (window.messagesArea.scrollTop === 0 && !isLoading) {
+      if (!throttleTimeout) {
       isLoading = true;
       await fetchChatHistory(userId, messageOffset);
       setTimeout(() => {
         window.messagesArea.scrollTop = 60;
         isLoading = false;
       }, 1000);
+
+      throttleTimeout = setTimeout(() => {
+        throttleTimeout = null;
+      }, 1000); 
+      }
     }
   });
 }

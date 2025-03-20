@@ -27,7 +27,6 @@ function createPostTemplate(post) {
                 </div>
             </div>
             <div class="post-content"><p></p></div>
-            <span class="see-more">See More</span>
             <div class="Hashtag">
                 ${post.Categories.map(category => `<a href=""><span>#${category}</span></a>`).join('')}
             </div>
