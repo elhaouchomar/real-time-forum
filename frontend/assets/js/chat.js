@@ -178,6 +178,7 @@ function handleIncomingMessage(data) {
       console.error("Messages container not found!");
     }
   } else {
+    alert(`${data.username} send message`)
     console.log("Message is from another user");
   }
 }
@@ -190,14 +191,6 @@ function getActiveChatUserId() {
       return parseInt(matches[1]);
     }
   }
-  const alternativeStatus = document.querySelector(".status[id^='user-']");
-  if (alternativeStatus && alternativeStatus.id) {
-    const matches = alternativeStatus.id.match(/user-(\d+)/);
-    if (matches && matches[1]) {
-      return parseInt(matches[1]);
-    }
-  }
-  return userID || currentUserId;
 }
 
 // Message Functions
@@ -261,6 +254,7 @@ export function displayMessage(message, currentUserId) {
     isSent ? "sent" : "received",
     message.username
   );
+
 }
 
 // Friend List Functions
@@ -345,8 +339,11 @@ async function handleFriendClick(friend, userId, status, unreadCount) {
   window.post.style.display = "none"
   console.log("Friend clicked:", friend, "ID:", userId);
   if (unreadCount > 0) {
-    markMessagesAsRead(userId);
+    markMessagesAsRead(friend);
   }
+  window.messageInput.focus()
+  window.messageInput.value = ""
+
   if (window.messagesArea) {
     window.messagesArea.innerHTML = "";
   } else {
@@ -436,6 +433,10 @@ async function fetchChatHistory(userId, offset = 0) {
         fragment.prepend(messageDiv);
       }
     });
+    
+    let activeUserId = getActiveChatUserId();
+    markMessagesAsRead(activeUserId)
+
     window.messagesArea.prepend(fragment);
     if (offset === 0) {
       window.messagesArea.scrollTop = window.messagesArea.scrollHeight;
