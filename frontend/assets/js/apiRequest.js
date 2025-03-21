@@ -17,6 +17,6 @@ export async function apiRequest(url){
         }
         
     }catch(error){
-        console.log(`Error Fetch data from http://localhost:8080/${url}`, error)
+        console.log(`Error Fetch data from http://localhost:9090/${url}`, error)
     }
 }

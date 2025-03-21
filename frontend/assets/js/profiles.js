@@ -1,25 +1,21 @@
 //###////////////////////  Controling The MainSidebar in Profile //////////
 export function profileEffect(){
     const switchIcons = document.querySelector(".sub-main")
-    const ProfileCard = document.querySelector(".ProfileCard")
+    const MessageCard = document.querySelector(".MessageCard")
     const Categories = document.querySelector(".Categories")
     const rotateIcon = document.querySelector(".switch-icon span")
-    const Parametrs = new URLSearchParams(window.location.search);
-
-    const Profile =  Parametrs.get('type') == "profile" 
-
-    if (switchIcons.classList.contains("reverse") && !Profile){ // change index to HomePage Path 
-        ProfileCard.classList.remove("display")
+    if (switchIcons.classList.contains("reverse")){ // change index to HomePage Path 
+        MessageCard.classList.remove("display")
         Categories.classList.add("display")
     }else{
         switchIcons.classList.toggle("reverse")
-        ProfileCard.classList.add("display")
+        MessageCard.classList.add("display")
         Categories.classList.remove("display")
     }
     switchIcons.addEventListener('click', () => {
         switchIcons.classList.toggle("reverse")
         rotateIcon.classList.toggle("rotate")
-        ProfileCard.classList.toggle("display")
+        MessageCard.classList.toggle("display")
         Categories.classList.toggle("display")
     })
 }

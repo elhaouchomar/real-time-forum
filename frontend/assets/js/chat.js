@@ -50,8 +50,9 @@ export function initChat() {
 
     if (friend) friend.addEventListener("click", showChatBox);
     if (back) back.addEventListener("click", showFriendsList);
-    if (close_message)
+    if (close_message){
       close_message.addEventListener("click", closeMessageArea);
+    }
   }
 }
 
@@ -100,7 +101,7 @@ function closeMessageArea() {
 export function connectWebSocket() {
 
   try {
-    ws = new WebSocket("ws://localhost:8080/ws");
+    ws = new WebSocket("ws://localhost:9090/ws");
     if (!spa.Logged) {
       ws.close();
     }
@@ -291,7 +292,7 @@ function addFriend(
   lastTimes,
   unreadCounts
 ) {
-  const friendsList = document.querySelector(".allfriends");
+  const friendsList = document.querySelectorAll(".allfriends");
   const messagesArea = document.getElementById("messages");
   const friends_list = document.querySelector(".friends-list");
   const chat_box = document.querySelector(".chat-box");
@@ -301,58 +302,60 @@ function addFriend(
     return;
   }
 
-  friendsList.innerHTML = "";
-  if (friends) {
-    friends.forEach((friend) => {
-      const userId = userIds[friend];
-      const status = userStatuses[friend] || "offline";
-      const lastMessage = lastMessages[friend] || "No messages yet";
-      const unreadCount = unreadCounts[friend] || 0;
-      const lastTime = lastTimes[friend]
-        ? new Date(lastTimes[friend]).toLocaleTimeString([], {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        })
-        : "—";
-
-      const friendElement = document.createElement("div");
-      friendElement.className = "friend";
-      if (unreadCount > 0) {
-        friendElement.classList.add("has-unread");
-      }
-
-      friendElement.innerHTML = `
-        <div class="friend-avatar">
-            <img src="https://ui-avatars.com/api/?name=${friend}" class="profile-img" alt="${friend}">
-            <div class="status ${status}" id="user-${userId}"></div>
-        </div>
-        <div class="friend-info">
-            <div>
-              <div class="friend-name">${friend}</div>
-                <div class="last-message">${lastMessage.length > 15
-          ? lastMessage.substring(0, 15) + "..."
-          : lastMessage
-        }</div>
+  friendsList.forEach(elem => {
+    elem.innerHTML = "";
+    if (friends) {
+      friends.forEach((friend) => {
+        const userId = userIds[friend];
+        const status = userStatuses[friend] || "offline";
+        const lastMessage = lastMessages[friend] || "No messages yet";
+        const unreadCount = unreadCounts[friend] || 0;
+        const lastTime = lastTimes[friend]
+          ? new Date(lastTimes[friend]).toLocaleTimeString([], {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          })
+          : "—";
+  
+        const friendElement = document.createElement("div");
+        friendElement.className = "friend";
+        if (unreadCount > 0) {
+          friendElement.classList.add("has-unread");
+        }
+  
+        friendElement.innerHTML = `
+          <div class="friend-avatar">
+              <img src="https://ui-avatars.com/api/?name=${friend}" class="profile-img" alt="${friend}">
+              <div class="status ${status}" id="user-${userId}"></div>
           </div>
-          <div class="time-notif">
-              <div class="last-time">${lastTime}</div>
-              <div class="notification ${unreadCount === 0 ? "hidden" : ""
-        }">${unreadCount}</div>
-          </div>
-      </div>`;
-
-      friendElement.addEventListener("click", () =>
-        handleFriendClick(friend, userId, status, unreadCount)
-
-      );
-      friendsList.appendChild(friendElement);
-      messagesArea.scrollTop = messagesArea.scrollHeight;
-    });
-  }
+          <div class="friend-info">
+              <div>
+                <div class="friend-name">${friend}</div>
+                  <div class="last-message">${lastMessage.length > 15
+            ? lastMessage.substring(0, 15) + "..."
+            : lastMessage
+          }</div>
+            </div>
+            <div class="time-notif">
+                <div class="last-time">${lastTime}</div>
+                <div class="notification ${unreadCount === 0 ? "hidden" : ""
+          }">${unreadCount}</div>
+            </div>
+        </div>`;
+        friendElement.addEventListener("click", () =>
+          handleFriendClick(friend, userId, status, unreadCount)
+  
+        );
+        elem.appendChild(friendElement)
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+      });
+    }
+  })
+  
 }
 
 async function handleFriendClick(friend, userId, status, unreadCount) {
@@ -363,7 +366,8 @@ async function handleFriendClick(friend, userId, status, unreadCount) {
   }
   console.log(userId);
   // Show Messages Box once user selected a friend to chat with
-  chat_box.style.visibility = "visible"
+  window.chat_box.style.visibility = "visible"
+  window.area_msg.hidden = false
   window.post.style.display = "none"
   console.log("Friend clicked:", friend, "ID:", userId);
   if (unreadCount > 0) {
@@ -393,7 +397,6 @@ async function handleFriendClick(friend, userId, status, unreadCount) {
   }
   messageOffset = 0;
   const limit = Math.round(document.querySelector(".messages-area").clientHeight / 44)
-  alert(limit)
   fetchChatHistory(userId, messageOffset, limit);
   setupScrollListener(userId);
 }

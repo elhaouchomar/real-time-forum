@@ -29,8 +29,8 @@ func main() {
 
 func StartServers(MainServer *http.ServeMux) {
 	fmt.Println("Trying runing server...")
-	fmt.Println("Main Server Started:\n http://localhost:8080")
-	err := http.ListenAndServe(":8080", MainServer)
+	fmt.Println("Main Server Started:\n http://localhost:9090")
+	err := http.ListenAndServe(":9090", MainServer)
 	if err != nil {
 		panic(err.Error())
 	}

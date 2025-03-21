@@ -1,44 +1,25 @@
 export function RightSideBar(){
     return  `
-    <div class="sidebar-right" id="categories">
-        <h1 class="h1-title sub-main reverse">
-            <div class="switch-icon rotate">
+    <div class="sidebar-right " id="categories">
+        <h1 class="h1-title sub-main ">
+            <div class="switch-icon">
                 <span class="material-symbols-outlined">
                     autorenew
                 </span>
             </div>
 
             <div class="switch-buttons">
-                <span class="main">Profile</span>
                 <span class="sub">Categories</span>
+                <span class="main">Messages</span>
             </div>
         </h1>
         
-        <div class="ProfileCard">
-            <div class="profileImage">
-                <img src="/assets/images/profile.png" alt="">
-            </div>
-            <div class="profileName">
-            </div>
-            <div class="profileStatics">
-                <span class="analytics">analytics</span>
-                <div class="posts">
-                    <span class="material-symbols-outlined">
-                        article
-                    </span>
-                        
-                        <span class="postCounts"><a href="/login">Login</a></span>
-                </div>
-                <div class="comments">
-                    <span class="material-symbols-outlined">
-                        comment
-                    </span>
-                    <span class="postCounts"><a href="/register">Register</a></span>
-                </div>
-            </div>
+        <div class="MessageCard">
+            <div class="friends-list-right">
+                <div class="allfriends"></div>
+            </div> 
         </div>
-        <!-- <h1 class="h1-title Categories">Categories</h1> -->
-        <div class="Categories display">
+        <div class="Categories ">
             <hr>
             <a class="Links" href="/?type=category&amp;category=Business">
                 <div class="trending-item">

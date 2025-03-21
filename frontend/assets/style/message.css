@@ -157,6 +157,13 @@
   background: var(--WhiteBlue);
   overflow-y: auto;
 }
+.friends-list-right{
+  height: 100%;
+  width: 100%;
+  border-left: var(--border);
+  background: var(--WhiteBlue);
+  overflow-y: auto;
+}
 
 .friends-header {
   display: flex;
@@ -178,6 +185,9 @@
   border-bottom: var(--border);
   cursor: pointer;
   transition: background 0.3s;
+}
+.friend-right {
+  padding: 4px;
 }
 
 .friend:hover {
@@ -305,6 +315,7 @@
   .friends-list {
     width: 100%;
   }
+
   .msg-input {
     width: 80%;
     margin: 0 15px 40px;

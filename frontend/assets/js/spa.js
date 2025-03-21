@@ -7,7 +7,7 @@ import { registerFunctions } from "./register.js";
 import {createPostListner} from "./createPost.js"
 import { ErrorPage } from "./component/error.js";
 import { connectWebSocket, initChat } from "./chat.js";
-import {profileEffect} from "./profile.js"
+import { profileEffect } from "./profiles.js";
 
 
 export const SPAContainer = document.querySelector(".SPAContainer");
@@ -78,14 +78,14 @@ export async function LoadPage(page = "home", code, msg, skip = false){
         ROUTES["home"]["styles"].forEach(elem => {
             headElement.appendChild(createStyle(elem, page))
         })
-        SPAContainer.appendChild(HomePage())
+        SPAContainer.appendChild(HomePage(page))
         console.log("Append HomePage");
         infiniteScroll("spa")
         fetchPosts(0, page, "LoadPage")
         postControlList()
         readPost()
-        createPostListner()
         profileEffect()
+        createPostListner()
         NotifyButtons()
         connectWebSocket()
         initChat()
@@ -116,15 +116,6 @@ function removeStyleElements(){
     console.log(`Removing all Style Elements`);
     const headStyles = document.head.querySelectorAll('link')
         headStyles.forEach(elem => {
-            if (elem.id){
-                elem.remove()
-            }
-        })
-}
-function removeScriptElements(){
-    console.log(`Removing all ScriptJs Elements`);
-    const JsFiles = document.querySelectorAll('script')
-        JsFiles.forEach(elem => {
             if (elem.id){
                 elem.remove()
             }

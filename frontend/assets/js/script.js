@@ -1,13 +1,12 @@
 import { apiRequest } from "./apiRequest.js";
 import { CommentInputEventListenner, ExpandComments, PostButtonSwitcher } from "./comments.js";
 import { HandleLikes } from "./likes.js";
-import { AVATAR_URL, BodyElement, ChangeUrl, ListnerMap, LoadPage, Logged, USRNAME } from "./spa.js";
+import { AVATAR_URL, BodyElement, ChangeUrl, ListnerMap, LoadPage, USRNAME } from "./spa.js";
 
 // const sidebardLeft = document.querySelector(".sidebar-left");
 const windowMedia = window.matchMedia("(min-width: 768px)");
 
 // let errorr = "";
-
 export async function fetchPosts(offset, type, where) {
   console.log("This is called from ", where);
   
@@ -30,7 +29,9 @@ export async function fetchPosts(offset, type, where) {
     console.log("POST +>>>>>>>", posts);
 
     if (posts) {
-      updateProfile(posts.profile);
+      if (type == "profile"){
+        updateProfile(posts.profile);
+      }
       updateCategoriesCount(posts.categories)
       if (posts.posts) {
         posts.posts.forEach((post) => {
@@ -58,11 +59,9 @@ function updateCategoriesCount(categoriesCount) {
 
 function updateProfile(profile) {
   const userName = profile.UserName
-  const pImage = document.querySelector(".profileImage img");
   const pName = document.querySelector(".profileName");
   const pCounts = document.querySelector(".posts .postCounts");
   const cCounts = document.querySelector(".comments .postCounts");
-  pImage.src = `${AVATAR_URL}${userName}`
   pName.textContent = userName
   pCounts.textContent = `${profile.ArticleCount} Articles`;
   cCounts.textContent = `${profile.CommentCount} Comments`;
@@ -246,8 +245,6 @@ export function infiniteScroll(where) {
           LoadPage("login")
           return
         }
-        Logged = false
-        ws.close()
       }
 
       if (elem.id == "message") {
