@@ -19,6 +19,7 @@ func GetChatHistory(w http.ResponseWriter, r *http.Request) {
 
 	otherUserID := r.URL.Query().Get("user_id")
 	offSet := r.URL.Query().Get("offset")
+	limit := r.URL.Query().Get("limit")
 
 	if otherUserID == "" {
 		ErrorJs(w, http.StatusBadRequest, errors.New("missing user_id parameter"))
@@ -40,9 +41,9 @@ func GetChatHistory(w http.ResponseWriter, r *http.Request) {
         OR 
         (m.sender_id = ? AND m.receiver_id = ?)
     ORDER BY m.timestamp DESC
-    LIMIT 10 OFFSET ?`
+    LIMIT ? OFFSET ?`
 
-	rows, err := DB.Query(query, userID, otherUserID, otherUserID, userID, offSet)
+	rows, err := DB.Query(query, userID, otherUserID, otherUserID, userID,limit, offSet)
 	if err != nil {
 		fmt.Println("GetChatHistory", err)
 		ErrorJs(w, http.StatusInternalServerError, errors.New("error apply query"))

@@ -17,9 +17,6 @@ var (
 	upgrader = wsLib.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
-		CheckOrigin: func(r *http.Request) bool {
-			return true // Allow all origins
-		},
 	}
 
 	// Thread-safe connected users map
@@ -96,10 +93,6 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	defer func() {
 		conn.Close()
-		connectedUsers.Lock()
-		delete(connectedUsers.m, userID)
-		connectedUsers.Unlock()
-		broadcastStatus(userID, username, false)
 	}()
 
 	for {
@@ -111,6 +104,10 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 			if !wsLib.IsCloseError(err, wsLib.CloseGoingAway, wsLib.CloseAbnormalClosure) {
 				log.Printf("WebSocket read errorfff: %v", err)
 			}
+			connectedUsers.Lock()
+			delete(connectedUsers.m, userID)
+			connectedUsers.Unlock()
+			BroadcastUsersList()
 			break
 		}
 		// broadcastStatus(userID, username, true)
@@ -190,7 +187,7 @@ type UsersList struct {
 	UserIDs      map[string]int       `json:"user_ids"`
 	LastMessages map[string]string    `json:"last_messages"`
 	LastTimes    map[string]time.Time `json:"last_times"`
-	UnreadCounts map[string]int       `json:"unread_counts"` // Added field for unread message counts
+	UnreadCounts map[string]int       `json:"unread_counts"`
 }
 
 func BroadcastUsersList() error {
@@ -238,7 +235,7 @@ func BroadcastUsersList() error {
 			).Scan(&lastMessage, &lastTime)
 
 			if err != nil {
-				lastMessages[username] = "No messages yet"
+				lastMessages[username] = ""
 				lastTimes[username] = time.Time{}
 			} else {
 				lastMessages[username] = lastMessage

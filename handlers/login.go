@@ -195,7 +195,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		JsResponse(w, http.StatusUnauthorized, false, RespondData)
 		return
 	}
-
+	Data.UserName = strings.Title(strings.ToLower(Data.UserName))
 	uid, err := database.CreateUser(DB, Data.FirstName, Data.LastName, Data.Gender, Age, Data.Email, Data.UserName, Data.Password)
 	if err != nil {
 		RespondData["message"] = "something wrong, please try later"

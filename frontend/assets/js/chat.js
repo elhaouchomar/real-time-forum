@@ -392,8 +392,9 @@ async function handleFriendClick(friend, userId, status, unreadCount) {
       </div>`;
   }
   messageOffset = 0;
-
-  fetchChatHistory(userId, messageOffset);
+  const limit = Math.round(document.querySelector(".messages-area").clientHeight / 44)
+  alert(limit)
+  fetchChatHistory(userId, messageOffset, limit);
   setupScrollListener(userId);
 }
 
@@ -426,12 +427,12 @@ function setupScrollListener(userId) {
 }
 
 // Chat History Functions
-async function fetchChatHistory(userId, offset = 0) {
+async function fetchChatHistory(userId, offset = 0, limit) {
 
   try {
 
     const response = await fetch(
-      `/api/chat/history?user_id=${userId}&offset=${offset}`, {
+      `/api/chat/history?user_id=${userId}&offset=${offset}&limit=${limit}`, {
       mode: "no-cors",
     }
     );
