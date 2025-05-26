@@ -22,8 +22,8 @@ var (
 	// Thread-safe connected users map
 	connectedUsers = struct {
 		sync.RWMutex
-		m map[int]*UserConnection
-	}{m: make(map[int]*UserConnection)}
+		m map[int][]*UserConnection
+	}{m: make(map[int][]*UserConnection)}
 )
 
 type UserConnection struct {
@@ -40,6 +40,10 @@ type Message struct {
 	Timestamp  time.Time `json:"timestamp"`
 	Type       string    `json:"type"`
 	Username   string    `json:"username"`
+}
+
+func RemoveConnection(userID int) {
+	delete(connectedUsers.m, userID)
 }
 
 func GetUsers(userID int) ([]string, error) {
@@ -61,7 +65,10 @@ func GetUsers(userID int) ([]string, error) {
 
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	check, userID := MiddleWear(w, r)
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 	if !check {
 		return
 	}
@@ -85,14 +92,37 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		UserID:   userID,
 	}
 
+	// Add this connection to the user's list
 	connectedUsers.Lock()
-	connectedUsers.m[userID] = userConn
+	connectedUsers.m[userID] = make([]*UserConnection, 0)
+	connectedUsers.m[userID] = append(connectedUsers.m[userID], userConn)
+	log.Printf("===> User %d connected. Total connections: %d", userID, len(connectedUsers.m[userID]))
 	connectedUsers.Unlock()
+
 	BroadcastUsersList()
 	broadcastStatus(userID, username, true)
 
 	defer func() {
 		conn.Close()
+<<<<<<< Updated upstream
+=======
+
+		connectedUsers.Lock()
+		conns := connectedUsers.m[userID]
+		for i, uc := range conns {
+			if uc == userConn {
+				connectedUsers.m[userID] = append(conns[:i], conns[i+1:]...)
+				break
+			}
+		}
+		if len(connectedUsers.m[userID]) == 0 {
+			delete(connectedUsers.m, userID)
+		}
+		connectedUsers.Unlock()
+
+		BroadcastUsersList()
+		broadcastStatus(userID, username, false)
+>>>>>>> Stashed changes
 	}()
 
 	for {
@@ -102,7 +132,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(msg)
 		if err != nil {
 			if !wsLib.IsCloseError(err, wsLib.CloseGoingAway, wsLib.CloseAbnormalClosure) {
-				log.Printf("WebSocket read errorfff: %v", err)
+				log.Printf("WebSocket read error: %v", err)
 			}
 			connectedUsers.Lock()
 			delete(connectedUsers.m, userID)
@@ -110,17 +140,17 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 			BroadcastUsersList()
 			break
 		}
+<<<<<<< Updated upstream
 		// broadcastStatus(userID, username, true)
+=======
+
+>>>>>>> Stashed changes
 		var receiver_id int
 		err = DB.QueryRow("SELECT id FROM users WHERE username = ?;", msg.Username).Scan(&receiver_id)
 		if err != nil || receiver_id == userID {
-
-			connectedUsers.Lock()
-			delete(connectedUsers.m, userID)
-			connectedUsers.Unlock()
 			break
-
 		}
+
 		msg.SenderID = userID
 		msg.ReceiverID = receiver_id
 		msg.Timestamp = time.Now()
@@ -130,8 +160,8 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 			log.Printf("Error saving message: %v", err)
 			continue
 		}
-		sendPrivateMessage(msg)
 
+		sendPrivateMessage(msg)
 	}
 }
 
@@ -171,10 +201,12 @@ func broadcastMessage(msg Message) {
 	defer connectedUsers.RUnlock()
 
 	for _, conn := range connectedUsers.m {
-		if conn.UserID != msg.SenderID {
-			err := conn.Conn.WriteJSON(msg)
-			if err != nil {
-				log.Printf("Error sending message to user %d: %v", conn.UserID, err)
+		for _, eachConn := range conn {
+			if eachConn.UserID != msg.SenderID {
+				err := eachConn.Conn.WriteJSON(msg)
+				if err != nil {
+					log.Printf("Error sending message to user %d: %v", eachConn.UserID, err)
+				}
 			}
 		}
 	}
@@ -195,6 +227,7 @@ func BroadcastUsersList() error {
 	defer connectedUsers.Unlock()
 
 	for currentUserID, conn := range connectedUsers.m {
+<<<<<<< Updated upstream
 		usernames, err := GetUsers(currentUserID)
 		if err != nil {
 			log.Printf("Error getting users for user %d: %v", currentUserID, err)
@@ -209,10 +242,15 @@ func BroadcastUsersList() error {
 
 		for _, username := range usernames {
 			userID, err := GetUserIDByUsername(username)
+=======
+		for _, EachConn := range conn {
+			usernames, err := GetUsers(currentUserID)
+>>>>>>> Stashed changes
 			if err != nil {
-				log.Printf("Error getting user ID for %s: %v", username, err)
+				log.Printf("Error getting users for user %d: %v", currentUserID, err)
 				continue
 			}
+<<<<<<< Updated upstream
 			userIDs[username] = userID
 
 			// Check if user is online
@@ -277,10 +315,91 @@ func BroadcastUsersList() error {
 			LastTimes:    lastTimes,
 			UnreadCounts: unreadCounts,
 		}
+=======
 
-		err = conn.Conn.WriteJSON(usersList)
-		if err != nil {
-			log.Printf("Error sending users list to user %d: %v", conn.UserID, err)
+			userStatuses := make(map[string]string)
+			userIDs := make(map[string]int)
+			lastMessages := make(map[string]string)
+			lastTimes := make(map[string]time.Time)
+			unreadCounts := make(map[string]int)
+
+			for _, username := range usernames {
+				userID, err := GetUserIDByUsername(username)
+				if err != nil {
+					log.Printf("Error getting user ID for %s: %v", username, err)
+					continue
+				}
+				userIDs[username] = userID
+
+				// Check if user is online
+				userStatuses[username] = "offline"
+				for _, c := range connectedUsers.m {
+					for _, EachConn := range c {
+						if EachConn.Username == username {
+							userStatuses[username] = "online"
+							break
+						}
+					}
+				}
+
+				// Get last message
+				var lastMessage string
+				var lastTime time.Time
+				err = DB.QueryRow(`
+					SELECT content, timestamp FROM messages 
+					WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) 
+					ORDER BY timestamp DESC LIMIT 1`,
+					userID, currentUserID, currentUserID, userID,
+				).Scan(&lastMessage, &lastTime)
+
+				if err != nil {
+					lastMessages[username] = ""
+					lastTimes[username] = time.Time{}
+				} else {
+					lastMessages[username] = lastMessage
+					lastTimes[username] = lastTime
+				}
+
+				// Count unread messages
+				var count int
+				err = DB.QueryRow("SELECT COUNT(*) FROM messages WHERE sender_id = ? AND receiver_id = ? AND read = 0", userID, currentUserID).Scan(&count)
+				if err != nil {
+					unreadCounts[username] = 0
+				} else {
+					unreadCounts[username] = count
+				}
+			}
+
+			// Sorting users
+			sort.Slice(usernames, func(i, j int) bool {
+				// Sort by last message timestamp
+				if lastTimes[usernames[i]].IsZero() && lastTimes[usernames[j]].IsZero() {
+					return usernames[i] < usernames[j] // Sort alphabetically if no timestamps
+				}
+				if lastTimes[usernames[i]].IsZero() {
+					return false
+				}
+				if lastTimes[usernames[j]].IsZero() {
+					return true
+				}
+				return lastTimes[usernames[i]].After(lastTimes[usernames[j]])
+			})
+
+			usersList := UsersList{
+				Type:         "users_list",
+				Usernames:    usernames,
+				UserStatuses: userStatuses,
+				UserIDs:      userIDs,
+				LastMessages: lastMessages,
+				LastTimes:    lastTimes,
+				UnreadCounts: unreadCounts,
+			}
+>>>>>>> Stashed changes
+
+			err = EachConn.Conn.WriteJSON(usersList)
+			if err != nil {
+				log.Printf("Error sending users list to user %d: %v", EachConn.UserID, err)
+			}
 		}
 	}
 	return nil
@@ -288,7 +407,11 @@ func BroadcastUsersList() error {
 
 func MarkMessagesAsRead(w http.ResponseWriter, r *http.Request) {
 	// Ensure the request method is POST or PUT
+<<<<<<< Updated upstream
 	var Data = map[string]any{
+=======
+	Data := map[string]any{
+>>>>>>> Stashed changes
 		"status":  false,
 		"message": "",
 	}
@@ -359,9 +482,14 @@ func sendPrivateMessage(msg Message) {
 	defer connectedUsers.Unlock()
 
 	if conn, ok := connectedUsers.m[msg.ReceiverID]; ok {
-		err := conn.Conn.WriteJSON(msg)
-		if err != nil {
-			log.Printf("Error sending private message: %v", err)
+		for _, eachConn := range conn {
+			fmt.Println("Sending private message to user:", eachConn.Username)
+			fmt.Println("Sending private message to user:", eachConn.Conn.LocalAddr())
+			fmt.Println("Sending private message to user:", eachConn.Conn.RemoteAddr())
+			err := eachConn.Conn.WriteJSON(msg)
+			if err != nil {
+				log.Printf("Error sending private message: %v", err)
+			}
 		}
 	} else {
 		log.Printf("User %d is not connected", msg.ReceiverID)

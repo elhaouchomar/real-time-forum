@@ -29,6 +29,22 @@ func init() {
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
+<<<<<<< Updated upstream
+=======
+	c, err := r.Cookie("session")
+	if err != nil {
+		c = &http.Cookie{}
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	uid, err := database.GetUidFromToken(DB, c.Value)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	RemoveConnection(uid)
+
+>>>>>>> Stashed changes
 	DeleteAllCookie(w, r)
 	JsResponse(w, 200, true, nil)
 }
@@ -68,8 +84,13 @@ func Checker(w http.ResponseWriter, r *http.Request) {
 	}
 	JsResponse(w, status, check, data)
 }
+
 func Login(w http.ResponseWriter, r *http.Request) {
+<<<<<<< Updated upstream
 	var data = map[string]any{
+=======
+	data := map[string]any{
+>>>>>>> Stashed changes
 		"status":  false,
 		"token":   "",
 		"message": "",
@@ -128,11 +149,17 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	data["status"] = true
 	data["token"] = token
 	JsResponse(w, http.StatusOK, true, data)
+<<<<<<< Updated upstream
 
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {
 
+=======
+}
+
+func Register(w http.ResponseWriter, r *http.Request) {
+>>>>>>> Stashed changes
 	var Data struct {
 		Email     string
 		UserName  string
@@ -141,6 +168,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		LastName  string
 		Password  string
 		Age       string
+<<<<<<< Updated upstream
 	}
 	var RespondData = map[string]any{
 		"status":  false,
@@ -149,6 +177,46 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewDecoder(r.Body).Decode(&Data)
 
+	if (!email_RGX.MatchString(Data.Email)) ||
+		(!username_RGX.MatchString(Data.UserName)) {
+		RespondData["message"] = "Email or Username is not valid."
+		JsResponse(w, http.StatusBadRequest, false, RespondData)
+		return
+	}
+
+	exist := CheckUserExists(Data.Email, Data.UserName)
+	if exist {
+		RespondData["message"] = "email or username already taken."
+		JsResponse(w, http.StatusBadRequest, false, RespondData)
+		return
+=======
+	}
+	RespondData := map[string]any{
+		"status":  false,
+		"token":   "",
+		"message": "",
+>>>>>>> Stashed changes
+	}
+	json.NewDecoder(r.Body).Decode(&Data)
+
+<<<<<<< Updated upstream
+	if !(validpassword(Data.Password)) {
+		RespondData["message"] = "Password is not valid."
+		JsResponse(w, http.StatusBadRequest, false, RespondData)
+		return
+	}
+	if strings.Trim(Data.FirstName, " ") == "" || strings.Trim(Data.LastName, " ") == "" {
+		RespondData["message"] = "Please Enter your First And Last Name."
+		JsResponse(w, http.StatusBadRequest, false, RespondData)
+		return
+	}
+	Data.Gender = strings.ToLower(Data.Gender)
+	if Data.Gender != "male" && Data.Gender != "female" {
+		RespondData["message"] = "Please Enter your Gender."
+		JsResponse(w, http.StatusBadRequest, false, RespondData)
+		return
+	}
+=======
 	if (!email_RGX.MatchString(Data.Email)) ||
 		(!username_RGX.MatchString(Data.UserName)) {
 		RespondData["message"] = "Email or Username is not valid."
@@ -179,6 +247,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		JsResponse(w, http.StatusBadRequest, false, RespondData)
 		return
 	}
+>>>>>>> Stashed changes
 	Age, err := strconv.Atoi(Data.Age)
 	if err != nil {
 		RespondData["message"] = "Please Enter the age."

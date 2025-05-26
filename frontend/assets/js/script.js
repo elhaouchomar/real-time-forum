@@ -26,7 +26,10 @@ export async function fetchPosts(offset, type, where) {
       }${username ? `&username=${username}` : ""}`
     );
     const posts = await response.json();
+<<<<<<< Updated upstream
     console.log("POST +>>>>>>>", posts);
+=======
+>>>>>>> Stashed changes
 
     if (posts) {
       if (type == "profile"){
@@ -35,7 +38,14 @@ export async function fetchPosts(offset, type, where) {
       updateCategoriesCount(posts.categories)
       if (posts.posts) {
         posts.posts.forEach((post) => {
+<<<<<<< Updated upstream
           postsContainer.append(createPostCard(post));
+=======
+          // const elem = document.querySelector(`.post-card #${post.post_id}`)
+          if (!document.querySelector(`.post-header [id='${post.post_id}']`)) {
+              postsContainer.append(createPostCard(post));
+          }
+>>>>>>> Stashed changes
         });
       }
 
@@ -181,6 +191,7 @@ function createDislikeCounter(post) {
   return dislikeCounter;
 }
 
+<<<<<<< Updated upstream
 function selectedItem(id) {
   console.log("Element Selected", id);
   
@@ -198,6 +209,8 @@ function selectedItem(id) {
   })
 
 }
+=======
+>>>>>>> Stashed changes
 export function infiniteScroll(where) {
   console.log("infiniteScroll This is called from ", where);
   const themeToggle = document.querySelectorAll("#switch");
@@ -207,7 +220,11 @@ export function infiniteScroll(where) {
   var UrlParams = new URLSearchParams(window.location.search);
   const type = UrlParams.get("type");
 
+<<<<<<< Updated upstream
   let offset = 10;
+=======
+  let offset = 0;
+>>>>>>> Stashed changes
   let timeout = null;
   window.addEventListener("scroll", () => {
     clearTimeout(timeout);
@@ -215,6 +232,10 @@ export function infiniteScroll(where) {
       const { scrollTop, scrollHeight, clientHeight } =
         document.documentElement;
       if (scrollTop + clientHeight >= scrollHeight - 5) {
+<<<<<<< Updated upstream
+=======
+        offset += 10;
+>>>>>>> Stashed changes
         await fetchPosts(offset, type, "infiniteScroll");
 
       }
@@ -264,7 +285,10 @@ export function infiniteScroll(where) {
 
       ChangeUrl(LinkHref)
       LoadPage(type, null, null, true)
+<<<<<<< Updated upstream
       setTimeout(selectedItem(elem.id), 2000)
+=======
+>>>>>>> Stashed changes
 
     })
   })
@@ -454,19 +478,64 @@ export function NotifyButtons() {
 
 }
 
+<<<<<<< Updated upstream
+=======
+function showChatBox() {
+  if (window.friends_list && window.chat_box) {
+    window.friends_list.style.display = "none";
+    window.chat_box.style.display = "flex";
+  }
+}
+
+function showFriendsList() {
+  if (window.friends_list && window.chat_box) {
+    window.friends_list.style.display = "block";
+    window.chat_box.style.display = "none";
+  }
+}
+function closeMessageArea() {
+  if (window.area_msg && window.post && window.notif) {
+    window.area_msg.style.display = "none";
+    window.post.style.display = "flex";
+    window.notif.style.display = "flex";
+  }
+}
+
+
+>>>>>>> Stashed changes
 function handleMediaChange(event) {
   const commentSection = document.querySelector(".postComments");
   const postSection = document.querySelector(".ProfileAndPost");
   const friendsList = document.querySelector(".friends-list");
   if (event.matches) {
+<<<<<<< Updated upstream
     friendsList.style.display = "block"
+=======
+    if (friendsList)
+      friendsList.style.display = "block"
+>>>>>>> Stashed changes
     if (postSection) {
       postSection.style.display = "flex"
       commentSection.style.display = "flex"
     }
+<<<<<<< Updated upstream
 
   } else {
     commentSection.style.display = "none"
+=======
+    const friend = document.querySelector(".friend");
+    const back = document.querySelector(".back");
+    const close_message = document.querySelector(".close-message");
+
+    if (friend) friend.addEventListener("click", showChatBox);
+    if (back) back.addEventListener("click", showFriendsList);
+    if (close_message){
+      close_message.addEventListener("click", closeMessageArea);
+    }
+  } else {
+    if (postSection)
+      commentSection.style.display = "none"
+>>>>>>> Stashed changes
   }
 }
 windowMedia.addEventListener('change', handleMediaChange)

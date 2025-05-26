@@ -47,11 +47,20 @@
   height: calc(100% - 70px);
   overflow-y: auto;
   padding-bottom: 40px;
+<<<<<<< Updated upstream
+=======
+  position: relative;
+  z-index: 2;
+>>>>>>> Stashed changes
 }
 #chat {
   margin-bottom: 70px;
   overflow-y: auto;
   height: 100%;
+<<<<<<< Updated upstream
+=======
+  position: relative;
+>>>>>>> Stashed changes
 }
 
 .messages {

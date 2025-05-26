@@ -43,6 +43,7 @@ export function initChat() {
   sendButton.addEventListener("click", sendMessage);
   messageInput.addEventListener("keypress", handleKeyPress);
 
+<<<<<<< Updated upstream
   if (window.innerWidth <= 780) {
     const friend = document.querySelector(".friend");
     const back = document.querySelector(".back");
@@ -54,6 +55,8 @@ export function initChat() {
       close_message.addEventListener("click", closeMessageArea);
     }
   }
+=======
+>>>>>>> Stashed changes
 }
 
 function handleDocumentClick(event) {
@@ -66,6 +69,7 @@ function handleDocumentClick(event) {
     area_msg.style.display = "flex";
     right_side_bare.style.display = "none";
     post.style.display = "none"
+<<<<<<< Updated upstream
   }
 }
 
@@ -187,6 +191,109 @@ function handleIncomingMessage(data) {
   }
 }
 
+=======
+  }
+}
+
+function handleKeyPress(e) {
+  if (e.key === "Enter") {
+    sendMessage();
+  }
+}
+
+
+
+
+// WebSocket Functions
+export function connectWebSocket() {
+
+  try {
+    ws = new WebSocket("ws://localhost:9090/ws");
+    if (!spa.Logged) {
+      ws.close();
+    }
+    ws.onopen = () => console.log("Connected to chat server");
+    ws.onmessage = handleWebSocketMessage;
+    ws.onerror = (event) => console.error("WebSocket error:", event);
+    ws.onclose = () => {
+      console.log("Disconnected from chat server, attempting to reconnect...");
+    };
+  } catch (error) {
+    console.error("WebSocket connection error:", error);
+    setTimeout(connectWebSocket, 5000);
+  }
+}
+
+async function handleWebSocketMessage(event) {
+  const response = await apiRequest("checker")
+  if (!response || !response.status) {
+    spa.ChangeUrl("login")
+    return
+  }
+  try {
+    const data = JSON.parse(event.data);
+
+    if (data.type === "users_list") {
+      addFriend(
+        data.usernames,
+        data.user_ids,
+        data.user_statuses,
+        data.last_messages,
+        data.last_times,
+        data.unread_counts
+      );
+      return;
+    }
+
+    if (data.type === "message") {
+      handleIncomingMessage(data);
+    }
+
+  } catch (error) {
+    console.error("Error processing WebSocket message:", error);
+  }
+}
+
+function handleIncomingMessage(data) {
+  const time = new Date(data.timestamp || new Date()).toLocaleTimeString([], {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  let activeUserId = getActiveChatUserId();
+
+  console.log("Active User ID:", activeUserId, "Sender ID:", data.receiver_id);
+  console.log(data.sender_id, activeUserId);
+  console.log("omar : ", data);
+
+  if (activeUserId === data.sender_id) {
+    markMessagesAsRead(activeUserId)
+    const messagesContainer =
+      window.messagesArea ||
+      document.getElementById("messages") ||
+      document.getElementById("messages-area");
+    if (messagesContainer) {
+      const messageElement = createMessageElement(
+        data.content,
+        time,
+        "received",
+        data.username
+      );
+      messagesContainer.appendChild(messageElement);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    } else {
+      console.error("Messages container not found!");
+    }
+  } else {
+    showNotification()
+    console.log("Message has been recived from", data.username);
+  }
+}
+
+>>>>>>> Stashed changes
 function getActiveChatUserId() {
   const statusElement = document.querySelector(".status[id^='user-status-']");
   if (statusElement && statusElement.id) {
@@ -341,7 +448,11 @@ function addFriend(
           }</div>
             </div>
             <div class="time-notif">
+<<<<<<< Updated upstream
                 <div class="last-time">${lastTime}</div>
+=======
+                ${elem.classList.contains("home") ? ""  : `<div class="last-time">${lastTime}</div>`}
+>>>>>>> Stashed changes
                 <div class="notification ${unreadCount === 0 ? "hidden" : ""
           }">${unreadCount}</div>
             </div>
@@ -353,6 +464,10 @@ function addFriend(
         elem.appendChild(friendElement)
         messagesArea.scrollTop = messagesArea.scrollHeight;
       });
+<<<<<<< Updated upstream
+=======
+      
+>>>>>>> Stashed changes
     }
   })
   

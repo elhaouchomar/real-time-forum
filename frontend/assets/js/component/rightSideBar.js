@@ -16,7 +16,11 @@ export function RightSideBar(){
         
         <div class="MessageCard">
             <div class="friends-list-right">
+<<<<<<< Updated upstream
                 <div class="allfriends"></div>
+=======
+                <div class="allfriends home"></div>
+>>>>>>> Stashed changes
             </div> 
         </div>
         <div class="Categories ">
